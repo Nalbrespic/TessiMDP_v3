@@ -1,0 +1,7 @@
+tmd_zpl_homepage:
+    path:     /etiquettes
+    defaults: { _controller: TMDZplBundle:Default:index }
+
+tmd_zpl_imprimEtiq:
+    path:     /printZpl
+    defaults: { _controller: TMDZplBundle:Default:imprimEtiq }

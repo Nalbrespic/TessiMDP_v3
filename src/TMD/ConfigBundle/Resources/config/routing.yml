@@ -1,0 +1,9 @@
+tmd_config_homepage:
+    path:     /
+    defaults: { _controller: TMDConfigBundle:Gestion:index }
+
+tmd_config_addnews:
+    path:     /addnew
+    defaults:
+        _controller: TMDConfigBundle:Gestion:addnew
+

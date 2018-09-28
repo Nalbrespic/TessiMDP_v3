@@ -1,0 +1,3 @@
+tmd_icomed_homepage:
+    path:     /
+    defaults: { _controller: TMDIcomedBundle:Icomed:index }

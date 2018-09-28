@@ -1,0 +1,27 @@
+{
+    "name": "lazeemenu",
+    "description": "Multi-level sidebar menu - JQuery plugin",
+    "version": "0.0.1",
+    "authors": [
+        "Jakob Vad Nielsen"
+    ],
+    "license": "BSD",
+    "homepage": "https://github.com/lazee/lazeemenu",
+    "moduleType": [
+        "amd",
+        "globals",
+        "node"
+    ],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "keywords": [
+        "menu",
+        "navigation",
+        "sidebar"
+    ]
+}

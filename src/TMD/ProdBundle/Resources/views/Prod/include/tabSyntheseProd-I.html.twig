@@ -1,0 +1,190 @@
+<div class="col-md-7" >
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#details" aria-controls="home" role="tab" data-toggle="tab">Synthese</a></li>
+        <li role="presentation"><a href="#transport" aria-controls="profile" role="tab" data-toggle="tab">Transport</a></li>
+        <li role="presentation"><a href="#test" aria-controls="home" role="tab" data-toggle="tab">SiteProd</a></li>
+        <li role="presentation"><a href="#article" aria-controls="home" role="tab" data-toggle="tab">Articles</a></li>
+    </ul>
+
+    <div class="tab-content" >
+        <div role="tabpanel" class="tab-pane active" id="details" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de fichiers:    </p></div>
+                        <div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">{{ files|length }}    </p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9" style="margin-bottom: -8px;"><p >Total des commandes:     </p></div>
+                        <div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">{% set nbTot = 0 %} {% for file in nbTrByFile %}{%  set nbTot = nbTot + file %}  {% endfor %}{{ nbTot }}</p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL crée:     </p></div>
+                        <div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">{% set nbTotbb = 0 %} {% for file in nbBlbyfile %}{% if file['nbBl'] is defined %}{%  set nbTotbb = nbTotbb + file['nbBl'] %}{% endif %}{% endfor %}{{ nbTotbb }}</p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL en réclamation:     </p></div>
+                        <div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">{% set nbTotbb = 0 %} {% for file in nbBlbyfile %}{% if file['articlesReclamation'] is defined %}{%  set nbTotbb = nbTotbb + file['articlesReclamation'] %}{% endif %}{% endfor %}{{ nbTotbb }}</p></div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="row">
+                        <div class="col-md-7" style="margin-bottom: -8px;"><p >Attente PROD:    </p></div>
+                        <div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;width: 40px;{% if quantiteBlaProduire == 0 %}background-color: #B3D6C2;{% endif %}">{{ quantiteBlaProduire }}   </p></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7" style="margin-bottom: -8px;"><p >Date premiere production:    </p></div>
+                        <div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;">{% if dateMinProdByApplication|date("d/m/Y") == "01/01/2040" %}Non renseigné{% else %}{{ dateMinProdByApplication|date("d/m/Y h:i") }}{% endif %}    </p></div>
+                    </div>
+                    <span id="dateMaxProd" style="display: none;">{{ dateMaxProdByApplication|date("Y-m-d") }}</span>
+                    <div class="row">
+                        <div class="col-md-7" style="margin-bottom: -8px;"><p >Date dernière production:</p></div>
+                        <div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;">{% if dateMaxProdByApplication|date("d/m/Y") == "01/01/1980" %}Non renseigné{% else %}{{ dateMaxProdByApplication|date("d/m/Y h:i") }}{% endif %} </p></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div role="tabpanel" class="tab-pane" id="transport" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">
+            <div class="row">
+                {%  for key, val in syntheseTransport  %}
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-8" style="margin-bottom: -8px;"><p style="font-size: 0.9em;">{{ key }} :    </p></div>
+                            <div class="col-md-2"><p style="font-size: 1.2em;margin-bottom: -8px;">{{ val }}    </p></div>
+                        </div>
+
+                    </div>
+
+
+                {% endfor %}
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="test" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">
+            <div class="row">
+
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="article" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">
+            <div class="row" >
+                <div class="col-md-12" style="padding-right: 27px;">
+                    {% if syntheseArticle['tot']is defined %}
+                        {% if syntheseArticle['tot']|length > 0 %}
+                            <div class="row" >
+                                <div class="col-md-12" style="margin-top: -7px;">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <p></p>
+                                        </div>
+                                        <div class="col-md-2" style="padding: 0;">
+                                            <p>Quantité totale</p>
+                                        </div>
+                                        <div class="col-md-2" style="padding: 0;">
+                                            <p>Reste à produire</p>
+                                        </div>
+                                    </div>
+                                    <div class="row" >
+                                        <div class="col-md-offset-5 col-md-7" >
+                                            <hr style="margin: -9px -20px;border: 0.2px #504A62 solid;" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="overflow-y: scroll;max-height: 105px;overflow-x: hidden;">
+                                <div class="col-md-12">
+                                    {% set compt = 0 %}
+                                    {% set compt1 = 0 %}
+                                    {% if syntheseArticle['tot'][0] is defined %}
+                                        {% for key,val in syntheseArticle['tot'][0]  %}
+                                            <div class="row">
+                                                <div class="col-md-8" style="margin-bottom: -14px;">
+                                                    {% if key is not empty %}
+                                                        <p >{{ key }}:</p>
+                                                    {% else %}
+                                                        <p>libelle non renseigné</p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-2" style="margin-bottom: -14px;">
+                                                    <p style="font-size: 1.2em;text-align: right;">{{ val }}</p>
+                                                    {% set compt = compt + val %}
+                                                </div>
+                                                {%  if syntheseArticle['aProd'][0] is defined %}
+                                                    {% for key2, val2 in syntheseArticle['aProd'][0] %}
+                                                        {% if  key|split('-> ')[1] == key2 %}
+                                                            <div class="col-md-2" style="margin-bottom: -14px;">
+                                                                <p style="font-size: 1.2em;color: brown;">{{ val2 }}</p>
+                                                            </div>
+                                                            {% set compt1 = compt1 + val2 %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+
+                                        {% endfor %}
+                                        <div class="row">
+                                            <div class="col-md-8" style="margin-bottom: -14px;">
+                                                <p style="font-size: 1.3em;">Total articles:</p>
+                                            </div>
+                                            <div class="col-md-2" style="margin-bottom: -14px;">
+                                                <p style="font-size: 1.3em;text-align: right;">{{ compt }}</p>
+                                            </div>
+                                            <div class="col-md-2" style="margin-bottom: -14px;">
+                                                <p style="font-size: 1.3em;color: brown;">{{ compt1 }}</p>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <hr>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                        {% if syntheseArticle['tot'][1] is defined %}
+                                        {% for key,val in syntheseArticle['tot'][1]  %}
+                                            <div class="row">
+                                                <div class="col-md-8" style="margin-bottom: -14px;">
+                                                    {% if key is not empty %}
+                                                        <p >{{ key }}:</p>
+                                                    {% else %}
+                                                        <p>libelle non renseigné</p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-md-2" style="margin-bottom: -14px;">
+                                                    <p style="font-size: 1.2em;text-align: right;">{{ val }}</p>
+                                                </div>
+                                                {% if syntheseArticle['aProd'][1] is defined %}
+                                                    {% for key2, val2 in syntheseArticle['aProd'][1] %}
+                                                        {#{{ dump(key|split('-')[1]) }}-{{ dump(key2) }}#}
+                                                        {% if  key|split('-> ')[1] == key2 %}
+                                                            <div class="col-md-2" style="margin-bottom: -14px;">
+                                                                <p style="font-size: 1.2em;color: brown;">{{ val2 }}</p>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-md-12">
+                                <p><span style="font-size: 1.2em;">pas d'articles enregistrés</span></p>
+                            </div>
+
+                        {% endif %}
+                    {% else %}
+                        <div class="col-md-12">
+                            <p><span style="font-size: 1.2em;">pas d'articles enregistrés</span></p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+

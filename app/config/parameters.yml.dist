@@ -1,0 +1,29 @@
+# This file is a "template" of what your parameters.yml file should look like
+# Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
+# https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
+parameters:
+    database_host: TMDPVLBDDPROD.sfdd78.fr
+    database_port: null
+    database_name: ecommerce
+    database_user: Tessi_Admin
+    database_password: TessiAdmin2013?#
+
+    database_host2: TMDPVLBDDPROD.sfdd78.fr
+    database_port2: null
+    database_name2: colisprive
+    database_user2: Tessi_Admin
+    database_password2: TessiAdmin2013?#
+
+    database_host3: TMDPVLBDDPROD.sfdd78.fr
+    database_port3: null
+    database_name3: dpd
+    database_user3: Tessi_Admin
+    database_password3: TessiAdmin2013?#
+
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+
+    secret: 4917b9facfbf092fb2be549b5ade4727dbea23c4
+    session_max_idle_time: 10

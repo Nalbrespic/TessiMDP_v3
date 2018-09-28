@@ -1,0 +1,3 @@
+tmd_colis_prive_homepage:
+    path:     /
+    defaults: { _controller: TMDColisPriveBundle:Default:index }

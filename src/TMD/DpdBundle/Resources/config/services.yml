@@ -1,0 +1,4 @@
+services:
+#    tmd_dpd.example:
+#        class: TMD\DpdBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -1,0 +1,71 @@
+{% set nbrSelect = 0 %}
+
+
+
+<div class="row" style="margin-top: 8px;">
+    <div class="col-md-10">
+        <label class="radio-inline">
+            <input type="radio" name="modeTracking" id="inlineRadio1" value="1" > Mois precedent
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="modeTracking" id="inlineRadio2" value="2" > Mois en cours
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="modeTracking" id="inlineRadio3" value="3" > tout selectionner
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="modeTracking" id="inlineRadio4" value="4"  style="display: none;">
+        </label>
+        <label>
+            <input  id="date-range0"  name="modeTr" size="40" value="" style="width: 160px;"> Par date
+        </label>
+        <p></p>
+    </div>
+</div>
+
+
+<div class="row" style="position: relative;">
+
+
+
+    <div class="col-md-offset-2 col-md-6">
+        <table class="table table-bordered table-striped tableSynthese" style="text-align: center;">
+            <tr class="active">
+                <th colspan="4" style="text-align: center;">Fichiers réceptionnés</th>
+
+            </tr>
+            <tr style="background-color: #DFD8DF;border-bottom: 2px solid #504A62;font-size: .9em;">
+                <th>Trackings</th>
+                <th>Date Fichier</th>
+                <th>Nom Fichier</th>
+                {#<th>ifFile</th>#}
+
+            </tr>
+            <div id="selectUniqTracking" class="widget">
+
+                {% for file in filesTot %}
+                    <tr>
+                        <td style="padding: inherit;">
+                            <label class="checkbox-inline">
+                                <input type="checkbox"  name="selecTrack{{ loop.index }}" id="trackSelect{{   loop.index }}" value="{{ file['idfile'] }}"  style="position: inherit;">
+                            </label></td>
+                        <td id="dateTracking{{   loop.index }}" style="padding: inherit;">{{ file['dateFile']|date("d/m/Y") }}</td>
+                        <td style="padding: inherit;"> {{ file['filename']   }}</td>
+                    </tr>
+                    <span id="idFileTracking{{   loop.index }}" style="padding: inherit;display: none;">{{ file['idfile'] }}</span>
+                    <span id="dateTracking{{   loop.index }}" style="padding: inherit;display: none;" >{{ file['dateFile']|date("Y/m/d") }}</span>
+                    {% set nbrSelect = nbrSelect + 1 %}
+                {% endfor %}
+            </div>
+        </table>
+    </div>
+
+    <div class="col-md-2 topExport" style="position: fixed;bottom:2em;right: 0;">
+        <p  id="exportTracking"></p>
+        <span id="nbrSelect" style="display: none;">{{ nbrSelect }}</span>
+    </div>
+
+
+
+
+</div>

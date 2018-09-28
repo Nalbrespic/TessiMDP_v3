@@ -1,0 +1,190 @@
+<?php
+
+namespace TMD\ProdBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * ViewBlApp
+ *
+ * @ORM\Table(name="bl_app", )
+ * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\ViewBlAppRepository", readOnly=true)
+ */
+class ViewBlApp
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="idBL", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $idBL;
+
+    /**
+     * @var string
+     */
+    private $bL;
+
+    /**
+     * @var string
+     */
+    private $nCOLIS;
+
+    /**
+     * @var \DateTime
+     */
+    private $dateProduction;
+
+    /**
+     * @var int
+     */
+    private $idAppli;
+
+    /**
+     * @var int
+     */
+    public $idFile;
+
+
+
+    /**
+     * Set idBL
+     *
+     * @param integer $idBL
+     *
+     * @return ViewBlApp
+     */
+    public function setIdBL($idBL)
+    {
+        $this->idBL = $idBL;
+
+        return $this;
+    }
+
+    /**
+     * Get idBL
+     *
+     * @return int
+     */
+    public function getIdBL()
+    {
+        return $this->idBL;
+    }
+
+    /**
+     * Set bL
+     *
+     * @param string $bL
+     *
+     * @return ViewBlApp
+     */
+    public function setBL($bL)
+    {
+        $this->bL = $bL;
+
+        return $this;
+    }
+
+    /**
+     * Get bL
+     *
+     * @return string
+     */
+    public function getBL()
+    {
+        return $this->bL;
+    }
+
+    /**
+     * Set nCOLIS
+     *
+     * @param string $nCOLIS
+     *
+     * @return ViewBlApp
+     */
+    public function setNCOLIS($nCOLIS)
+    {
+        $this->nCOLIS = $nCOLIS;
+
+        return $this;
+    }
+
+    /**
+     * Get nCOLIS
+     *
+     * @return string
+     */
+    public function getNCOLIS()
+    {
+        return $this->nCOLIS;
+    }
+
+    /**
+     * Set dateProduction
+     *
+     * @param \DateTime $dateProduction
+     *
+     * @return ViewBlApp
+     */
+    public function setDateProduction($dateProduction)
+    {
+        $this->dateProduction = $dateProduction;
+
+        return $this;
+    }
+
+    /**
+     * Get dateProduction
+     *
+     * @return \DateTime
+     */
+    public function getDateProduction()
+    {
+        return $this->dateProduction;
+    }
+
+    /**
+     * Set idAppli
+     *
+     * @param integer $idAppli
+     *
+     * @return ViewBlApp
+     */
+    public function setIdAppli($idAppli)
+    {
+        $this->idAppli = $idAppli;
+
+        return $this;
+    }
+
+    /**
+     * Get idAppli
+     *
+     * @return int
+     */
+        public function getIdAppli()
+        {
+            return $this->idAppli;
+    }
+
+    /**
+     * Get idFile
+     *
+     * @return int
+     */
+    public function getIdFile()
+    {
+        return $this->idFile;
+    }
+
+    /**
+     * @param integer $idFile
+     */
+    public function setIdFile($idFile)
+    {
+        $this->idFile = $idFile;
+    }
+
+
+}

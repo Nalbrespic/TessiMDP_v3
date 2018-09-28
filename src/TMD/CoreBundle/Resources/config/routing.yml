@@ -1,0 +1,21 @@
+tmd_core_homepage:
+    path:     /
+    defaults: { _controller: TMDCoreBundle:Core:index }
+
+tmd_core_productionJour:
+    path: /prodDuJour
+    defaults:
+        _controller: TMDCoreBundle:Core:prodJour
+    methods: [POST]
+
+tmd_core_productionVeille:
+    path: /prodVeille
+    defaults:
+        _controller: TMDCoreBundle:Core:prodVeille
+    methods: [POST]
+
+tmd_core_donneResteProd:
+    path: /ResteProd
+    defaults:
+        _controller: TMDCoreBundle:Core:resteProd
+    methods: [POST]

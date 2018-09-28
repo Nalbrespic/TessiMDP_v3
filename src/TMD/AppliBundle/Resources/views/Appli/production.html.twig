@@ -1,0 +1,914 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Production
+{% endblock %}
+
+
+{% block styleChild %}
+    style="display: none;"
+{% endblock %}
+
+{% block body %}
+    <script type="text/javascript">
+        var OSName="Unknown OS";
+        if (navigator.appVersion.indexOf("Win")!==-1) OSName="Windows";
+        //{
+        //OSName="Windows";
+//        document.write('<a href="ZebraWebPrint.exe" class="navbar-brand" href="#">Download the '+OSName+' App</a>');
+        //}
+        if (navigator.appVersion.indexOf("Mac")!==-1) OSName="MacOS";
+        if (navigator.appVersion.indexOf("X11")!==-1) OSName="UNIX";
+        if (navigator.appVersion.indexOf("Linux")!==-1) OSName="Linux";
+
+    </script>
+
+
+    <div id ="jojotest" class="modal fade modalErrorZpl" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="false">
+        <div class="modal-dialog modal-sm" role="document" >
+            <div class="modal-content" style="width: 100%;margin-top: 57%;">
+                <div class="modal-header" style="padding: 3px;">
+
+                    <h4 class="modal-title" id="myModalLabel">Erreur</h4>
+                </div>
+                <div class="modal-body">
+                   <p id="error_message"></p> L'imprimante n'est pas connectée !
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: 1px;">Etiquettes ZPL </h3>
+            </div>
+        </div>
+    </div>
+    {% if etat != "nc" %}
+    <div class="row" >
+
+        <div class="col-md-7 col-md-offset-4" id="barre" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;font-family: initial;height: 34px;{% if etat == 1 or etat == 2 or etat == 3 %}background: #d34026;{% endif %}">
+            <div class="row">
+                <div  class="col-md-7">{{ apresScan }}{% if etat == '0' %}<span id="recupEtatProd" style="display: none;">{{ etat }}</span>  {% endif %} </div>
+                {% if button is defined and button %}
+                    <div class="col-md-3"><button onclick="sendData({{  blCmd.bl.numbl }})" style="margin-bottom: 9px;" type="button" class="btn btn-default  btn-xs">Re-imprimer etiquette</button></div>
+                {% endif %}
+                <div class="col-md-1 " id="fermer"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row" style="margin-top: 5px;">
+        <div class="col-md-3" >
+            <div class="row" id="blocDateDepot">
+                <div class="col-md-12">
+                    <h5 id="prodInputDateDepot" style="font-size: 1em;width: 150px;margin-left:1px;text-align: left;font-weight: 700;margin-bottom: 5px;{% if dateDepotN is defined and dateDepotN != 0 %}color:red;{% endif %}">Date de depôt: </h5>
+                </div>
+                {#<div id="dateDepotProdIn" class="col-md-8">#}
+                    {#{% if dateDepotN is defined and dateDepotN != '0' %}#}
+                        {#<input type="text" class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ dateDepotN|date("d/m/Y") }}">#}
+                    {#{% else %}#}
+                        {#<input type="text" class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ "now"|date("d/m/Y") }}">#}
+                    {#{% endif %}#}
+                    {#<span style="" id="dateDepotProdInAdd">{% if dateDepotN is defined and dateDepotN != '0' %}{{ dateDepotN|date("Y-m-d") }}{% endif %}</span>#}
+                {#</div>#}
+                <div id="dateDepotProdIn" class="col-md-8">
+                    {% if dateDepotN is not null %}
+                        <input type="text" readonly="readonly"  class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ dateDepotN|date("d/m/Y") }}">
+                    {% else %}
+                        <input id="inputlettreColor" readonly="readonly"  type="text" class="form-control" style="width: 200px;font-size: 1.2em;color: #D34026" value="à renseigner">
+                    {% endif %}
+                    <span style="display: none;" id="dateDepotProdInAdd">{% if dateDepotN is defined %}{{ dateDepotN|date("Y-m-d") }}{% endif %}</span>
+                </div>
+            </div>
+            <div class="row" id="hideifnotdateProd" style="{% if dateDepotN is null %}display: none;{% endif %}">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="entered_name">N° BL</label>
+                        <input name="numCmd" type="text" style="width: 150px;" onchange="sendData('first')" class="form-control"  id="entered_name" placeholder={% if numCmd is not defined %}"cmd n°"{% else %}"{{ numCmd }}"{% endif %}>
+                    </div>
+                </div>
+            </div>
+            <div class="row" >
+                <div class="col-md-12">
+                    <div class="checkbox" style="margin-left: 1px;">
+                        <label style="font-weight: 700;margin-right: 14px;"><input type="checkbox" id="checkVerifBL" value="">Verif BL</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% if blCmd is defined and blCmd != null %}
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-3 img-responsive" style="text-align: -moz-center;">
+                    <div style="max-width: 130px;">
+                        {% if logoAppli is defined and logoAppli != null %}
+                            <img  class="img-responsive" src="data:image/jpg;base64,{{ logoAppli['appliImage'] }}" style="padding: 0px;margin-top: -13px;">
+                        {% else %}
+                            <img  class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;margin-top: -13px;">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-9" style="padding-left: 0">
+                    <p style="font-size: 1.4em;">{{ blCmd.bl.numligne.idclient.nomclient }}</p>
+                    <p style="font-size: 1.1em;margin-top: -11px;">{{ blCmd.bl.numligne.idfile.idappli.appliname }}</p>
+                </div>
+
+                <div class="col-md-12 ">
+                    <table class="table">
+                        <thead>
+                            <tr >
+                                <th class="text-center">n°BL</th>
+                                <th class="text-center">Transport</th>
+                                <th class="text-center">Poids</th>
+                                <th >Destinataire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-md-2 text-center">{{ blCmd.bl.numbl }}</td>
+                                <td class="col-md-2 text-center">{{ blCmd.bl.numligne.typeTransport }}</td>
+                                <td class="col-md-2 text-center">{{ (blCmd.poids|number_format)/100 }} Kgs</td>
+                                <td class="col-md-6 text-center">
+                                    <div class="row">
+                                    <div class="col-md-12"style="margin-left: -15px;">
+                                    <div class="col-md-12"><p style="text-align: left;">{{ blCmd.bl.numligne.destinataire }}</p></div>
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destRue }}</p></div>
+                                    {% if  blCmd.bl.numligne.destAd2|length > 0 %}
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destAd2 }}</p></div>
+                                    {% endif %}
+                                    {% if  blCmd.bl.numligne.destAd3|length > 0 %}
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destAd3 }}</p></div>
+                                    {% endif %}
+                                    {% if  blCmd.bl.numligne.destAd4|length > 0 %}
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destAd4 }}</p></div>
+                                    {% endif %}
+                                    {% if  blCmd.bl.numligne.destAd5|length > 0 %}
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destAd5 }}</p></div>
+                                    {% endif %}
+                                    {% if  blCmd.bl.numligne.destAd6|length > 0 %}
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destAd6 }}</p></div>
+                                    {% endif %}
+
+                                    <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destCp }} {{ blCmd.bl.numligne.destVille }}</p></div>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-3 col-md-offset-1" >
+            <p style="margin-bottom: 1px;">Historique des traitements ({{ histo|length }}):</p>
+            <div style="overflow-y: auto;height: 128px;">
+                <table class="table table-bordered" style="font-size: 0.7em;">
+                    <thead>
+                        <tr>
+                            <th style="padding-bottom: 3px;padding-top: 3px;">Date</th>
+                            <th style="padding-bottom: 3px;padding-top: 3px;">Statut</th>
+                            <th style="padding-bottom: 3px;padding-top: 3px;">Operateur</th>
+                            <th style="padding-bottom: 3px;padding-top: 3px;">Observation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for his in histo  %}
+                        <tr>
+                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.datestatut|date("d/m/Y H:i") }}</td>
+                            <td style="padding-bottom: 3px;padding-top: 3px;{% if his.idstatut =='2'%}background-color: #BFD626{% endif %}">{{ his.idstatut }}</td>
+                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.iduser }}</td>
+                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.observation }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        {% endif %}
+    </div>
+
+
+
+
+    {% if blCmd is defined and blCmd != null %}
+
+
+
+
+
+            {% set p1 = false %}
+            {% for pe1 in articles['art'] if p1 == false %}
+                {% if pe1['perso1']|length >0 %}
+                    {% set p1 = true %}
+                {% endif %}
+            {% endfor %}
+
+            {% set p2 = false %}
+            {% for pe2 in articles['art'] if p2 == false %}
+                {% if pe2['perso2']|length >0 %}
+                    {% set p2 = true %}
+                {% endif %}
+            {% endfor %}
+
+            {% set i1 = false %}
+            {% for ie1 in articles['art'] if i1 == false %}
+                {% if ie1['Image']|length >0 %}
+                    {% set i1 = true %}
+                {% endif %}
+            {% endfor %}
+
+            {% set i2 = false %}
+                {% if articles['emb'] is defined %}
+                    {% for ie2 in articles['emb'] if i2 == false %}
+                        {% if ie2['Image']|length >0 %}
+                            {% set i2 = true %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            <div class="row">
+                {% if p1 or p2 or p3 %}
+                    {% if articles['emb'] is defined %}
+                    <div class="col-md-2" style="background-color: #F9F9F9;margin-top: -23px;">
+
+                            <p style="text-align: center;font-size: 1.2em;">{{ articles['emb']|length }} {% if articles['emb']|length == 1 %}Emballage{% else %}Emballages{% endif %}</p>
+
+                            <div id="overflowEmbal" style="overflow-y: auto;max-height: 321px;overflow-x: hidden;">
+                                <table class="table table-bordered " style="border-collapse: inherit;background-color: white;">
+                                    {% for art in articles['emb'] %}
+                                        <tbody>
+                                        <tr>
+
+                                             {% if i2 %}<td >
+                                                {% if  art['Image']|length > 0 %}
+                                                    <div class="row" style="position: relative">
+                                                        {% for em in articles['countArticle'] %}
+                                                            {% if em['libelle'] == art['libelle'] %}
+                                                                <div style="position: absolute; top:0;right: 0;margin-right: 13px;font-size: 2em;">x{{ em['quantite']}} </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <div class="col-md-12">
+                                                            <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                        </div>
+                                                        <div class="col-md-12" >
+                                                            {{ art['libelle'] }}
+
+
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </td>{% endif %}
+                                        </tr>
+                                        </tbody>
+                                    {% endfor %}
+                                </table>
+                            </div>
+
+                    </div>
+                    {% endif %}
+                    <div  {% if articles['emb'] is defined %} class="col-md-9 col-md-offset-1 "{% else %}class=" col-md-9 col-md-offset-1 "{% endif %} style="background-color: #F9F9F9;margin-top: -23px;{% if articles['emb'] is defined %}margin-left: 72px;{% else %}padding-right: 0px;{% endif %}" >
+                        <p style="text-align: center;font-size: 1.2em;">{{ articles['art']|length }} {% if articles['art']|length == 1 %}Article{% else %}Articles{% endif %}</p>
+
+
+                        <div class="row">
+                            <div id="overflowArticles" class="col-md-12"style="overflow-y: auto;max-height:313px;">
+                                <div class="row" style="margin-left: 6px;margin-right: 6px;">
+
+
+                                {% for em in articles['countArticle'] %}
+                                    {% if not em['flagart'] %}
+                                        <p style="font-size: 1.1em;margin-top: -10px;margin-bottom: -6px;"><span style="font-size: 1.8em;">{{ em['quantite']}}x</span> {{ em['libelle'] }} </p>
+                                                    <table class="table table-bordered " style="border-collapse: inherit;margin-bottom:6px;background-color: white;{% if em['quantite'] == '1' %}width: 50%;margin-left: auto;margin-right: auto;{% endif %}">
+                                                        {% set recup = 1 %}
+                                                        {% for art in articles['art']  %}
+                                                        {% if recup == 2 %}{% set recup = 3 %}{% endif %}
+                                                            {% if recup == 1 %} <tr >{% endif %}
+                                                            {% if art['libelle'] == em['libelle']  and recup == 1 %}
+                                                                {% set recup = 2 %}
+                                                                {% set der = 1 %}
+                                                                                    <td  class="col-md-1">{{ loop.index }}</td>
+                                                                                    {% if p1 %}
+                                                                                        <td class="col-md-2">{{ art['perso1'] }}</td>
+                                                                                    {% endif %}
+                                                                                    {% if p2 %}
+                                                                                        <td class="col-md-1">{{ art['perso2'] }}</td>
+                                                                                    {% endif %}
+                                                                                    {% if i1 %}
+                                                                                        <td class="col-md-3" style="padding-bottom: 0px;padding-top: 0px;">
+                                                                                                {% if  art['Image']|length > 0 %}
+                                                                                                    <div class="row" >
+                                                                                                        <div class="col-md-11">
+                                                                                                            <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                                                                        </div>
+                                                                                                        <div class="col-md-11" style="text-align: center;">
+                                                                                                            {{ art['nameImage'] }}
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                {% endif %}
+                                                                                        </td>
+                                                                                    {% endif %}
+
+
+                                                            {% endif %}
+
+                                                            {% if art['libelle'] == em['libelle']  and recup == 3  %}
+                                                                {% set recup = 1 %}
+                                                                            <td style="background-color:  #F4F2F7;border-bottom: 0;border-top: 0;"></td>
+                                                                            <td class="col-md-1">{{ loop.index }}</td>
+                                                                            {% if p1 %}
+                                                                                <td class="col-md-2">{{ art['perso1'] }}</td>
+                                                                            {% endif %}
+                                                                            {% if p2 %}
+                                                                                <td class="col-md-1">{{ art['perso2'] }}</td>
+                                                                            {% endif %}
+                                                                            {% if i1 %}
+                                                                                <td class="col-md-3" style="padding-bottom: 0px;padding-top: 0px;">
+                                                                                        {% if  art['Image']|length > 0 %}
+                                                                                            <div class="row" >
+                                                                                                <div class="col-md-11">
+                                                                                                    <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                                                                </div>
+                                                                                                <div class="col-md-11" style="text-align: center;">
+                                                                                                    {{ art['nameImage'] }}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        {% endif %}
+                                                                                </td>
+                                                                            {% endif %}
+
+
+                                                            {% endif %}
+
+                                                            {% if recup == 1 %}</tr>{% endif %}
+                                                        {% endfor %}
+
+
+                                                    </table>
+
+
+                                    {% endif %}
+                                {% endfor %}
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            {% else %}
+                <h2>PAS DE PERSO SUR CETTE COMMANDE</h2>
+            {% endif %}
+            </div>
+
+
+
+
+
+    {% endif %}
+
+
+
+{% endblock %}
+
+
+
+{% block javascriptsPlus %}
+
+    <script>
+        $('#checkVerifBL').change(function() {
+            if($(this).prop('checked')){
+                document.getElementById('blocDateDepot').style.display = 'none';
+                document.getElementById('hideifnotdateProd').style.display = '';
+//                sendData("verif");
+            }
+            else{
+                document.getElementById('blocDateDepot').style.display = '';
+                document.getElementById('hideifnotdateProd').style.display = 'none';
+            }
+
+        })
+    </script>
+
+    <script>
+        $(document).ready(function(){
+            document.getElementById('contentMenu').style.marginLeft = '25px';
+            document.getElementById('contentMenu').style.width = '98%';
+            document.getElementById('flecheMenuD').style.display = '';
+            document.getElementById('contentMenu').className = 'col-md-12';
+            document.getElementById('header').style.height = '39px';
+            document.getElementById('imgHeader').style.width = '53px';
+            document.getElementById('texteHeadertessi').style.fontSize = '3em';
+            document.getElementById('texteHeadertessi').style.marginTop = '-8px';
+            document.getElementById('hideheaderRow').style.marginTop = '-29px';
+            document.getElementById('hideHeaderNavConnec').style.marginTop = '25px';
+
+        });
+
+        function afficheMenu() {
+            document.getElementById('contentMenu').style.marginLeft = '0px';
+            document.getElementById('flecheMenuD').style.display = 'none';
+            document.getElementById('contentMenu').style.width = '';
+            document.getElementById('flecheMenuG').style.display = '';
+            document.getElementById('menuGauche').style.display = '';
+            document.getElementById('contentMenu').className = 'col-md-10';
+            document.getElementById('header').style.height = '103px'
+            document.getElementById('imgHeader').style.width = '';
+            document.getElementById('texteHeadertessi').style.fontSize = '';
+            document.getElementById('texteHeadertessi').style.marginTop = '';
+            document.getElementById('hideheaderRow').style.marginTop = '-8px';
+            document.getElementById('hideHeaderNavConnec').style.marginTop = '92px';
+            document.getElementById('overflowArticles').style.maxHeight = '333px';
+            document.getElementById('overflowEmbal').style.maxHeight = '313px';
+        }
+
+
+        function hideLeMenu() {
+            document.getElementById('contentMenu').style.marginLeft = '25px';
+            document.getElementById('flecheMenuD').style.display = '';
+            document.getElementById('contentMenu').style.width = '98%';
+            document.getElementById('contentMenu').className = 'col-md-12';
+            document.getElementById('flecheMenuG').style.display = 'none';
+            document.getElementById('menuGauche').style.display = 'none';
+            document.getElementById('header').style.height = '39px';
+            document.getElementById('imgHeader').style.width = '53px';
+            document.getElementById('texteHeadertessi').style.fontSize = '3em';
+            document.getElementById('texteHeadertessi').style.marginTop = '-8px';
+            document.getElementById('hideheaderRow').style.marginTop = '-29px';
+            document.getElementById('hideHeaderNavConnec').style.marginTop = '25px';
+            document.getElementById('overflowArticles').style.maxHeight = '392px';
+            document.getElementById('overflowEmbal').style.maxHeight = '392px';
+        }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#dateDepotProdIn input').datepicker({
+                isRTL: false,
+                language: "fr",
+                autoclose: true
+            })
+                .on('changeDate', function(e) {
+                    document.getElementById('prodInputDateDepot').style.color = 'red';
+                    var date = $("#dateDepotProdIn input").datepicker("getDate");
+                    var dateString = $.datepicker.formatDate("yy-mm-dd", date);
+                    $("#dateDepotProdInAdd").html(dateString);
+                    document.getElementById('hideifnotdateProd').style.display = '';
+                    document.getElementById("entered_name").focus();
+                    document.getElementById('inputlettreColor').style.color = '';
+                });
+
+        });
+        //
+
+
+
+    </script>
+
+
+    <script>
+        $(document).ready(function(){
+
+//au chargement de la page je règle le marginTop de #barre à 0 (il etait fixé à -50px dans le css) en 500ms
+
+            $('#barre').animate({
+                marginTop: "-10px",
+            }, 1000);
+
+
+//au clic sur #fermer qui est la croix j'anime le marginTop de #barre à -30px pour le faire remonter et laisser le border bottom apparent
+
+            $("#fermer").mousedown(function(){
+
+                $('#barre').animate({
+                    marginTop: "-50px",
+                }, 500);
+
+            });
+        });
+
+
+
+    </script>
+
+    <script>
+            var etat = $('#recupEtatProd').text();
+//
+            if (etat === '0') {
+
+//                function hideApresProd() {
+
+                    window.setTimeout(fonctionAExecuter, 5000); //On attend 5 secondes avant d'exécuter la fonction
+//                }
+
+                function fonctionAExecuter() {
+                    $('#barre').animate({
+                        marginTop: "-50px",
+                    }, 500);
+                }
+            }
+
+
+    </script>
+    <script>
+
+        var available_printers = sessionStorage.getItem("available_printers");
+        var selected_category = null;
+        var default_printer = sessionStorage.getItem("selected_printer");
+        var selected_printer = sessionStorage.getItem("selected_printer");
+
+        var format_start = "^XA^LL200^FO80,50^A0N36,36^FD";
+        var format_end = "^FS^XZ";
+        var default_mode = true;
+
+
+            function setup_web_print() {
+
+                $('#printer_select').on('change', onPrinterSelected);
+                showLoading("Loading Printer Information...");
+                default_mode = true;
+                selected_printer = null;
+                available_printers = sessionStorage.getItem("printers");
+                selected_category = null;
+                default_printer = null;
+
+                BrowserPrint.getDefaultDevice('printer', function (printer) {
+                        default_printer = printer
+                        sessionStorage.setItem("default_printer", printer)
+                        if ((printer != null) && (printer.connection != undefined)) {
+                            selected_printer = printer;
+                            sessionStorage.setItem("selected_printer", printer)
+                            var printer_details = $('#printer_details');
+                            var selected_printer_div = $('#selected_printer');
+
+                            selected_printer_div.text("Using Default Printer: " + printer.name);
+                            hideLoading();
+                            // printer_details.show();
+                            $('#print_form').show();
+
+                        }
+                        BrowserPrint.getLocalDevices(function (printers) {
+                                available_printers = printers;
+                                sessionStorage.setItem("available_printers", printers)
+                                var sel = document.getElementById("printers");
+                                var printers_available = false;
+                                sel.innerHTML = "";
+                                if (printers != undefined) {
+                                    for (var i = 0; i < printers.length; i++) {
+                                        if (printers[i].connection == 'usb') {
+                                            var opt = document.createElement("option");
+                                            opt.innerHTML = printers[i].connection + ": " + printers[i].uid;
+                                            opt.value = printers[i].uid;
+                                            sel.appendChild(opt);
+                                            printers_available = true;
+                                        }
+                                    }
+                                }
+
+                                if (!printers_available) {
+                                    showErrorMessage("No Zebra Printers could be found!");
+                                    hideLoading();
+                                    $('#print_form').hide();
+                                    return;
+                                }
+                                else if (selected_printer == null) {
+                                    default_mode = false;
+                                    changePrinter();
+                                    $('#print_form').show();
+                                    hideLoading();
+                                }
+                            }
+
+                            , undefined, 'printer');
+                    },
+                    function (error_response) {
+
+                        showBrowserPrintNotFound();
+                    });
+            };
+
+
+        function showBrowserPrintNotFound()
+        {
+            showErrorMessage("An error occured while attempting to connect to your Zebra Printer. You may not have Zebra Browser Print installed, or it may not be running. Install Zebra Browser Print, or start the Zebra Browser Print Service, and try again.");
+
+        };
+        function sendData(message)
+        {
+
+//            var date = $("#dateDepotProdIn input").datepicker("getDate");
+//            var dateString = $.datepicker.formatDate("yy-mm-dd", date);
+            var dateString = $('#dateDepotProdInAdd').text();
+//            alert(dateString);
+            checkPrinterStatus( function (text) {
+                if (text === "Ready to Print") {
+                    if (message === "first" ) {
+                        var cmd = $('#entered_name').val();
+                        $.ajax({
+                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                            type: "POST",
+                            data: {numCmd: cmd, date: dateString},
+                            dataType: "json",
+                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                            complete: function (html) {
+                                if (html.status !== 400 && html.status !== 401 ) {
+                                    var bl = html.responseText;
+                                    var obj = JSON.parse(bl);
+                                    var blT = JSON.parse(obj['bl']);
+
+                                    var objb = JSON.parse(bl);
+                                    var dateT = JSON.parse(objb['donne']);
+
+                                    hideLoading();
+
+//                                    if (dateT.date !== '') {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varDate', dateT.date);
+                                        if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                            temp = temp.replace('varEtat', '0');
+                                            if (html.responseText['zpl'] !== null){
+                                                selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);
+                                            }
+                                            else{
+                                                temp = temp.replace('varEtat', '2');
+                                                window.location.href = temp
+                                            }
+                                        }
+                                        else {
+                                            temp = temp.replace('varEtat', '1');
+                                            window.location.href = temp
+                                        }
+                                    {#}#}
+                                    {#else{#}
+                                        {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat'})|escape('js') }}';#}
+                                        {#temp = temp.replace('varBl', cmd);#}
+
+                                        {#if ((blT.date_production).substr(0, 11) === '-0001-11-30') {#}
+                                            {#temp = temp.replace('varEtat', '0');#}
+                                            {#if (html.responseText['zpl'] !== null){#}
+                                                {#selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);#}
+                                            {#}#}
+                                            {#else{#}
+                                                {#temp = temp.replace('varEtat', '2');#}
+                                                {#window.location.href = temp#}
+                                            {#}#}
+                                        {#}#}
+                                        {#else {#}
+
+                                            {#temp = temp.replace('varEtat', '1');#}
+                                            {#window.location.href = temp#}
+                                        {#}#}
+                                    {#}#}
+
+                                }
+                                else if (html.status === 400 ) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '4');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                }
+                                else if (html.status === 401 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '3');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+
+                            },
+                            error: function (request, status, error) {
+//                                alert(request.responseText);
+//                                $('.modalErrorZpl').modal('show');
+
+                                {#window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';#}
+
+                                {#setTimeout((function() {  window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';}), 2500);#}
+
+                            }
+                        })
+                    }
+                    if (message === "verif" ) {
+                        var cmd = $('#entered_name').val();
+                        $.ajax({
+                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                            type: "POST",
+                            data: {numCmd: cmd, date: dateString},
+                            dataType: "json",
+                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                            complete: function (html) {
+                                if (html.status !== 400 && html.status !== 401 ) {
+                                    var bl = html.responseText;
+                                    var obj = JSON.parse(bl);
+                                    var blT = JSON.parse(obj['bl']);
+
+                                    var objb = JSON.parse(bl);
+                                    var dateT = JSON.parse(objb['donne']);
+
+                                    hideLoading();
+
+//                                    if (dateT.date !== '') {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varDate', dateT.date);
+                                    if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                        temp = temp.replace('varEtat', '0');
+                                        if (html.responseText['zpl'] !== null){
+                                            window.location.href = temp;
+                                        }
+                                        else{
+                                            temp = temp.replace('varEtat', '2');
+                                            window.location.href = temp
+                                        }
+                                    }
+                                    else {
+                                        temp = temp.replace('varEtat', '1');
+                                        window.location.href = temp
+                                    }
+
+                                }
+                                else if (html.status === 400 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '4');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+                                else if (html.status === 401 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '3');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+
+                            },
+                            error: function (request, status, error) {
+//                                alert(request.responseText);
+//                                $('.modalErrorZpl').modal('show');
+
+                                {#window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';#}
+
+                                {#setTimeout((function() {  window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';}), 2500);#}
+
+                            }
+                        })
+                    }
+                    else {
+                        $.ajax({
+                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                            type: "POST",
+                            data: 'numCmd=' + message,
+                            dataType: "json",
+                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                            complete: function (html) {
+                                hideLoading();
+
+
+                                selected_printer.send(html.responseJSON['zpl'], printComplete, printerError);
+
+
+                            }
+                        })
+                    }
+                }
+                else {
+//                    $('.modalErrorZpl').modal('show');
+                    printerError(text);
+                }
+            });
+        }
+        function checkPrinterStatus(finishedFunction)
+        {
+
+            selected_printer.sendThenRead("~HQES",
+                function(text){
+                    var that = this;
+                    var statuses = new Array();
+                    var ok = false;
+                    var is_error = text.charAt(70);
+                    var media = text.charAt(88);
+                    var head = text.charAt(87);
+                    var pause = text.charAt(84);
+                    // check each flag that prevents printing
+                    if (is_error == '0')
+                    {
+                        ok = true;
+                        statuses.push("Ready to Print");
+                    }
+                    if (media == '1')
+                        statuses.push("Paper out");
+                    if (media == '2')
+                        statuses.push("Ribbon Out");
+                    if (media == '4')
+                        statuses.push("Media Door Open");
+                    if (media == '8')
+                        statuses.push("Cutter Fault");
+                    if (head == '1')
+                        statuses.push("Printhead Overheating");
+                    if (head == '2')
+                        statuses.push("Motor Overheating");
+                    if (head == '4')
+                        statuses.push("Printhead Fault");
+                    if (head == '8')
+                        statuses.push("Incorrect Printhead");
+                    if (pause == '1')
+                        statuses.push("Printer Paused");
+                    if ((!ok) && (statuses.Count == 0))
+                        statuses.push("Error: Unknown Error");
+                    finishedFunction(statuses.join());
+                }, printerError);
+        };
+        function hidePrintForm()
+        {
+            $('#print_form').hide();
+        };
+        function showPrintForm()
+        {
+            $('#print_form').show();
+        };
+        function showLoading(text)
+        {
+            $('#loading_message').text(text);
+            $('#printer_data_loading').show();
+            hidePrintForm();
+            $('#printer_details').hide();
+            $('#printer_select').hide();
+        };
+        function printComplete()
+        {
+            hideLoading();
+//            alert ("Printing complete");
+        }
+        function hideLoading()
+        {
+            $('#printer_data_loading').hide();
+            if(default_mode == true)
+            {
+                showPrintForm();
+                $('#printer_details').show();
+            }
+            else
+            {
+                $('#printer_select').show();
+                showPrintForm();
+            }
+        };
+        function changePrinter()
+        {
+            default_mode = false;
+            selected_printer = null;
+            $('#printer_details').hide();
+            if(available_printers == null)
+            {
+                showLoading("Finding Printers...");
+                $('#print_form').hide();
+                setTimeout(changePrinter, 200);
+                return;
+            }
+            // $('#printer_select').show();
+            onPrinterSelected();
+
+        }
+        function onPrinterSelected()
+        {
+            selected_printer = available_printers[$('#printers')[0].selectedIndex];
+        }
+        function showErrorMessage(text)
+        {
+            $('#main').hide();
+            // $('#error_div').show();
+            $('#error_message').html(text);
+            $('.modalErrorZpl').modal('show');
+
+        }
+        function printerError(text)
+        {
+//            alert(text)
+            showErrorMessage("An error occurred while printing. Please try again." + text);
+        }
+        function trySetupAgain()
+        {
+            $('#main').show();
+            $('#error_div').hide();
+            setup_web_print();
+            //hideLoading();
+        }
+
+
+
+    </script>
+{% endblock %}
+
+

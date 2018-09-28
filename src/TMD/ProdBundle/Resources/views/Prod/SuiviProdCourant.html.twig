@@ -1,0 +1,572 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Suivi opération - Production
+{% endblock %}
+
+{% block body %}
+
+
+
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div style="text-align: right;"><a href="#"><span class="closeArticle">&times;</span></a></div>
+            <div id="modalArticleContenu">Some text in the Modal..</div>
+        </div>
+    </div>
+
+{%  if files is defined %}
+        {% set ClientSelected =  0  %}
+        {% set OpeSelected =  0  %}
+            {% if idOperation is defined %}
+                {% if  idOperation == operation[0].idappli %}
+                        {% set ClientSelected =  operation[0].idclient.nomClient  %}
+                        {% set OpeSelected =  operation[0].appliname  %}
+                {% endif %}
+            {% endif %}
+{% endif %}
+
+{% if idClient is defined %}
+    <span id="idClient" style="display: none;">{{ idClient }}</span>
+{% endif %}
+{% if idOperation is  defined %}
+    <span id="idOperation" style="display: none;" >{{ idOperation }}</span>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="titreFenetre">
+            <h3>Operations en cours </h3>
+        </div>
+    </div>
+</div>
+
+        <div class="row">
+            {%  if files is defined %}
+                <div class="col-md-5">
+                    <div class="row">
+                            {% if idOperation is defined %}
+                                {% if  idOperation == operation[0].idappli %}
+                                    <div class="col-md-5">
+                                        <p style="font-size: 1.4em;">{{ ClientSelected }}</p>
+                                        <p style="font-size: 1.1em;">{{ OpeSelected }}</p>
+                                    </div>
+                                    <div class="col-md-4  center-block img-responsive" style="text-align: -moz-center;">
+                                        <div style="max-width: 130px;">
+                                            {% if operation['appliImage'] is defined and operation['appliImage'] != null %}
+                                                <img  class="img-responsive" src="data:image/jpg;base64,{{ operation['appliImage'] }}" style="padding: 0px;">
+                                            {% else %}
+                                                <img  class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+
+
+                                {% endif %}
+                            {% endif %}
+
+
+
+                    </div>
+                </div>
+
+               {{ include('TMDProdBundle:Prod/include:tabSyntheseProd-I.html.twig') }}
+
+            {% else %}
+                {% for ope in operations %}
+
+                    <div class="col-md-2  center-block " style="text-align: -moz-center;position: relative;">
+                        <div style="max-width: 110px;max-height: 112px;line-height: 110px;">
+                            <a class="btn btn-default" style="padding: 0px;"   href="{{ path('tmd_prod_suiviCourant',{'idClient':  ope['idclient'], 'idOpe': ope['idappli'] }) }}" role="button">
+                                {% if ope['appliImage'] is defined and ope['appliImage'] != null %}
+                                    <img  class="img-responsive" src="data:image/jpg;base64,{{ ope['appliImage'] }}" style="padding: 0px;max-height: 120px;">
+                                {% else %}
+                                    <img  class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;">
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.9em;width: 120px;position: absolute;left: 50%;right: 50%;margin-top: 29px;transform: translate(-50%, -50%);">{{ ope['appliname'] }}</p>
+                        </div>
+
+                    </div>
+
+
+                {#<div class="col-md-5 text-center" style="height: 130px;text-align: -moz-center;">#}
+                {#<a class="btn btn-default" href="{{ path('tmd_prod_suiviCourant',{'idClient':  ope[0].bl.numligne.idfile.idappli.idclient.idclient, 'idOpe': ope[0].bl.numligne.idfile.idappli.idAppli}) }}" role="button" style="padding: 0px;"> <img class="img-thumbnail" src="{{ asset('Images/ClientsOpe/'~ope[0].bl.numligne.idfile.idappli.idappli~'.png') }}" style="height: 80px;padding: 0px;"></a>#}
+                {#<div><p style="font-size: 0.9em;width: 150px;">{{ ope[0].bl.numligne.idfile.idappli.appliname }}</p></div>#}
+
+                {#</div>#}
+                {% endfor %}
+            {% endif %}
+
+        </div>
+
+    <div class="row">
+        <div class="col-md-12" style="margin-top: 18px;">
+            {#{%  if files is defined %}#}
+            {#<hr style="background-color: #504a62;height: 2px;width: 30%;">#}
+            {#{% endif %}#}
+
+            {% set dateProdMax = 0 %}
+            {% set dateProdMin = 0 %}
+            {%  if files is defined %}
+
+                {% set tagArticle = 0  %}
+                {% for file in nbBlbyfile if  tagArticle == 0 %}
+                    {% if file['articles'][0] is defined %}
+                        {% set tagArticle = 1 %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set Colrecla = 0  %}
+                {% for file in nbBlbyfile if  Colrecla == 0 %}
+                    {% if file['articlesReclamation'] is defined %}
+                        {% set Colrecla = 1 %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set retention = 0  %}
+                {% for file in files if  retention == 0 %}
+                    {% if file['flagXport'] is defined and file['flagXport'] != 0 %}
+                        {% set retention = 1 %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set nbColonne =  tagArticle + Colrecla + retention %}
+
+
+
+
+
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Suivi d'opération</a></li>
+                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Suivi de production</a></li>
+                    {#<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">date de dépot</a></li>#}
+                    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Extraction trackings</a></li>
+                    <li role="presentation"><a href="#recherche" aria-controls="recherche" role="tab" data-toggle="tab">Recherche</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+
+                <div class="tab-content" style="position: relative;">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+
+
+
+
+                        <div style="overflow-x: auto;">
+
+                            {{ include('TMDProdBundle:Prod/include:tableauProd-I.html.twig') }}
+
+                        </div>
+
+
+                        {% if idOperation is defined %}
+
+                            {% if nbPages > 1 %}
+                                Nombre de fichiers par page
+                                <select class="form-control" onchange="nbPaginator('parent',this,0)" style="width: 80px;">
+                                    <option value="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': 1 , 'nbFichierPage': 10}) }}" {% if nbFichiersPage == '10' %} selected {% endif %}>10</option>
+                                    <option value="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': 1 , 'nbFichierPage': 20}) }}" {% if nbFichiersPage == '20' %} selected {% endif %}>20</option>
+                                    <option value={{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': 1 , 'nbFichierPage': 50}) }} {% if nbFichiersPage == 50 %}selected="selected"{% endif %}>50</option>
+                                    <option value={{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': 1 , 'nbFichierPage': 100}) }} {% if nbFichiersPage == 100 %}selected="selected"{% endif %}>100</option>
+                                </select>
+                            {% endif %}
+                            <div style="text-align: center;">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination">
+                                        {% if  page > 1 %}
+                                            <li>
+                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': page-1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        {% if nbPages != 1 %}
+                                            {% for p in range(1, nbPages) %}
+                                                <li{% if p == page %} class="active"{% endif %}>
+                                                    <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if page < nbPages %}
+                                            <li>
+                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': page+1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        {% endif %}
+
+                </div>
+
+                    <div role="tabpanel" class="tab-pane" id="profile">
+
+                        {{ include('TMDProdBundle:Prod/include:suiviProduction-I.html.twig') }}
+
+                    </div>
+
+                    {#<div role="tabpanel" class="tab-pane" id="messages"></div>#}
+
+                    <div role="tabpanel" class="tab-pane" id="settings">
+
+                        {{ include('TMDProdBundle:Prod/include:extractionTrackings-I.html.twig') }}
+
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="recherche">
+
+                        {{ include('TMDProdBundle:Prod/include:recherche-I.html.twig') }}
+
+                    </div>
+
+
+
+
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+    {# ###   FULLCALENDAR   ### #}
+    <script>
+
+
+
+        $(document).ready(function () {
+
+
+            var max = $('#dateMaxProd').text();
+            var caseBefore;
+            var recase = false;
+            if (max == 0)
+            {
+                max =Date.now();
+            }
+            tabSynthese(moment(max).format('YYYY-MM'), $('#recupIdAppli').text(),0);
+
+            $('#calendar').fullCalendar({
+
+                header: {
+                    left: 'prev,next ',
+                    center: 'title',
+                    right: ''
+                },
+
+                defaultDate: max,
+                lang: 'fr',
+
+
+                buttonIcons: false, // show the prev/next text
+                editable: true,
+                eventLimit: true,
+
+
+                // allow "more" link when too many events
+                dayClick: function () {
+                },
+                events:
+                    {
+                        url: '{{ path('tmd_prod_calendar') }}',
+                        data: { idappli: ($('#recupIdAppli').text())},
+
+
+
+                    },
+                eventRender: function(event, eventElement) {
+                    eventElement.find("div.fc-content").css('text-align', 'center');
+                    eventElement.find("div.fc-row.fc-week.fc-widget-content.fc-rigid").css('height', 'inherit');
+                    eventElement.find("tr:first-child td .fc-day-grid-event").css('margin-top','-4px');
+                    eventElement.find("span.fc-day-number").css('padding', '-4px');
+
+                },
+
+                eventClick: function(calEvent, jsEvent, view) {
+
+                    var dateProd = calEvent.infoDate;
+                    var idAppli = calEvent.infoIdAppli;
+//                    document.getElementById("modifClassCalendar").className = "col-md-4";
+//                    $('#modifClassCalendar2').css('display', 'inherit');
+//                    document.getElementById("modifClassCalendar2").css('display', 'block');
+                    if (caseBefore !== undefined) {
+                        caseBefore.css('border-color', '#3A87AD')
+                        $(this).css('border-color', 'red');
+                        if (caseBefore[0] === $(this)[0]) {
+                            $(this).css('border-color', '#3A87AD');
+                            recase = true;
+                        }
+                    }
+                    else {
+                        $(this).css('border-color', 'red');
+                    }
+
+                    if(!recase){
+                        afficherDateFile();
+                    }else{
+                        $("#afficherPardate").html("");
+                        tabSynthese(moment(view.start).add(1,'M').format('YYYY-MM'), $('#recupIdAppli').text(),0);
+                        recase = false;
+                    }
+
+
+                    // change the border color just for fun
+
+//                    if (!recase) {
+//                        $(this).css('border-color', 'red');
+//
+//                    }
+                    caseBefore = $(this);
+
+                    var init = 0;
+
+
+//                        $("#afficherPardate").hide();
+                    function afficherDateFile(){
+
+                        $.ajax({
+                            url: "{{ path('tmd_prod_donneTrackingsByDateProd') }}",
+                            type: "POST",
+                            data: {infoDate:  dateProd,infoAppli:  idAppli},
+
+                            dataType: "html",
+                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                            complete: function (data) {
+
+                                var json = data.responseText;
+                                var obj = JSON.parse(json);
+                                var len = obj.length;
+
+                                if ( len != 0) {
+
+                                    var afficheTout = false;
+                                    var titre = "Trackings:";
+                                    var html ="";
+
+                                    html+= tabTrackings(obj, len, titre, afficheTout, html);
+
+
+
+                                    html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse: </p></div>';
+
+
+                                    tabSynthese(moment(dateProd).format('YYYY-MM-DD'), $('#recupIdAppli').text(),1);
+
+//
+
+//                                            $("#rempliCalendar2").html(html2);
+                                    $("#afficherPardate").html(html);
+//                                            $("#afficherPardate").show();
+                                }
+
+                            }
+                        });
+
+                    } ;
+
+                },
+                viewRender: function(view,element) {
+                    var date = moment(view.start).add(1,'M').format('YYYY-MM');
+                    tabSynthese(moment(view.start).add(1,'M').format('YYYY-MM'), $('#recupIdAppli').text(),0);
+                    $("#afficherPardate").html("");
+
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function tabSynthese(date,app,indice ) {
+            $.ajax({
+                url: "{{ path('tmd_prod_donneSyntheseByDateProd') }}",
+                type: "POST",
+                data: {infoDate: date, infoAppli: app},
+
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var obj2 = obj[1];
+                    var obj3 = obj[2];
+                    var len = obj2.length;
+
+                    var html2 = "";
+                    if ( indice == 0){
+                        html2 += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse pour le mois de '+moment(date).format('MMMM')+'</p><hr class="menutr">';
+//                        html2 = '<p>Synthese pour le mois de '+moment(date).format('MMMM')+'</p>';
+                    }
+                    else{
+                        html2 += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse pour la date: '+moment(date).format('DD-MM-YYYY')+'</p><hr class="menutr">';
+                    }
+
+                    html2 += '<div class="row">'
+                        +'<div class="col-md-8" >'
+                        +'<ul class="nav nav-tabs" role="tablist">'
+                        +'<li role="presentation" class="active"><a href="#detailsS" aria-controls="home" role="tab" data-toggle="tab">Synthese</a></li>'
+                        +'<li role="presentation"><a href="#transportS" aria-controls="profile" role="tab" data-toggle="tab">Transport</a></li>'
+                        +'<li role="presentation"><a href="#testS" aria-controls="home" role="tab" data-toggle="tab">SiteProd</a></li>'
+                        +'<li role="presentation"><a href="#articleS" aria-controls="home" role="tab" data-toggle="tab">Articles</a></li>'
+                        +'</ul>'
+                        +'<div class="tab-content">'
+                        +'<div role="tabpanel" class="tab-pane active" id="detailsS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'
+                        +'<div class="row">'
+                        +'<div class="col-md-12">'
+//                                                                        +'<div class="row">'
+//                                                                            +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de fichiers:    </p></div>'
+//                                                                            +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">    </p></div>'
+//                                                                        +'</div>'
+//                                                                        +'<div class="row">'
+//                                                                            +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Total des commandes:     </p></div>'
+//                                                                            +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'
+//                                                                        +'</div>'
+                        +'<div class="row">'
+                        +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL produits:     </p></div>'
+                        +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">'+obj[0]+'</p></div>'
+                        +'</div>'
+                        +'<div class="row">'
+                        +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL en réclamation:     </p></div>'
+                        +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'
+                        +'</div>'
+//                                                                    +'</div>'
+//                                                                    +'<div class="col-md-7">'
+//                                                                        +'<div class="row">'
+//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Attente PROD:    </p></div>'
+//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;width: 40px;></p></div>'
+//                                                                        +'</div>'
+//                                                                        +'<div class="row">'
+//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Date premiere production:    </p></div>'
+//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'
+//                                                                        +'</div>'
+//                                                                        +'<span id="dateMaxProd" style="display: none;"></span>'
+//                                                                        +'<div class="row">'
+//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Date dernière production:</p></div>'
+//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'
+//                                                                        +'</div>'
+//                                                                    +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'<div role="tabpanel" class="tab-pane" id="transportS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'
+                        +'<div class="row" >'
+                        +'<div class="col-md-12" style="padding-right: 27px;">'
+                        +'<div class="row" style="overflow-y: auto;max-height: 98px;overflow-x: hidden;">'
+                        +'<div class="col-md-11">'
+                        +'<div class="row">'
+                    for (var key in obj3) {
+                        html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'
+                            +'<p>'+key+'</p>'
+                            +'</div>'
+                            +'<div class="col-md-4" style="margin-bottom: -8px;">'
+                            +'<p style="font-size: 1.2em;">'+obj3[key]+'</p>'
+                            +'</div>';
+                    }
+                    html2 +='</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'<div role="tabpanel" class="tab-pane" id="testS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'
+                        +'<div class="row">'
+                        +'</div>'
+                        +'</div>'
+                        +'<div role="tabpanel" class="tab-pane" id="articleS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'
+                        +'<div class="row" >'
+                        +'<div class="col-md-12" style="padding-right: 27px;">'
+//                                                                        +'<div class="row" >'
+//                                                                            +'<div class="col-md-12">'
+//                                                                                +'<div class="row">'
+//                                                                                    +'<div class="col-md-5">'
+//                                                                                        +'<p></p>'
+//                                                                                    +'</div>'
+//                                                                                    +'<div class="col-md-3">'
+//                                                                                        +'<p>Quantité totale</p>'
+//                                                                                    +'</div>'
+//                                                                                    +'<div class="col-md-3">'
+//                                                                                        +'<p>Reste à produire</p>'
+//                                                                                    +'</div>'
+//                                                                                +'</div>'
+//                                                                                +'<div class="row" >'
+//                                                                                    +'<div class="col-md-offset-5 col-md-7" >'
+//                                                                                        +'<hr style="margin: -5px -20px;border: 0.2px #504A62 solid;" >'
+//                                                                                    +'</div>'
+//                                                                                +'</div>'
+//                                                                            +'</div>'
+//                                                                        +'</div>'
+                        +'<div class="row" style="overflow-y: auto;max-height: 98px;overflow-x: hidden;">'
+                        +'<div class="col-md-12">'
+                        +'<div class="row">';
+                    var compt = null ;
+                    for (var key in obj2[0]) {
+                        html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'
+                            +'<p>'+key+'</p>'
+                            +'</div>'
+                            +'<div class="col-md-4" style="margin-bottom: -8px;">'
+                            +'<p style="font-size: 1.2em;">'+obj2[0][key]+'</p>'
+                            +'</div>';
+                        compt = compt + parseInt(obj2[0][key]);
+                    }
+
+                    if (compt !== null) {
+                        html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'
+                            + '<p style="font-size: 1.2em;">Total : ' + compt + ' articles</p>';
+                        if (obj2[1] != null && obj2[1].length !== 0) {
+                            html2 += '<hr style="border: 1px #504A62 solid;">';
+                        }
+                        html2 += '</div>'
+                            + '</div>';
+                    }else{
+                        html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'
+                            + '<p style="font-size: 1.2em;">Pas d\'articles enregistrés</p>'
+                            + '</div>'
+                            + '</div>';
+                    }
+
+                    for (var key in obj2[1]) {
+                        html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'
+                            +'<p>'+key+'</p>'
+                            +'</div>'
+                            +'<div class="col-md-4" style="margin-bottom: -8px;">'
+                            +'<p style="font-size: 1.2em;">'+obj2[1][key]+'</p>'
+                            +'</div>';
+
+                    }
+
+                    if (app === '416') {
+                        var url = '{{ path('tmd_prod_syntheseArtCoke', {'date': 'data' }) }}';
+                        url = url.replace("data", date);
+                        html2 += '<a href=' + url + ' style="margin-bottom: 9px;" type="button" class="btn btn-default btn-xs"   >Synthese Nb bouteilles</a>';
+                    }
+
+
+
+                    html2 +='</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>'
+                        +'</div>';
+
+                    $("#rempliCalendar2").html(html2);
+
+                }
+            })
+        }
+
+    </script>
+{% endblock %}

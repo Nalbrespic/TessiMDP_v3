@@ -1,0 +1,404 @@
+{% extends '@TMDCore/index.html.twig' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block body %}
+
+
+    {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}
+
+        {% for message in app.session.flashbag.get('addApp') %}
+            <div class="row">
+                <div class="col-md-12"  style="background-color: #BFD626;border-radius: 9px;margin: 0px; */border-radius: 9px;padding-top: 20px;padding-bottom: 10px;margin-top: -34px;margin-bottom: -27px;">
+
+                        <p>
+                                    {{ message}}
+                               </p>
+                    </div>
+
+            </div>
+        {% endfor %}
+        {% if operations is defined %}
+            <div class="row" style="margin-top: 38px;">
+                <div class="col-md-12" style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;margin-top: 7px;">
+                    <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                        <p style="font-weight: bold;font-size: 1.1em;">news ...</p>
+
+                    </div>
+                    <div style="padding: 25px;">
+                        {% if new is defined and new is not null %}
+                            {% if new != null %}
+                                    <h3>{{ new.titre }}</h3>
+                                    <p style="font-weight: bold;font-size: 1.1em;">{{ (new.contenu)|nl2br }}</p>
+                                {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-2 center-block " style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;">
+                            <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;margin-bottom: 10px;">
+                                <p style="margin-bottom: 10px;font-weight: bold;font-size: 1.1em;">Operations en cours</p>
+                            </div>
+                            {% for ope in operations %}
+                                <div class="row" {% if loop.first %} style="margin-top: 10px;" {% endif %}>
+                                    <div class="col-md-12  center-block " style="text-align: -moz-center;padding: inherit;">
+                                        <div style="max-width: 50px;max-height: 45px;line-height: 45px;">
+                                            <a class="btn btn-default" style="padding: 0px;"   href="{{ path('tmd_prod_suiviCourant',{'idClient':  ope['idclient'], 'idOpe': ope['idappli']}) }}" role="button">
+                                                <img onmouseover="afficheMenu({{ loop.index }})" onmouseout="notAfficheMenu({{ loop.index }})" class="img-responsive"
+                                                {% if ope['appliImage'] is defined and ope['appliImage'] != null %}
+                                                  src="data:image/jpg;base64,{{ ope['appliImage'] }}" style="padding: 0px;max-height: 46px;">
+                                                {% else %}
+                                                    src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;">
+                                                {% endif %}
+                                                    </a>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <p style="font-size: 0.9em;">
+                                                                   {{ ope['appliname'] }}
+
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-md-12" style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;">
+                                                <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                                                    <p style="font-weight: bold;font-size: 1.1em;">Production du jour</p>
+                                                </div>
+                                                <div style="margin-top: 23px;" id="operationDuJour">
+                                                    <div style="text-align: center;">
+                                                        <img id="ajax-loading" src={{ asset('Images/57932-full.gif') }} alt="Loading" style="width: 45px;"/>
+                                                    </div>
+                                                    {#{% if syntheseProdJour|length == 0 %}#}
+                                                        {#<p>Pas de production validée aujourd'hui !</p>#}
+                                                    {#{% else %}#}
+                                                        {#<div style="overflow: auto;" >#}
+                                                            {#<table class="table table-hover table-bordered " style="">#}
+                                                                {#<tr style="font-weight: bold;font-size: 0.9em;border-bottom: 2px solid #504A62">#}
+                                                                    {#<td>Client</td>#}
+                                                                    {#<td>Nom de l'opération</td>#}
+                                                                    {#<td>Nb commande</td>#}
+                                                                    {#<td>Nb BL</td>#}
+                                                                    {#<td>Quantite articles</td>#}
+                                                                {#</tr>#}
+                                                                {#{% for prod in syntheseProdJour %}#}
+
+                                                                    {#<tr onclick="document.location='{{ path('tmd_prod_suiviCourant',{'idClient':  prod['idclient'], 'idOpe':prod['idappli']}) }}'" style="cursor: pointer;font-size: 0.8em;">#}
+                                                                        {#<a class="btn btn-default" style="padding: 0px;"   href="{{ path('tmd_prod_suiviCourant',{'idClient':  prod['idclient'], 'idOpe':prod['idappli']}) }}" role="button"></a>#}
+                                                                        {#<td>{{ prod['nomclient'] }}</td>#}
+                                                                        {#<td>{{ prod['appliname'] }}</td>#}
+                                                                        {#<td>{{ prod['fileC'] }}</td>#}
+                                                                        {#<td>{{ prod['blC'] }}</td>#}
+                                                                        {#<td>{{ prod['qtS'] }}</td>#}
+
+                                                                    {#</tr>#}
+
+                                                                {#{% endfor %}#}
+                                                            {#</table>#}
+                                                        {#</div>#}
+                                                    {#{% endif %}#}
+                                                </div>
+                                            </div>
+                                                <span id="dateVeille" style="display: none;">{{ dateVeille|date("Y-m-d") }}</span>
+                                                <div class="col-md-12" style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;">
+                                                    <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                                                        <p style="font-weight: bold;font-size: 1.1em;">Production du {{  dateVeille|date("d/m/Y") }}</p>
+                                                    </div>
+                                                    <div style="margin-top: 23px;" id="operationDelaVeille">
+                                                        <div style="text-align: center;">
+                                                            <img id="ajax-loading" src={{ asset('Images/57932-full.gif') }} alt="Loading" style="width: 45px;"/>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            {#{%  if  syntheseProdVeille[0][1] is defined %}#}
+                                                {#<div class="col-md-12" style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;">#}
+                                                    {#<div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">#}
+                                                        {#<p style="font-weight: bold;font-size: 1.1em;">Production du {{ syntheseProdVeille[0][1]|date("d/m/Y") }}</p>#}
+                                                    {#</div>#}
+                                                    {#<div style="margin-top: 23px;">#}
+                                                        {#{% if syntheseProdVeille|length == 0 %}#}
+                                                            {#<p>Pas de production validée aujourd'hui !</p>#}
+                                                        {#{% else %}#}
+                                                            {#<div style="overflow: auto;">#}
+                                                                {#<table class="table table-hover table-bordered " style="">#}
+                                                                    {#<tr style="font-weight: bold;font-size: 0.9em;border-bottom: 2px solid #504A62">#}
+                                                                        {#<td>Client</td>#}
+                                                                        {#<td>Nom de l'opération</td>#}
+                                                                        {#<td>Nb commande</td>#}
+                                                                        {#<td>Nb BL</td>#}
+                                                                        {#<td>Quantite articles</td>#}
+                                                                    {#</tr>#}
+                                                                    {#{% for prod in syntheseProdVeille %}#}
+                                                                        {#<tr onclick="document.location='{{ path('tmd_prod_suiviCourant',{'idClient':  prod['idclient'], 'idOpe':prod['idappli']}) }}'" style="cursor: pointer;font-size: 0.8em;">#}
+                                                                            {#<td>{{ prod['nomclient'] }}</td>#}
+                                                                            {#<td>{{ prod['appliname'] }}</td>#}
+                                                                            {#<td>{{ prod['fileC'] }}</td>#}
+                                                                            {#<td>{{ prod['blC'] }}</td>#}
+                                                                            {#<td>{{ prod['qtS'] }}</td>#}
+                                                                        {#</tr>#}
+                                                                    {#{% endfor %}#}
+                                                                {#</table>#}
+                                                            {#</div>#}
+                                                            {#{% endif %}#}
+                                                    {#</div>#}
+                                                {#</div>#}
+                                            {#{% endif %}#}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-12"style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;">
+                                            <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                                                <p style="font-weight: bold;font-size: 1.1em;">Reste à produire</p>
+                                            </div>
+                                            <div style="margin-top: 23px;" id="syntheseResteaProd">
+                                                <div style="text-align: center;">
+                                                    {#<img id="ajax-loading" src={{ asset('Images/57932-full.gif') }} alt="Loading" style="width: 45px;"/>#}
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+     {% if is_granted('ROLE_PROD_USER') %}
+            <div class="row" style="margin-top: 38px;">
+                <div class="col-md-12" style="border: 2px solid #504A62;position: relative;border-radius: 5px;margin-bottom: 15px;margin-top: 7px;">
+                    <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                        <p style="font-weight: bold;font-size: 1.1em;">news ...</p>
+
+                    </div>
+                    <div style="padding: 25px;">
+                        {% if new is defined and new is not null %}
+                            <h3>{{ new.titre }}</h3>
+                            <p style="font-weight: bold;font-size: 1.1em;">{{ (new.contenu)|nl2br }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+     {% endif %}
+
+
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            opdujour();
+
+        });
+
+
+    </script>
+
+    {#operation du jour Synthese#}
+    <script>
+        function opdujour() {
+            $.ajax({
+                url: "{{ path('tmd_core_productionJour') }}",
+                type: "POST",
+                data: 't',
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var len = obj[0].length;
+                    var html='';
+                    if (len == 0) {
+                        html += '<p>Pas de production validée aujourd\'hui !</p>';
+                    }
+                    else {
+                        html += '<div style="overflow-y: auto;overflow-x: hidden;"><table class="table table-hover table-bordered " style="">'+
+                            '<tr  style="font-weight: bold;font-size: 0.9em;border-bottom: 2px solid #504A62">' +
+                            '<td>Client</td><td>Nom de l\'opération</td><td>Nb commande</td><td>Nb BL</td><td>Quantite articles</td>' +
+                            '</tr>';
+                        for (var i = 0; i < len; i++) {
+                            var temp = '{{ path('tmd_prod_suiviCourant' ,{ 'idClient': 'varidClient', 'idOpe': 'varidOpe'})|escape('js') }}';
+                            temp = temp.replace('varidClient', obj[0][i]['idclient']);
+                            temp = temp.replace('varidOpe', obj[0][i]['idappli']);
+                            html += '<tr onclick=document.location="';
+                            html += temp+'"';
+                            html +=' style="cursor: pointer;font-size: 0.8em;">';
+                            html += '<td>' + obj[0][i]['nomclient'] + '</td><td>' + obj[0][i]['appliname'] + '</td><td>' + obj[0][i]['fileC'] + '</td><td id="tabProdBl-'+obj[0][i]['idappli']+'" style="border-bottom: 1px solid white;">' + obj[0][i]['blC'] + '</td><td id="tabProdArt-'+obj[0][i]['idappli']+'" style="border-bottom: 1px solid white;">' + obj[0][i]['qtS'] + '</td>' +
+                                '<div><tr id="tabProdbltr-'+obj[0][i]['idappli']+'" style="border-bottom: 2px solid #504A62;background-color: #BFD626" ><td colspan="5" style="padding-top: 2px;padding-bottom: 1px;">' +
+                                '<div class="row" id="tabProdbl-'+obj[0][i]['idappli']+'">' +
+                                '</div>'+
+                                '<div class="row" id="tabProdart-'+obj[0][i]['idappli']+'">' +
+                                '</div></div>'+
+
+                                '</td></tr></tr>';
+                        }
+                        html += '</table></div>'
+
+                    }
+
+                    $("#operationDuJour").html(html);
+
+                    syntheseProd();
+                    window.setTimeout("opdujour();",20000);
+                }
+            })
+        }
+
+    </script>
+    {#operation de la veille#}
+    <script async>
+        var date = $('#dateVeille').text();
+        if (date !== 0) {
+            $.ajax({
+                url: "{{ path('tmd_core_productionVeille') }}",
+                type: "POST",
+                data: 'date=' + date,
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+
+                    var len = obj[0].length;
+                    var html = '';
+                    if (len === 0) {
+                        html += '<p>Pas de production !</p>';
+                    }
+                    else {
+                        html += '<div style="overflow-y: auto;overflow-x: hidden;"><table class="table table-hover table-bordered " >' +
+                            '<tr  style="font-weight: bold;font-size: 0.9em;border-bottom: 2px solid #504A62">' +
+                            '<td>Client</td><td>Nom de l\'opération</td><td>Nb commande</td><td>Nb BL</td><td>Quantite articles</td>' +
+                            '</tr>';
+                        for (var i = 0; i < len; i++) {
+                            var temp = '{{ path('tmd_prod_suiviCourant' ,{ 'idClient': 'varidClient', 'idOpe': 'varidOpe'})|escape('js') }}';
+                            temp = temp.replace('varidClient', obj[0][i]['idclient']);
+                            temp = temp.replace('varidOpe', obj[0][i]['idappli']);
+                            html += '<tr onclick=document.location="';
+                            html += temp + '"';
+                            html += ' style="cursor: pointer;font-size: 0.8em;">';
+                            html += '<td>' + obj[0][i]['nomclient'] + '</td><td>' + obj[0][i]['appliname'] + '</td><td>' + obj[0][i]['fileC'] + '</td><td>' + obj[0][i]['blC'] + '</td><td>' + obj[0][i]['qtS'] + '</td></tr>';
+
+
+                        }
+                        html += '</table></div>'
+                    }
+                    $("#operationDelaVeille").html(html);
+                }
+
+            })
+        }
+    </script>
+
+    <script async>
+        function syntheseProd() {
+            $.ajax({
+                url: "{{ path('tmd_core_donneResteProd') }}",
+                type: "POST",
+                data: '',
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var len = obj[0].length;
+                    var html = '';
+                    if (len === 0) {
+                        html += '<p>Pas de production !</p>';
+                    }
+                    else {
+                        html += '<div style="overflow-y: auto;overflow-x: hidden;"><table class="table table-hover table-bordered " >' +
+                            '<tr  style="font-weight: bold;font-size: 0.9em;border-bottom: 2px solid #504A62;padding: 0px;">' +
+                            '<td class="col-md-3">Client</td><td>Nom de l\'opération</td><td>Bl en attente</td><td>quantité d\'articles</td></tr>';
+                        for (var i in obj[0]) {
+
+                            {#html += '<tr onclick=document.location="';#}
+                            {#html += temp + '"';#}
+                            {#html += ' style="cursor: pointer;font-size: 0.8em;">';#}
+//                            html += '<td>' + obj[0][i]['nomclient'] + '</td><td>' + obj[0][i]['appliname'] + '</td><td>' + obj[0][i][1] + '</td><td>' + obj[0][i]['article'] + '</td></tr>';
+
+
+
+                            html +='<tr style="font-size: 1em;"><td style="padding: 0px;">'+i+'</td> ';
+
+                            for( var k in obj[0][i]) {
+
+                                var temp = '{{ path('tmd_prod_suiviCourant' ,{ 'idClient': 'varidClient', 'idOpe': 'varidOpe'})|escape('js') }}';
+                                temp = temp.replace('varidClient', obj[0][i][k]['idclient']);
+                                temp = temp.replace('varidOpe', obj[0][i][k]['idappli']);
+
+                                if (k >= 1  ){html +='<tr style="font-size: 1em;"><td style="padding: 0px;"></td>'}
+                                html += '<td onclick=document.location="'+temp+'"; style="padding: 0px;cursor: pointer;">' + obj[0][i][k]['appliname'] +'</td><td style="padding: 0px;text-align: right;" >' + obj[0][i][k][1] + '</td><td style="padding: 0px;text-align: right;">' + obj[0][i][k]['article'] + '</td></tr>';
+
+
+                                if (document.getElementById("tabProdBl-" + obj[0][i][k]['idappli'] + "")) {
+                                    var blProd = $("#tabProdBl-" + obj[0][i][k]['idappli'] + "").text();
+                                    var blTot = obj[0][i][k][1];
+                                    var htm = '<div class="col-md-4" style="font-size: 0.9em;">' + parseInt(blTot) + '/' + (parseInt(blTot) + parseInt(blProd)) + ' Bl</div>' +
+                                        '<div class="col-md-8">' +
+                                        '<div class="progress" style="margin-bottom: 0px;height: 13px;border: 1px solid #c7c9e2;">' +
+                                        '<div class="progress-bar" role="progressbar" aria-valuenow="' + (parseInt(blProd) / (parseInt(blTot) + parseInt(blProd))) * 100 + '" aria-valuemin="0" aria-valuemax="100" style="background-color: #504A62;line-height: 13px;width: ' + (parseInt(blProd) / (parseInt(blTot) + parseInt(blProd))) * 100 + '%;">';
+                                    //                                            htm += blProd+'/'+(parseInt(blTot)+parseInt(blProd))+'-'+Math.round((parseInt(blProd)/(parseInt(blTot)+parseInt(blProd)))*100)+'%';
+                                    htm += Math.round((parseInt(blProd) / (parseInt(blTot) + parseInt(blProd))) * 100) + '%';
+                                    htm += '</div></div></div>';
+
+                                    $("#tabProdbl-" + obj[0][i][k]['idappli'] + "").html(htm);
+
+
+                                    var artProd = $("#tabProdArt-" + obj[0][i][k]['idappli'] + "").text();
+                                    var artTot = obj[0][i][k]['article'];
+
+                                    if ((parseInt(artTot) + parseInt(artProd)) != (parseInt(blTot) + parseInt(blProd))) {
+
+                                        var htma = '<div class="col-md-4" style="font-size: 0.9em;">' + parseInt(artTot) + '/' + (parseInt(artTot) + parseInt(artProd)) + '  Articles</div>' +
+                                            '<div class="col-md-8">' +
+                                            '<div class="progress" style="margin-bottom: 0px;height: 13px;border: 1px solid #c7c9e2;">' +
+                                            '<div class="progress-bar" role="progressbar" aria-valuenow="' + (parseInt(artProd) / (parseInt(artTot) + parseInt(artProd))) * 100 + '" aria-valuemin="0" aria-valuemax="100" style="background-color: #504A62;line-height: 13px;width: ' + (parseInt(artProd) / (parseInt(artTot) + parseInt(artProd))) * 100 + '%;">';
+                                        //                                            htma += artProd+'/'+(parseInt(artTot)+parseInt(artProd))+'-'+Math.round((parseInt(artProd)/(parseInt(artTot)+parseInt(artProd)))*100)+'%';
+                                        htma += Math.round((parseInt(artProd) / (parseInt(artTot) + parseInt(artProd))) * 100) + '%';
+                                        htma += '</div></div></div>';
+                                        $("#tabProdart-" + obj[0][i][k]['idappli'] + "").html(htma);
+                                    }
+                                    document.getElementById("tabProdbltr-" + obj[0][i][k]['idappli'] + "").style.backgroundColor='';
+                                }
+
+
+
+                            }
+                        html +='</tr>';
+                        }
+                        html += '</table></div>';
+                    }
+                    $("#syntheseResteaProd").html(html);
+                }
+
+            })
+        }
+    </script>
+{% endblock %}
+

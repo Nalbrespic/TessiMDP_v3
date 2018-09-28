@@ -1,0 +1,4 @@
+services:
+#    tmd_prod.example:
+#        class: TMD\ProdBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -1,0 +1,80 @@
+{% extends '@TMDProd/Prod/search.html.twig' %}
+
+{% block title %}
+
+{% endblock %}
+
+
+
+    {% block tmdprod_search %}
+            <p>DATE 1: {{ date1 }}</p>
+        <p>DATE 2: </p>
+
+        <div>
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Par client</a></li>
+                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Par application</a></li>
+                <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Par numero</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="home">
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        {% for client in clients %}
+                            <div class="panel-heading" role="tab" id="heading{{ loop.index }}">
+                                <h4 class="panel-title">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapseOne">
+                                        <p>{{ client.nomclient }}</p>
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse{{ loop.index }}" class="panel-collapse collapse " role="tabpanel" aria-labelledby="heading{{ loop.index }}">
+                                <div class="panel-body">
+                                    {% for bl in bl %}
+                                        {%  if bl.numLigne.idclient.nomclient == client.nomclient %}
+                                            <p style="margin-left: 60px;">{{ bl.numLigne.idclient.nomclient }} {{ bl.numLigne.destcp }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="profile">
+                    {% for app in applis %}
+                        <div class="panel-heading" role="tab" id="heading2{{ loop.index }}">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2{{ loop.index }}" aria-expanded="true" aria-controls="collapseTwo">
+                                    <p>{{ app.appliname }}</p>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse2{{ loop.index }}" class="panel-collapse collapse " role="tabpanel" aria-labelledby="heading2{{ loop.index }}">
+                            <div class="panel-body">
+                                {% for bl in bl %}
+                                    {%  if bl.numLigne.idfile.idappli.appliname == app.appliname %}
+                                        <p style="margin-left: 60px;">{{ bl.idbl }} {{ bl.numLigne.destinataire }} {{ bl.numLigne.destRue }}{{ bl.numLigne.destcp }}</p>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="messages">
+                    {% for bl in bl %}
+                        <p>{{ bl.idbl }} </p>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+
+    {% endblock %}
+

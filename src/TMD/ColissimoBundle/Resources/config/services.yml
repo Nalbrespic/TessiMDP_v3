@@ -1,0 +1,4 @@
+services:
+#    tmd_colissimo.example:
+#        class: TMD\ColissimoBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

@@ -1,0 +1,38 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+
+{% block title %}
+
+    Production - {{ parent() }}
+
+{% endblock %}
+
+
+{% block body %}
+
+
+    {# On définit un sous-titre commun à toutes les pages du bundle, par exemple #}
+
+    <div class="row" style="background-color: aliceblue;">
+        <div id="menu" class="col-md-3" >
+            <h2>Production</h2>
+            <hr>
+            <ul class="nav nav-pills nav-stacked">
+                <li><a href="{{ path('tmd_prod_client') }}">Suivi opération</a></li>
+                <li><a href="">Recherche un BL</a></li>
+                <li><a href="">Controle</a></li>
+            </ul>
+        </div>
+        <div id="content" class="col-md-9" style="margin-top: 70px;">
+            {% block tmdprod_body %}
+
+            {% endblock %}
+        </div>
+    </div>
+
+    {# On définit un nouveau bloc, que les vues du bundle pourront remplir #}
+
+
+
+
+{% endblock %}

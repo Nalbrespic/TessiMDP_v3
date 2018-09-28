@@ -1,0 +1,3 @@
+tmd_colissimo_homepage:
+    path:     /
+    defaults: { _controller: TMDColissimoBundle:Default:index }

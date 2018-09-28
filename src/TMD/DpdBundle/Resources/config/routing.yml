@@ -1,0 +1,3 @@
+tmd_dpd_homepage:
+    path:     /
+    defaults: { _controller: TMDDpdBundle:Default:index }

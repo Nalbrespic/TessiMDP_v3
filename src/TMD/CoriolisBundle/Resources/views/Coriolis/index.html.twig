@@ -1,0 +1,512 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Production - Coriolis
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="titreFenetre">
+                <h3>Cartes Abonnés 4G</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="row" style="margin-top: 18px;">
+                <div class="col-md-12">
+                    <h5 id="dateDepotCoriolis" style="font-size: 1em;width: 150px;margin-left:1px;text-align: left;font-weight: 700;margin-bottom: 5px;">Date de depôt: </h5>
+                </div>
+                <div id="cocotest" class="col-md-8">
+                   {% if dateDepotN is defined %}
+                        <input type="text" class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ dateDepotN|date("d/m/Y") }}">
+                   {% else %}
+                       <input id="inputlettreColor" type="text" class="form-control" style="width: 200px;font-size: 1.2em;color: #D34026" value="à renseigner">
+                    {% endif %}
+                    <span style="display: none;" id="dateDepotCoriolisAdd">{% if dateDepotN is defined %}{{ dateDepotN|date("Y-m-d") }}{% endif %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4  col-md-offset-3" >
+            <table class="table table-bordered table-striped tableSynthese " style="text-align: center;">
+                <tr class="active">
+                    <th colspan="2" style="text-align: center;padding-bottom: 0px;">Reste à produire</th>
+                </tr>
+                <tr style="background-color: #DFD8DF;border-bottom: 2px solid #504A62;font-size: .9em;">
+                    <th style="text-align: center;padding-bottom: 0px;" class="col-md-3">Nombre de commandes</th>
+                    <th style="text-align: center;padding-bottom: 0px;"class="col-md-3">Nombres de cartes</th>
+                </tr>
+                <tr >
+                    <td>{% if resteAproduireCm is defined %}{{ resteAproduireCm[0]['nbBl'] }}{% else %}-{% endif %}</td>
+                    {%  set comtBl = 0 %}
+                    {% if  resteAproduireBl is defined %}
+                        {% for bl in resteAproduireBl %}
+                            {% if bl['flagProd'] == false %}
+                                {% set comtBl = comtBl +1 %}
+                            {% endif %}
+                        {% endfor %}
+                        <td>{{ comtBl }}</td>
+                    {% else %}
+                        <td>-</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="row" id="retourCoriolisNa" style="display: none;">
+        <div class="col-md-10"  style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+            <div class="alert alert-notice" style="padding-bottom: 0px;">
+                <p style="color: white;font-size: 1.3em;font-family: initial;">Le numero saisi n'existe pas !!</p>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="retourCoriolisAlreadyProd" style="display: none;">
+        <div class="col-md-10"  style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+            <div class="alert alert-notice" style="padding-bottom: 0px;">
+                <p style="color: white;font-size: 1.3em;font-family: initial;">La commande est déjà produite !!</p>
+            </div>
+        </div>
+    </div>
+    {% if alreadyprod is defined %}
+        <div class="row" id="retourCoriolisLettreAlreadyProd2" style="display: none;">
+            <div class="col-md-10"  style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+                <div class="alert alert-notice" style="padding-bottom: 0px;">
+                    <p style="color: white;font-size: 1.3em;font-family: initial;">La lettre est déjà produite !!</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row" id="retourCoriolisLettreAlreadyProd" style="display: none;">
+        <div class="col-md-10"  style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+            <div class="alert alert-notice" style="padding-bottom: 0px;">
+                <p style="color: white;font-size: 1.3em;font-family: initial;">La lettre est déjà produite !!</p>
+            </div>
+        </div>
+    </div>
+
+    {% for message in app.session.flashbag.get('ConfirmProdCmdCoriolis') %}
+             <div class="row" id="ConfirmProdOkCmdCoriolis">
+                <div class="col-md-10"  style="background-color: #BFD626;margin: 18px;border-radius: 9px;">
+                    <div class="alert alert-notice" style="padding-bottom: 0px;">
+                        <p style="color: white;font-family: initial;">La commande  <span style="font-size: 1.3em;">{{ message['numCmd'] }}</span>   (n°BL: <span style="font-size: 1.2em;">{{ message['bl'] }}</span>)  est complète</p>
+                    </div>
+                </div>
+            </div>
+    {% endfor %}
+    {% for message in app.session.flashbag.get('NonCorrespNumTrackCoriolis') %}
+        <div class="row">
+            <div class="col-md-10" id="NonCorrespNumTrackCoriolis" style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+                <div class="alert alert-notice" style="padding-bottom: 0px;">
+                    <p style="color: white;font-family: initial;">Le N° de carte :<span style="font-size: 1.3em;">  {{ message['numTrack'] }}  </span> ne correspond pas à la lettre: <span style="font-size: 1.2em;">  {{ message['numRef'] }}</span> </p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% for message in app.session.flashbag.get('NonUpdateNumTrackCoriolis') %}
+        <div class="row">
+            <div class="col-md-10" id="NonUpdateNumTrackCoriolis" style="background-color: #D34026;margin: 18px;border-radius: 9px;">
+                <div class="alert alert-notice" style="padding-bottom: 0px;">
+                    <p style="color: white;font-size: 1.3em;font-family: initial;">Le BL n'a pas pu etre mis à jour .... Veuillez recommencer ! </p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+
+
+
+    {% if numRefApresValideCoriolis is defined and numRefApresValideCoriolis != 0 %}
+        <span id="numRefApresValideCoriolis" style="display: none;">{{ numRefApresValideCoriolis }}</span>
+    {% endif %}
+
+    <div class="row" style="background-color: #f9f9f9;" >
+        <div class="col-md-3" style="margin-top: 30px;">
+            <div class="row" >
+                <div id="hideIfNoDate" class="col-md-12" style="margin-top: -17px;{% if dateDepotN is not defined %}display: none;{% endif %}">
+                    <div id="inputnumRefCoriolis">
+                        <label for="numRefCoriolis">Saisir N° lettre</label>
+                        <input type="text" class="form-control" onchange="VerifNumRefCoriolis()" id="numRefCoriolis" autofocus style="width: 200px;font-size: 1.2em;">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div id="inputnumTrackCoriolis" style="display: none;margin-top: 5px;">
+                        <label for="numTrackCoriolis">Saisir N° carte SIM</label>
+                        <input type="text" class="form-control" onchange="VerifNumTrackCoriolis()" id="numTrackCoriolis" placeholder="N° carte SIM" style="width: 200px;font-size: 1.2em;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div id="retourCmdCoriolis"></div>
+        </div>
+    </div>
+    <div class="row" style="background-color: #f9f9f9;">
+        <div class="col-md-12">
+            <div id="retourCmdCoriolisArticle"></div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+
+    <script>
+        $(document).ready(function() {
+            $('#cocotest input').datepicker({
+                isRTL: false,
+                language: "fr",
+                autoclose: true
+            })
+            .on('changeDate', function(e) {
+
+                var date = $("#cocotest input").datepicker("getDate");
+                var dateString = $.datepicker.formatDate("yy-mm-dd", date);
+                $("#dateDepotCoriolisAdd").html(dateString);
+                document.getElementById('hideIfNoDate').style.display = '';
+                document.getElementById("numRefCoriolis").focus();
+                document.getElementById('inputlettreColor').style.color = '';
+            });
+
+
+
+        });
+//
+
+
+
+    </script>
+    <script>
+
+        var alreadyDemande = 0;
+        function VerifNumRefCoriolis() {
+            var dd = document.getElementById('NonCorrespNumTrackCoriolis');
+            if (dd !== null){dd.style.display = "none";}
+
+
+            if (alreadyDemande === 1 ){document.getElementById('inputnumTrackCoriolis').style.display = "none";}
+
+
+            var numRef = $('#numRefCoriolis').val();
+            var inputNumTrack = document.getElementById('numTrackCoriolis');
+            $.ajax({
+                url: "{{ path('tmd_coriolis_envoiNumRef') }}",
+                type: "POST",
+                data: 'numRef=' + numRef,
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    if (obj.length === 0) {
+                        document.getElementById('retourCoriolisNa').style.display = "";
+                        document.getElementById('numRefCoriolis').value = '';
+                        $("#retourCmdCoriolis").html("");
+                        $("#retourCmdCoriolisArticle").html("");
+
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd').style.display = "none";
+                        }
+                        if (document.getElementById('retourCoriolisAlreadyProd')) {
+                            document.getElementById('retourCoriolisAlreadyProd').style.display = "none";
+                        }
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd2')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd2').style.display = "none";
+                        }
+                        if (document.getElementById('ConfirmProdOkCmdCoriolis')) {
+                            document.getElementById('ConfirmProdOkCmdCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonCorrespNumTrackCoriolis')) {
+                            document.getElementById('NonCorrespNumTrackCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonUpdateNumTrackCoriolis')) {
+                            document.getElementById('NonUpdateNumTrackCoriolis').style.display = "none";
+                        }
+                    }
+                    else if(obj[0]['tagCmdComplete'] === 1){
+                        document.getElementById('retourCoriolisAlreadyProd').style.display = "";
+                        document.getElementById('numRefCoriolis').value = '';
+                        $("#retourCmdCoriolis").html("");
+                        $("#retourCmdCoriolisArticle").html("");
+
+                        document.getElementById('retourCoriolisNa').style.display = "none";
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd').style.display = "none";
+                        }
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd2')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd2').style.display = "none";
+                        }
+                        if (document.getElementById('ConfirmProdOkCmdCoriolis')) {
+                            document.getElementById('ConfirmProdOkCmdCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonCorrespNumTrackCoriolis')) {
+                            document.getElementById('NonCorrespNumTrackCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonUpdateNumTrackCoriolis')) {
+                            document.getElementById('NonUpdateNumTrackCoriolis').style.display = "none";
+                        }
+                    }
+                    else if (obj[0]['tagProdTrue'] === 1) {
+                        document.getElementById('retourCoriolisLettreAlreadyProd').style.display = "";
+                        document.getElementById('numRefCoriolis').value = '';
+                        $("#retourCmdCoriolis").html("");
+                        $("#retourCmdCoriolisArticle").html("");
+
+                        document.getElementById('retourCoriolisNa').style.display = "none";
+                        document.getElementById('retourCoriolisAlreadyProd').style.display = "none";
+
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd2')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd2').style.display = "none";
+                        }
+                        if (document.getElementById('ConfirmProdOkCmdCoriolis')) {
+                            document.getElementById('ConfirmProdOkCmdCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonCorrespNumTrackCoriolis')) {
+                            document.getElementById('NonCorrespNumTrackCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonUpdateNumTrackCoriolis')) {
+                            document.getElementById('NonUpdateNumTrackCoriolis').style.display = "none";
+                        }
+                    }
+
+                    else {
+                        alreadyDemande = 1;
+                        document.getElementById('retourCoriolisNa').style.display = "none";
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd').style.display = "none";
+                        }
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd2')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd2').style.display = "none";
+                        }
+                        if (document.getElementById('ConfirmProdOkCmdCoriolis')) {
+                            document.getElementById('ConfirmProdOkCmdCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonCorrespNumTrackCoriolis')) {
+                            document.getElementById('NonCorrespNumTrackCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonUpdateNumTrackCoriolis')) {
+                            document.getElementById('NonUpdateNumTrackCoriolis').style.display = "none";
+                        }
+                        document.getElementById('retourCoriolisAlreadyProd').style.display = "none";
+                        document.getElementById('inputnumTrackCoriolis').style.display = "";
+                        document.getElementById("numTrackCoriolis").focus();
+                        var len = obj.length;
+//                        var reader = new FileReader();
+                        if (len !== 0) {
+    //
+                            var html = '<div class="row"><div class="col-md-12" style="margin-top: 77px;"><p style="font-size: 1.4em;margin-bottom: -3px;">N° commande: ' + obj[0]['refclient'] + '</p><span id="numCmdCoriolis" style="display: none;">' + obj[0]['numcmde'] + '</span>';
+
+                            html += ('<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;font-size: 0.9em;"><thead><tr style="font-weight: bold;"><th>N° BL</th><th>Destinataire</th><th>Adresse</th><th>CP</th><th>Ville</th><th>Etat production</th></tr></thead>');
+
+                            var compt =0;
+                            for (var k = 0; k < len; k++) {
+                                if (obj[k]['flagProd'] === true ) {
+                                    compt = compt + 1;
+                                }
+                            }
+                            var avancement = 0;
+                            if (compt !== 0) {
+                                avancement = ((compt / len) * 100);
+                            }
+
+                            html += '<tr><td style="padding: 0px;">' + obj[0]['numbl'] + '</td><td style="padding: 0px;">' + obj[0]['destinataire'] + '</td><td style="padding: 0px;">' + obj[0]['destRue'] + '</td><td style="padding: 0px;">' + obj[0]['destCp'] + '</td><td style="padding: 0px;">' + obj[0]['destVille'] + '</td>';
+
+                            if (len > 1 ) {
+                                html += '<td style="position: relative;padding: 0px;"><div style="background-color: #BFD626;position: absolute;width: ' + Math.ceil(avancement) + '%; height: 22px;padding: 0px;"></div><div style="position: absolute;text-align: center;left: 50%;transform: translate(-50%, 0);padding: 0px;">' + Math.ceil(avancement) + '%</div></td>';
+
+                            }else {
+                                html += '<td style="position: relative;padding: 0px;text-align: center;">non produit</td>';
+                            }
+
+
+
+
+                            var html2 = '<div class="row"><div class="col-md-12"><p style="font-size: 1.4em;margin-bottom: -3px;">';
+                            if (len === 1){html2 += len+' Article:</p>'}
+                            else {html2 += len+' Articles:</p>'}
+
+                            html2 += ('<div ><table id="tableCoriolis" class="table table-hover table-bordered table-responsive coriolis" style="z-index: 1;font-size: 0.9em;"><thead style="display:table;table-layout:fixed;width: 99%;"><tr style="font-weight: bold;"><th class="col-md-1">N° BL</th><th class="col-md-2">Destinataire</th><th class="col-md-2">Adresse</th><th class="col-md-1">CP</th><th class="col-md-1">Ville</th><th class="col-md-1">N° lettre</th><th class="col-md-2">N° carte</th><th class="col-md-2">Etat production</th></tr></thead>' +
+                            '<tbody style="display:block;max-height:154px;overflow:auto;">');
+    //
+                            for (var j = 0; j < len; j++) {
+
+                                var detail = (obj[j]['detail']).split(";");
+                                html2 += '<tr id="'+obj[j]['numRef']+'" style="display:table;table-layout:fixed;width: 100%"><td class="col-md-1" style="padding-left: 2px;" >' + obj[j]['numbl'] + '</td><td class="col-md-2">' + detail[3] + ' ' + detail[4] + ' ' + detail[5] + '</td><td class="col-md-2">' + detail[9] + '</td><td class="col-md-1">' + detail[11] + '</td><td class="col-md-1">' + detail[12] + '</td><td class="col-md-1">' + obj[j]['numRef'] + '</td><td class="col-md-2">' + obj[j]['numTrack'] + '' +
+                                    '</td><td class="col-md-2"';
+                                if (obj[j]['flagProd']) {
+                                    html2 += 'style="background-color: #BFD626;"';
+                                }
+                                else {
+                                    html2 += 'style="background-color: #D34026;"';
+                                }
+                                html2 += '></td></tr>';
+
+                            }
+                            html2 += '</tbody></table></div></div>';
+
+                            $("#retourCmdCoriolis").html(html);
+                            $("#retourCmdCoriolisArticle").html(html2);
+                            var elmnt = document.getElementById(numRef);
+                            if (len > 1 ){
+                                elmnt.scrollIntoView();
+                                elmnt.style.backgroundColor = "#DFD8DF";
+                            }
+
+                        }
+                        $("#").html(html);
+                    }
+                }
+            })
+        }
+
+
+
+    </script>
+
+
+    <script>
+
+        function VerifNumTrackCoriolis() {
+            var numRef = $('#numRefCoriolis').val();
+            var numTrack = $('#numTrackCoriolis').val();
+            var numCmdCorio =  $('#numCmdCoriolis').text();
+            if ($('#dateDepotCoriolisAdd').text() != 0){
+                var temp = '{{ path('tmd_coriolis_envoiNumTrack' ,{ 'numRef': 'varnumRef', 'numTrack': 'varnumTrack', 'numCmd': 'varnumCmd', 'dateDepot': 'vardateDepot'})|escape('js') }}';
+                temp = temp.replace('vardateDepot', $('#dateDepotCoriolisAdd').text());
+            }else{
+                var temp = '{{ path('tmd_coriolis_envoiNumTrack' ,{ 'numRef': 'varnumRef', 'numTrack': 'varnumTrack', 'numCmd': 'varnumCmd'})|escape('js') }}';
+            }
+
+            temp = temp.replace('varnumRef', numRef);
+            temp = temp.replace('varnumTrack', numTrack);
+            temp = temp.replace('varnumCmd', numCmdCorio);
+            window.location.href = temp;
+
+
+        }
+
+    </script>
+
+    <script>
+        var numRef = $('#numRefCoriolis').val();
+        var numRefapresretour =  $('#numRefApresValideCoriolis').text();
+        if (numRefapresretour > 0) {
+            $.ajax({
+                url: "{{ path('tmd_coriolis_envoiNumRef') }}",
+                type: "POST",
+                data: 'numRef=' + numRefapresretour,
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    if (obj.length === 0) {
+                        document.getElementById('retourCoriolisNa').style.display = "";
+                        document.getElementById('numRefCoriolis').value = '';
+                        $("#retourCmdCoriolis").html("");
+                        $("#retourCmdCoriolisArticle").html("");
+
+                        document.getElementById('retourCoriolisAlreadyProd').style.display = "none";
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd').style.display = "none";
+                        }
+                        if (document.getElementById('retourCoriolisLettreAlreadyProd2')) {
+                            document.getElementById('retourCoriolisLettreAlreadyProd2').style.display = "none";
+                        }
+
+                        if (document.getElementById('NonCorrespNumTrackCoriolis')) {
+                            document.getElementById('NonCorrespNumTrackCoriolis').style.display = "none";
+                        }
+                        if (document.getElementById('NonUpdateNumTrackCoriolis')) {
+                            document.getElementById('NonUpdateNumTrackCoriolis').style.display = "none";
+                        }
+                    }
+    //
+                    else {
+    //                          document.getElementById('inputnumTrackCoriolis').style.display = "none";
+                        document.getElementById("numRefCoriolis").focus();
+                        var len = obj.length;
+                        var reader = new FileReader();
+                        if (len !== 0) {
+    //
+                            var html = '<div class="row"><div class="col-md-12" style="margin-top: 77px;"><p style="font-size: 1.4em;margin-bottom: -3px;">N° commande: ' + obj[0]['refclient'] + '</p><span id="numCmdCoriolis" style="display: none;">' + obj[0]['numcmde'] + '</span>';
+
+                            html += ('<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;font-size: 0.9em;"><thead><tr style="font-weight: bold;"><th>N° BL</th><th>Destinataire</th><th>Adresse</th><th>CP</th><th>Ville</th><th>Etat production</th></tr></thead>');
+
+                            var compt =0;
+                            for (var k = 0; k < len; k++) {
+                                if (obj[k]['flagProd'] === true ) {
+                                    compt = compt + 1;
+                                }
+                            }
+                            var avancement = 0;
+                            if (compt !== 0) {
+                                avancement = ((compt / len) * 100);
+                            }
+
+                            html += '<tr><td style="padding: 0px;">' + obj[0]['numbl'] + '</td><td style="padding: 0px;">' + obj[0]['destinataire'] + '</td><td style="padding: 0px;">' + obj[0]['destRue'] + '</td><td style="padding: 0px;">' + obj[0]['destCp'] + '</td><td style="padding: 0px;">' + obj[0]['destVille'] + '</td>';
+
+                            if (len > 1 ) {
+                                html += '<td style="position: relative;padding: 0px;"><div style="background-color: #BFD626;position: absolute;width: ' + Math.ceil(avancement) + '%; height: 22px;padding: 0px;"></div><div style="position: absolute;text-align: center;left: 50%;transform: translate(-50%, 0);padding: 0px;">' + Math.ceil(avancement) + '%</div></td>';
+
+                            }else {
+                                html += '<td style="position: relative;padding: 0px;text-align: center;">non produit</td>';
+                            }
+
+
+
+
+                            var html2 = '<div class="row"><div class="col-md-12"><p style="font-size: 1.4em;margin-bottom: -3px;">';
+                            if (len === 1){html2 += len+' Article:</p>'}
+                            else {html2 += len+' Articles:</p>'}
+
+                            html2 += ('<div ><table id="tableCoriolis" class="table table-hover table-bordered table-responsive coriolis" style="z-index: 1;font-size: 0.9em;"><thead style="display:table;table-layout:fixed;width: 99%;"><tr style="font-weight: bold;"><th class="col-md-1">N° BL</th><th class="col-md-2">Destinataire</th><th class="col-md-2">Adresse</th><th class="col-md-1">CP</th><th class="col-md-1">Ville</th><th class="col-md-1">N° lettre</th><th class="col-md-2">N° carte</th><th class="col-md-2">Etat production</th></tr></thead>' +
+                            '<tbody style="display:block;max-height:154px;overflow:auto;">');
+    //
+                            for (var j = 0; j < len; j++) {
+
+                                var detail = (obj[j]['detail']).split(";");
+                                html2 += '<tr id="'+obj[j]['numRef']+'" style="display:table;table-layout:fixed;width: 100%;"><td class="col-md-1" >' + obj[j]['numbl'] + '</td><td class="col-md-2">' + detail[3] + ' ' + detail[4] + ' ' + detail[5] + '</td><td class="col-md-2">' + detail[9] + '</td><td class="col-md-1">' + detail[11] + '</td><td class="col-md-1">' + detail[12] + '</td><td class="col-md-1">' + obj[j]['numRef'] + '</td><td class="col-md-2">' + obj[j]['numTrack'] + '' +
+                                    '</td><td class="col-md-2"';
+                                if (obj[j]['flagProd']) {
+                                    html2 += 'style="background-color: #BFD626;"';
+                                }
+                                else {
+                                    html2 += 'style="background-color: #D34026;"';
+                                }
+                                html2 += '></td></tr>';
+
+                            }
+                            html2 += '</tbody></table></div></div>';
+
+                            $("#retourCmdCoriolis").html(html);
+                            $("#retourCmdCoriolisArticle").html(html2);
+                            var elmnt = document.getElementById(numRefapresretour);
+                            if (len > 1 ){
+                                elmnt.scrollIntoView();
+                                elmnt.style.backgroundColor = "#DFD8DF";
+                            }
+                        }
+                    }
+                }
+            })
+        }
+
+
+    </script>
+{% endblock %}

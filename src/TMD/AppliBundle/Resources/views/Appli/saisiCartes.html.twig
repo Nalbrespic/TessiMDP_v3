@@ -1,0 +1,260 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Outils - Cartes/Plages
+{% endblock %}
+
+{% block body %}
+
+
+
+    <div class="row">
+        <div class="col-md-11">
+            <div class="titreFenetre">
+                <h3>Saisie de cartes par plages</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label>{% if clients is defined %} {% if idClient != 0 %}Clients:{% endif %}{% endif %}</label>
+            <select class="form-control" onchange="location = this.options[this.selectedIndex].value;" style="width: 210px;>
+            {% if clients is defined %}
+                {% if idClient == 0 %}
+                    {% for client in clients %}
+                            <option value="{{ path('tmd_appli_cartepage', {'idClient': client.idclient}) }}" class="list-group-item" >{{ client.nomclient}} </option>
+                    {% endfor %}
+                {% else %}
+                    {% set ClientLabel = 'Clients' %}
+                    {% for client in clients %}
+                        <option value="{{ path('tmd_appli_cartepage', {'idClient': client.idclient}) }}" class="list-group-item"
+                                {%  if client.idclient == idClient %} selected  {% endif  %} >
+                            {{ client.nomclient}} </option>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            </select>
+        </div>
+
+    </div>
+
+    {% if idClient is defined %}
+        <span id="clientForListe" style="display: none;">{{ idClient }}</span>
+    {% endif %}
+
+
+    <div class="row">
+            {% for message in app.session.flashbag.get('ConfirmRecepCartesbyPlages') %}
+                <div class="row" id="saisiCarteConfirm">
+                    <div class="col-md-10"  style="background-color: #B3D6C2;margin: 18px;border-radius: 9px;">
+                        <div class="alert alert-notice" style="padding-bottom: 0px;">
+                            <p><span>{% if message['plageFin']|length > 15 %}
+                                        {{ (message['plageFin'][10:])[:8] - (message['plageDebut'][10:])[:8] +1 }}
+                                    {% else %}
+                                        {{ message['plageFin'] - message['plageDebut'] +1 }}
+                                    {% endif %}
+                                    </span> Cartes enregistrées:</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% for message in app.session.flashbag.get('ErrorRecepCartest') %}
+                {% if message|length > 0 %}
+                    <div class="row" id="saisiCarteKo">
+                        <div class="col-md-10"  style="background-color: #FFE2E5;margin: 18px;border-radius: 9px;">
+                            <div class="alert alert-notice" style="padding-bottom: 0px;">
+                                <p>Au moins une carte est deja enregistrée dans le stock !!</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% for message in app.session.flashbag.get('ErrorRecepCartesContenant') %}
+                {% if message|length > 0 %}
+                    <div class="row" id="saisiCarteKo2">
+                        <div class="col-md-10"  style="background-color: #FFE2E5;margin: 18px;border-radius: 9px;">
+                            <div class="alert alert-notice" style="padding-bottom: 0px;">
+                                <p>La réference du colis existe déjà !!</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+    {% if form is defined %}
+
+        <div class="col-md-3" style="margin-top: 17px;">
+            <div class="well">
+                {{ form(form) }}
+            </div>
+        </div>
+
+
+        <div id="ModalCarte" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="ModalCarteContenu" class="ModalCarte-title"></h4>
+                </div>
+
+                {#<h4 class="modal-title">Modal title</h4>#}
+                {#<div style="text-align: right;"><a href="#"><span class="closeModalCarte">&times;</span></a></div>#}
+
+                <div class="modal-footer">
+                    <button id="ModalCarteAnnule" type="button" class="btn btn-default" >Annuler</button>
+                    <button id="ModalCarteConfirme"type="button" class="btn btn-primary">Confirmer</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-8" style="margin-top: 50px;">
+            <h4><span id="nbCarteDis" style="font-size: 1.2em;"></span> cartes disponibles</h4>
+            <h5 style="color: #555555;">Lots de cartes non entamés en stock:</h5>
+
+                <div id="tabListeCarte" style="overflow-y: auto; height: 372px;"></div>
+
+
+    </div>
+        </div>
+        {% endif %}
+
+
+
+{% endblock %}
+
+
+{% block javascriptsPlus %}
+    {#operation du jour Synthese#}
+    <script>
+        $(document).ready(function() {
+            donneListeCarte();
+
+        })
+
+        function donneListeCarte() {
+
+            var idClient = $('#clientForListe').text();
+            $.ajax({
+                url: "{{ path('tmd_appli_listeCarte') }}",
+                type: "POST",
+                data: 'idClient=' + idClient,
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var len = obj[0].length;
+                    var html = '';
+                    if (len === 0) {
+                        html += '<p>Pas de Carte en stock !</p>';
+                    }
+                    else {
+                        html += '<table class="table table-bordered table-striped tableSynthese " style="text-align: center;"><tr class="active">' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Réference du colis</th>' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Plage de début</th>' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Plage de fin</th>' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Nombre de cartes</th>' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Supprimer</th></tr>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<tr><td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['box'] + '</td>' +
+                                '<td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['plagedebut'] + '</td>' +
+                                '<td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['plagefin'] + '</td>' +
+                                '<td style="text-align: center;padding-bottom: 0px;">' + (((obj[0][i]['plagefin']).slice(5, -1)) - ((obj[0][i]['plagedebut']).slice(5, -1)) + 1) + '</td>';
+                            html += '<td style="text-align: center;padding-bottom: 0px;cursor: pointer;" onclick="ConfirmationSuppArticlePlage(\'' + obj[0][i]['box'] + '\',\'' + obj[0][i]['numplage'] + '\')";><a href="#">&times</a></td></tr>';
+                        }
+                        html += '</table></div>'
+
+                    }
+                    $("#nbCarteDis").html(obj[1][0]['1']);
+                    $("#tabListeCarte").html(html)
+                }
+            })
+        }
+    </script>
+    <script>
+        function ConfirmationSuppArticlePlage(refColis, id) {
+            var modal = document.getElementById('ModalCarte');
+            var modalAnnule = document.getElementById('ModalCarteAnnule');
+            var modalConfirme = document.getElementById('ModalCarteConfirme');
+//            var span = document.getElementsByClassName("closeModalCarte");
+//            var contenuModal = document.getElementsByClassName("ModalCarte-title");
+            $("#ModalCarteContenu").html("Confirmer la suppression de la ref: "+refColis);
+
+            modal.style.display = "block";
+            window.onclick = function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+                if (event.target === modalAnnule) {
+                    modal.style.display = "none";
+                }
+                if (event.target === modalConfirme) {
+//
+
+
+                    $.ajax({
+                        url: "{{ path('tmd_appli_deleteLotCarte') }}",
+                        type: "POST",
+                        data: 'carteLot=' + id,
+                        dataType: "html",
+                        contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                        complete: function (data) {
+                            var json = data.responseText;
+                            var obj = JSON.parse(json)
+                            if (obj[0] === 1){
+                                if (document.getElementById('saisiCarteConfirm')) {
+                                    document.getElementById('saisiCarteConfirm').style.display = "none";
+                                }
+                                if (document.getElementById('saisiCarteKo')) {
+                                    document.getElementById('saisiCarteKo').style.display = "none";
+                                }
+                                if (document.getElementById('saisiCarteKo2')) {
+                                    document.getElementById('saisiCarteKo2').style.display = "none";
+                                }
+
+                                modalAnnule.style.display = "none";
+                                $("#ModalCarteContenu").html("Suppression impossible ... plage utilisée !");
+                                modal.style.display = "block";
+                                window.onclick = function (event) {
+                                    if (event.target === modal) {
+                                        modal.style.display = "none";
+                                    }
+                                    if (event.target === modalConfirme) {
+                                        modal.style.display = "none";
+                                    }
+                                }
+
+                            }
+                            else{
+                                if (document.getElementById('saisiCarteConfirm')) {
+                                    document.getElementById('saisiCarteConfirm').style.display = "none";
+                                }
+                                if (document.getElementById('saisiCarteKo')) {
+                                    document.getElementById('saisiCarteKo').style.display = "none";
+                                }
+                                if (document.getElementById('saisiCarteKo2')) {
+                                    document.getElementById('saisiCarteKo2').style.display = "none";
+                                }
+                                modal.style.display = "none";
+                                donneListeCarte();
+                            }
+
+
+                        }
+
+                    })
+
+                }
+
+            }
+
+
+        }
+
+    </script>
+
+{% endblock %}

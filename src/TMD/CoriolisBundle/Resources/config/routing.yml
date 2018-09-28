@@ -1,0 +1,18 @@
+tmd_coriolis_homepage:
+    path:     /
+    defaults: { _controller: TMDCoriolisBundle:Coriolis:index }
+
+tmd_coriolis_envoiNumRef:
+    path: /envoiNumRef
+    defaults:
+        _controller: TMDCoriolisBundle:Coriolis:envoiNumRef
+    methods: [POST]
+
+tmd_coriolis_envoiNumTrack:
+    path: /envoiNumTrack/{numRef}/{numTrack}/{numCmd}/{dateDepot}
+    defaults:
+        _controller: TMDCoriolisBundle:Coriolis:envoiNumTrack
+        numRef: 0
+        numTrack: 0
+        numCmd: 0
+        dateDepot: 0

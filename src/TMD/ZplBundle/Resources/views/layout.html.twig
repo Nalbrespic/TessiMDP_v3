@@ -1,0 +1,38 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+
+{% block title %}
+
+    Etiquettes - {{ parent() }}
+
+{% endblock %}
+
+
+{% block body %}
+
+
+    {# On définit un sous-titre commun à toutes les pages du bundle, par exemple #}
+
+    <div class="row" style="background-color: aliceblue;">
+        <div id="menu" class="col-md-3" >
+            <h2>Etiquettes Zebra</h2>
+            <hr>
+            <ul class="nav nav-pills nav-stacked">
+                <li><a href="">re-edition</a></li>
+                <li><a href="">Nouvelle Etik</a></li>
+                <li><a href="">Controle</a></li>
+            </ul>
+        </div>
+        <div id="content" class="col-md-9">
+            {% block tmdspl_body %}
+
+            {% endblock %}
+        </div>
+    </div>
+
+    {# On définit un nouveau bloc, que les vues du bundle pourront remplir #}
+
+
+
+
+{% endblock %}

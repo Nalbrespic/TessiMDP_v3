@@ -1,0 +1,117 @@
+tmd_prod_homepage:
+    path:     /
+    defaults: { _controller: TMDProdBundle:Prod:index }
+
+tmd_prod_client:
+    path:     /client/{page}/{nbFichierPage}/{idClient}/{idOpe}
+    defaults:
+        _controller: TMDProdBundle:Prod:viewClient
+        page: 1
+        nbFichierPage: 20
+        idClient: 0
+        idOpe:    0
+    requirements:
+        page: \d*
+
+tmd_prod_suiviCourant:
+    path:     /suiviOpeCourant/{page}/{nbFichierPage}/{idClient}/{idOpe}
+    defaults:
+        _controller: TMDProdBundle:Prod:viewSuiviCourant
+        page: 1
+        nbFichierPage: 20
+        idClient: 0
+        idOpe:    0
+    requirements:
+        page: \d*
+
+#tmd_prod_test:
+#    path: /test/{idFile}
+#    defaults:
+#        _controller: TMDProdBundle:Prod:test
+#
+#tmd_prod_search:
+#    path:     /search
+#    defaults:
+#        _controller: TMDProdBundle:Prod:search
+#
+#tmd_prod_searchdate:
+#    path:     /searchdate/{date1}
+#    defaults:
+#        _controller: TMDProdBundle:Prod:searchdate
+#        date1: 0
+
+#tmd_prod_mymodule:
+#    path:   /search/{sf_format}
+#    defaults:
+#        _controller: TMDProdBundle:Prod:mymodule
+#    requirements:
+#        format: xml
+
+tmd_prod_donneBlNonProd:
+    path: /blNonProd
+    defaults:
+        _controller: TMDProdBundle:Prod:donneBlNonProd
+    methods: [POST]
+
+
+tmd_prod_calendar:
+    path: /calendar
+    defaults:
+        _controller: TMDProdBundle:Prod:calendar
+    methods: [GET]
+
+tmd_prod_donneTrackingsByFile:
+    path: /trackingsByFile
+    defaults:
+        _controller: TMDProdBundle:Prod:donneTrackingsByFile
+    methods: [POST]
+
+tmd_prod_exportTrackings:
+    path: /rTracking/{idFile}/{prod}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingExcel
+
+#tmd_prod_exportTracking:
+#    path: /exportTracking/{idFiles}
+#    defaults:
+#        _controller: TMDProdBundle:Prod:exportTrackingchoice
+
+tmd_prod_donneTrackingsByDateProd:
+    path: /rTrackingDate
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingbyDate
+
+tmd_prod_donneSyntheseByDateProd:
+    path: /syntheseDate
+    defaults:
+        _controller: TMDProdBundle:Prod:exportSynthesebyDate
+
+tmd_prod_rechercheCmd:
+    path: /rechercheCmd
+    defaults:
+        _controller: TMDProdBundle:Prod:rechercheByCmd
+
+tmd_prod_donneArticleByBl:
+    path: /articleByBl
+    defaults:
+        _controller: TMDProdBundle:Prod:articleByBl
+
+tmd_prod_modifDateDepot:
+    path: /modifDateDepot
+    defaults:
+        _controller: TMDProdBundle:Prod:modifDateDepot
+
+tmd_prod_modifDateProduction:
+    path: /modifDateProduction
+    defaults:
+        _controller: TMDProdBundle:Prod:modifDateProduction
+
+tmd_prod_syntheseArtCoke:
+    path: /syntheseArtCoke/{date}
+    defaults:
+        _controller: TMDProdBundle:Prod:syntheseCoke
+
+tmd_prod_addApplication:
+    path: /addApplication
+    defaults:
+        _controller: TMDProdBundle:Prod:addApplication
