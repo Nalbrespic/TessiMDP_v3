@@ -3,6 +3,7 @@
 namespace TMD\AppliBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -154,6 +155,7 @@ class AppliController extends Controller
 
 
 
+
         if ($etat != 'nc' and $etat != '3') {
             $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
 
@@ -187,7 +189,7 @@ class AppliController extends Controller
                     $articleArray['art'][$k]['perso1'] = $v->getPerso1();
                     $articleArray['art'][$k]['perso2'] = $v->getPerso2();
                     $articleArray['art'][$k]['libelle'] = $v->getLibelle();
-                    if (sizeof($cheminImage . $v->getNomimg()) > 0) {
+                    if (sizeof($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
                         $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
                     }
                     $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
@@ -210,107 +212,20 @@ class AppliController extends Controller
                 $button = true;
             }elseif($etat === '0') {
                 $messageApresScan = "La commande N° " . $bl . " a été mise à jour";
+            }elseif($etat === '0v') {
+                $messageApresScan = "La commande N° " . $bl . " est en attente de production";
             }elseif($etat === '2') {
-                $messageApresScan = "ZPL inexistant on non genéré pour le BL N° " . $bl;
+                $messageApresScan = "La commande N° " . $bl . " a été mise à jour et ZPL inexistant on non genéré";
+            }elseif($etat === '2.0') {
+                $messageApresScan = "La commande N° " . $bl . " est en attente de production et ZPL inexistant on non genéré";
+            }elseif($etat === '5') {
+                $messageApresScan = "Probléme d'enregistrement ... Veuillez recommencer !";
             }
             else{
                 $messageApresScan = "Probleme de reseau !";
             }
 
 
-
-//            $user = $this->getUser();
-//
-//                $histo = new EcommHistoStatut();
-//                $histo->setDatestatut(new \DateTime());
-//                $histo->setIdstatut(2);
-//                $histo->setNumbl($bl);
-//                $histo->setIduser($user->getId());
-//                $em->persist($histo);
-//                $dateProdAverif = new \DateTime();
-//                $BlaProduire->setDateProduction($dateProdAverif);
-//
-//                if ($dateDepot === 0){
-//                    $date = (new \DateTime())->format('Y-m-d');
-//                    $dateDepotAverif = $date;
-//                    $BlaProduire->getBl()->getNumligne()->setDateDepot(\DateTime::createFromFormat('Y-m-d', $date));
-//                    $trackBL = $BlaProduire->getBl()->getNumligne();
-//                }
-//                else{
-//                    $date = (new \DateTime($dateDepot))->format('Y-m-d');
-//                    $dateDepotAverif = $date;
-//                    $BlaProduire->getBl()->getNumligne()->setDateDepot(\DateTime::createFromFormat('Y-m-d', $date));
-//                    $trackBL = $BlaProduire->getBl()->getNumligne();
-//                }
-//            }
-//            else{
-//                $updateHistoOK = true;
-//                $updateProdOK = true;
-//                $updateDateDepotOK = true;
-//            }
-//
-//            $em->flush();
-//
-//
-////      Verification de histoStatut-cmd
-//            if ($articleAverif != null)
-//            {
-//                $break = 0;
-//                while (!$updateHistoOK and $break < 3 ) {
-//                    $histoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $numBLUpdate, 'idstatut' => '2'));
-//                    if (sizeof($histoVerif) == 0) {
-//                        $break ++;
-//                        $em->persist($histo);
-//                        $em->flush();
-//                    }else{
-//                        $updateHistoOK = true;
-//                        break;
-//                    }
-//                }
-//
-//
-//                $break1 = 0;
-//                while (!$updateArticleOK and $break1 < 3) {
-//                    $articleVerif = $em->getRepository('TMDProdBundle:EcommCmdep')->findOneBy(array('numbl' => $numBLUpdate, 'flagProd' => '1'));
-//                    if (sizeof($articleVerif) == 0) {
-//                        $break1 ++;
-//                        $articleAverif->setFlagProd(1);
-//                        $em->flush();
-//                    }else{
-//                        $updateArticleOK = true;
-//                        break;
-//                    }
-//                }
-//                if ($dateDepotAverif != null ) {
-//                    $break2 = 0;
-//                    while (!$updateDateDepotOK  and $break2 < 3) {
-//                        $dateVerif = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('expRef' => $numBLUpdate, 'dateDepot' => \DateTime::createFromFormat('Y-m-d', $dateDepotAverif)));
-//                        if (sizeof($dateVerif) == 0) {
-//                            $break2++;
-//                            $trackBL->setDateDepot(\DateTime::createFromFormat('Y-m-d', $dateDepotAverif));
-//                            $em->flush();
-//                        } else {
-//                            $updateDateDepotOK = true;
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//                if ($dateProdAverif != null) {
-//                    $break3 = 0;
-//                    while (!$updateProdOK and $break3 < 3) {
-//                        $dateProdVerif = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $numBLUpdate, 'dateProduction' => $dateProdAverif));
-//                        if (sizeof($dateProdVerif) == 0) {
-//                            dump('4');
-//                            $break3++;
-//                            $BlaProduire->setDateProduction($dateProdAverif);
-//                            $em->flush();
-//                        } else {
-//                            $updateProdOK = true;
-//                            break;
-//                        }
-//                    }
-//                }
 
 
 
@@ -325,7 +240,8 @@ class AppliController extends Controller
                 'articles'      =>$articleArray,
                 'button'        =>$button,
                 'histo'         =>$histo,
-                'dateDepotN'    =>$dateDepot
+                'dateDepotN'    =>$dateDepot,
+                'verif'         =>$verif
             ));
         }
 //        if ( $etat == '2'){
@@ -348,9 +264,125 @@ class AppliController extends Controller
         return $this->render('TMDAppliBundle:Appli:production.html.twig', array(
             'etat'          =>$etat,
             'apresScan'     =>$messageApresScan,
-            'dateDepotN'    =>$dateDepot
+            'dateDepotN'    =>$dateDepot,
+            'verif'         =>$verif
 
         ));
 
+    }
+
+    public function testColAction()
+    {
+
+        return $this->render('TMDAppliBundle:Appli:colissimo.html.twig', array(
+
+        ));
+    }
+
+    public function colissimoAction(Request $request)
+    {
+
+        if ($request->isXmlHttpRequest()) {
+
+            define("SERVER_NAME", 'https://ws.colissimo.fr'); //TODO : Change server name
+            define("LABEL_FOLDER",'./labels/'); //TODO : Change OutPut Folder: this is where the label will be saved
+
+//Build the input request : adapt parameters according to your parcel info and options
+$requestParameter = array(
+    'contractNumber' => '923108', //TODO : Change contractNumber
+    'password' => 'dhu48/y!', //TODO : Change password
+    'outputFormat' => array(
+        'outputPrintingType' => 'ZPL_10x15_203dpi'
+    ),
+    'letter' => array(
+        'service' => array(
+            'productCode' => 'DOM',
+            'depositDate' => '2017-04-30' //TODO : Change depositDate (must be at least equal to current date)
+                                ),
+                        'parcel' => array(
+                'weight' => '3',
+            ),
+                        'sender' => array(
+                'address' => array(
+                    'companyName' => 'companyName',
+                    'line2' => 'main address',
+                    'countryCode' => 'FR',
+                    'city' => 'Paris',
+                    'zipCode' => '75007'
+                )
+            ),
+                        'addressee' => array(
+                'address' => array(
+                    'lastName' => 'lastName',
+                    'firstName' => 'firstName',
+                    'line2' => 'main address',
+                    'countryCode' => 'FR',
+                    'city' => 'Paris',
+                    'zipCode' => '75017'
+                )
+            )
+                        )
+                    );
+
+            function array_to_xml($soapRequest, $soapRequestXml) {
+                foreach($soapRequest as $key => $value) {
+                    if(is_array($value)) {
+                        if(!is_numeric($key)){
+                            $subnode = $soapRequestXml->addChild("$key");
+                            array_to_xml($value, $subnode);
+                        }
+                        else{
+                            $subnode = $soapRequestXml->addChild("item$key");
+                            array_to_xml($value, $subnode);
+                        }
+                    }
+                    else {
+                        $soapRequestXml->addChild("$key",htmlspecialchars("$value"));
+                    }
+                }
+            }
+
+
+        //+ Generate SOAPRequest
+        $xml = new \SimpleXMLElement('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" />');
+        $xml->addChild("soapenv:Header");
+        $children = $xml->addChild("soapenv:Body");
+        $children = $children->addChild("sls:generateLabel", null, 'http://sls.ws.coliposte.fr');
+        $children = $children->addChild("generateLabelRequest", null, "");
+        array_to_xml($requestParameter,$children);
+
+        $requestSoap = $xml->asXML();
+        dump($requestSoap);
+        //- Generate SOAPRequest
+
+        //+ Call Web Service
+
+            $options = array(
+                'cache_wsdl' => 0,
+                'trace' => 1,
+                'stream_context' => stream_context_create(array(
+                    'ssl' => array(
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    )
+                ))
+            );
+            try {
+                    $resp = new \SoapClient ( 'https://ws.colissimo.fr/sls-ws/SlsServiceWS?wsdl', $options);
+        $response = $resp->__doRequest ( $requestSoap, SERVER_NAME .'/sls-ws/SlsServiceWS', 'generateLabel', '2.0', 1 );
+            } catch (\Exception $e) {
+                var_dump($e->getMessage(), die());
+            }
+
+
+
+
+
+
+            return new $response;
+        };
+
+        return new Response("erreur: ce n'est pas du Json", 400);
     }
 }

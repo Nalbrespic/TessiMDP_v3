@@ -109,7 +109,7 @@ class EcommAppli
      *   @ORM\JoinColumn(name="idTypeProd", referencedColumnName="idTypeProd", nullable=false)
      * })
      */
-    private $idtypeprod;
+    private $idtypeprod = 1 ;
 
     /**
      * EcommAppli constructor.

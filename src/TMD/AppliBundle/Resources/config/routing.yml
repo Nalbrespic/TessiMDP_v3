@@ -20,4 +20,12 @@ tmd_appli_production:
         bl: 0
         etat: nc
         dateDepot: 0
-        verif: 0
+        verif: false
+
+tmd_appli_testCol:
+    path:     /testCol
+    defaults: { _controller: TMDAppliBundle:Appli:testCol }
+
+tmd_appli_col:
+    path:     /colissimo
+    defaults: { _controller: TMDAppliBundle:Appli:colissimo }

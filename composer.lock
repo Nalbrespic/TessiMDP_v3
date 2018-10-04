@@ -1709,16 +1709,16 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "125f462a718956f37d81305ca0df4f17cef0f3b9"
+                "reference": "57404f43742a8164b5eac3ab03b962d8740885c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/125f462a718956f37d81305ca0df4f17cef0f3b9",
-                "reference": "125f462a718956f37d81305ca0df4f17cef0f3b9",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/57404f43742a8164b5eac3ab03b962d8740885c1",
+                "reference": "57404f43742a8164b5eac3ab03b962d8740885c1",
                 "shasum": ""
             },
             "require": {
@@ -1751,7 +1751,7 @@
                 "dompdf/dompdf": "Option for rendering PDF with PDF Writer",
                 "jpgraph/jpgraph": "Option for rendering charts, or including charts with PDF or HTML Writers",
                 "mpdf/mpdf": "Option for rendering PDF with PDF Writer",
-                "tecnick.com/tcpdf": "Option for rendering PDF with PDF Writer"
+                "tecnickcom/tcpdf": "Option for rendering PDF with PDF Writer"
             },
             "type": "library",
             "autoload": {
@@ -1792,7 +1792,7 @@
                 "xls",
                 "xlsx"
             ],
-            "time": "2018-08-06T02:58:06+00:00"
+            "time": "2018-09-30T03:57:24+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -2169,16 +2169,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v3.4.15",
+            "version": "v3.4.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "8a84fcb207451df0013b2c74cbbf1b62d47b999a"
+                "reference": "54ba444dddc5bd5708a34bd095ea67c6eb54644d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/8a84fcb207451df0013b2c74cbbf1b62d47b999a",
-                "reference": "8a84fcb207451df0013b2c74cbbf1b62d47b999a",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/54ba444dddc5bd5708a34bd095ea67c6eb54644d",
+                "reference": "54ba444dddc5bd5708a34bd095ea67c6eb54644d",
                 "shasum": ""
             },
             "require": {
@@ -2214,7 +2214,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:19:56+00:00"
+            "time": "2018-10-03T08:46:40+00:00"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -2913,16 +2913,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v2.8.45",
+            "version": "v2.8.46",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "289dc238c533476d0101d736816b408b02e51751"
+                "reference": "a7f5ade1f8b3eb74a130cf681c45bfa991c330d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/289dc238c533476d0101d736816b408b02e51751",
-                "reference": "289dc238c533476d0101d736816b408b02e51751",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/a7f5ade1f8b3eb74a130cf681c45bfa991c330d1",
+                "reference": "a7f5ade1f8b3eb74a130cf681c45bfa991c330d1",
                 "shasum": ""
             },
             "require": {
@@ -3049,7 +3049,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2018-08-27T17:33:57+00:00"
+            "time": "2018-09-30T03:53:41+00:00"
         },
         {
             "name": "tms/logistic-bundle",
@@ -3412,16 +3412,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v2.8.45",
+            "version": "v2.8.46",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "85c95412dd60855542256d4c40992062f37912cf"
+                "reference": "a1295ca6e2a7f2d8ced9e0dd70900d7a64d9474b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/85c95412dd60855542256d4c40992062f37912cf",
-                "reference": "85c95412dd60855542256d4c40992062f37912cf",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/a1295ca6e2a7f2d8ced9e0dd70900d7a64d9474b",
+                "reference": "a1295ca6e2a7f2d8ced9e0dd70900d7a64d9474b",
                 "shasum": ""
             },
             "require": {
@@ -3466,7 +3466,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:13:39+00:00"
+            "time": "2018-09-19T20:34:51+00:00"
         }
     ],
     "aliases": [],

@@ -52,11 +52,11 @@
     {% if etat != "nc" %}
     <div class="row" >
 
-        <div class="col-md-7 col-md-offset-4" id="barre" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;font-family: initial;height: 34px;{% if etat == 1 or etat == 2 or etat == 3 %}background: #d34026;{% endif %}">
+        <div class="col-md-7 col-md-offset-4" id="barre" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;font-family: initial;height: 34px;{% if etat == 1 or etat == 2 or etat == 3 or etat == 5 %}background: #d34026;{% endif %}">
             <div class="row">
-                <div  class="col-md-7">{{ apresScan }}{% if etat == '0' %}<span id="recupEtatProd" style="display: none;">{{ etat }}</span>  {% endif %} </div>
+                <div  class="col-md-9">{{ apresScan }}{% if etat == '0' %}<span id="recupEtatProd" style="display: none;">{{ etat }}</span>  {% endif %} </div>
                 {% if button is defined and button %}
-                    <div class="col-md-3"><button onclick="sendData({{  blCmd.bl.numbl }})" style="margin-bottom: 9px;" type="button" class="btn btn-default  btn-xs">Re-imprimer etiquette</button></div>
+                    <div class="col-md-2" style="margin-left: -20px;"><button onclick="sendData({{  blCmd.bl.numbl }})" style="margin-bottom: 9px;" type="button" class="btn btn-default  btn-xs">Re-imprimer etiquette</button></div>
                 {% endif %}
                 <div class="col-md-1 " id="fermer"></div>
             </div>
@@ -66,9 +66,17 @@
 
     <div class="row" style="margin-top: 5px;">
         <div class="col-md-3" >
+            <div class="row" >
+                <div class="col-md-12">
+                    <div class="checkbox" style="margin-left: 1px;">
+                        <label style="font-weight: 700;margin-right: 14px;"><input type="checkbox" id="checkVerifBL" value="">Consultation commande</label>
+                        <span id="veriOrNot" style="display: none;">{% if verif %}verif{% endif %}</span>
+                    </div>
+                </div>
+            </div>
             <div class="row" id="blocDateDepot">
                 <div class="col-md-12">
-                    <h5 id="prodInputDateDepot" style="font-size: 1em;width: 150px;margin-left:1px;text-align: left;font-weight: 700;margin-bottom: 5px;{% if dateDepotN is defined and dateDepotN != 0 %}color:red;{% endif %}">Date de depôt: </h5>
+                    <h5 id="prodInputDateDepot" style="font-size: 1em;width: 150px;margin-left:1px;text-align: left;font-weight: 700;margin-bottom: 5px;">Date de depôt: </h5>
                 </div>
                 {#<div id="dateDepotProdIn" class="col-md-8">#}
                     {#{% if dateDepotN is defined and dateDepotN != '0' %}#}
@@ -79,7 +87,7 @@
                     {#<span style="" id="dateDepotProdInAdd">{% if dateDepotN is defined and dateDepotN != '0' %}{{ dateDepotN|date("Y-m-d") }}{% endif %}</span>#}
                 {#</div>#}
                 <div id="dateDepotProdIn" class="col-md-8">
-                    {% if dateDepotN is not null %}
+                    {% if dateDepotN is not null and not verif %}
                         <input type="text" readonly="readonly"  class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ dateDepotN|date("d/m/Y") }}">
                     {% else %}
                         <input id="inputlettreColor" readonly="readonly"  type="text" class="form-control" style="width: 200px;font-size: 1.2em;color: #D34026" value="à renseigner">
@@ -95,13 +103,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row" >
-                <div class="col-md-12">
-                    <div class="checkbox" style="margin-left: 1px;">
-                        <label style="font-weight: 700;margin-right: 14px;"><input type="checkbox" id="checkVerifBL" value="">Verif BL</label>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
 
@@ -390,14 +392,27 @@
             if($(this).prop('checked')){
                 document.getElementById('blocDateDepot').style.display = 'none';
                 document.getElementById('hideifnotdateProd').style.display = '';
-//                sendData("verif");
+                $('#veriOrNot').html('verif');
+                document.getElementById("entered_name").focus();
+//
+
             }
             else{
                 document.getElementById('blocDateDepot').style.display = '';
                 document.getElementById('hideifnotdateProd').style.display = 'none';
+                $('#veriOrNot').html('');
+                document.getElementById("inputlettreColor").value = "à renseigner";
+
+
             }
 
         })
+
+        if ($('#veriOrNot').text() === 'verif'){
+            document.getElementById('blocDateDepot').style.display = 'none';
+            document.getElementById('hideifnotdateProd').style.display = '';
+            $('#checkVerifBL').prop("checked", true);
+        }
     </script>
 
     <script>
@@ -412,6 +427,7 @@
             document.getElementById('texteHeadertessi').style.marginTop = '-8px';
             document.getElementById('hideheaderRow').style.marginTop = '-29px';
             document.getElementById('hideHeaderNavConnec').style.marginTop = '25px';
+            document.getElementById("entered_name").focus();
 
         });
 
@@ -612,7 +628,75 @@
 //            alert(dateString);
             checkPrinterStatus( function (text) {
                 if (text === "Ready to Print") {
-                    if (message === "first" ) {
+                    if ( $('#veriOrNot').text() === "verif" && message === "first") {
+                        var cmd = $('#entered_name').val();
+                        $.ajax({
+                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                            type: "POST",
+                            data: {numCmd: cmd, date: dateString, verif: 1},
+                            dataType: "json",
+                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                            complete: function (html) {
+                                if (html.status !== 400 && html.status !== 401 && html.status !== 405  ) {
+                                    var bl = html.responseText;
+                                    var obj = JSON.parse(bl);
+                                    var blT = JSON.parse(obj['bl']);
+                                    var objb = JSON.parse(bl);
+                                    var dateT = JSON.parse(objb['donne']);
+
+
+                                    hideLoading();
+
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varDate', dateT.date);
+                                    if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                        if (html.responseJSON['zpl'] !== 'inconnu'){
+                                            temp = temp.replace('varEtat', '0v');
+                                            window.location.href = temp;
+                                        }
+                                        else{
+                                            temp = temp.replace('varEtat', '2.0');
+                                            window.location.href = temp
+                                        }
+                                    }
+                                    else {
+                                        temp = temp.replace('varEtat', '1');
+                                        window.location.href = temp
+                                    }
+
+                                }
+                                else if (html.status === 400 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '4');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+                                else if (html.status === 401 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '3');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+                                else if (html.status === 405 ) {
+                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                    temp = temp.replace('varBl', cmd);
+                                    temp = temp.replace('varEtat', '5');
+                                    temp = temp.replace('varDate', dateString);
+                                    window.location.href = temp;
+                                }
+
+                            },
+                            error: function (request, status, error) {
+
+
+                            }
+                        })
+                    }
+                    else if (message === "first" && $('#veriOrNot').text() !== "verif") {
+
                         var cmd = $('#entered_name').val();
                         $.ajax({
                             url: "{{ path('tmd_zpl_imprimEtiq') }}",
@@ -621,23 +705,21 @@
                             dataType: "json",
                             contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                             complete: function (html) {
-                                if (html.status !== 400 && html.status !== 401 ) {
+                                if (html.status !== 400 && html.status !== 401 && html.status !== 405) {
                                     var bl = html.responseText;
                                     var obj = JSON.parse(bl);
                                     var blT = JSON.parse(obj['bl']);
-
                                     var objb = JSON.parse(bl);
                                     var dateT = JSON.parse(objb['donne']);
 
                                     hideLoading();
 
-//                                    if (dateT.date !== '') {
                                         var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
                                         temp = temp.replace('varBl', cmd);
                                         temp = temp.replace('varDate', dateT.date);
                                         if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
-                                            temp = temp.replace('varEtat', '0');
-                                            if (html.responseText['zpl'] !== null){
+                                            if (html.responseJSON['zpl'] !== 'inconnu'){
+                                                temp = temp.replace('varEtat', '0');
                                                 selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);
                                             }
                                             else{
@@ -649,27 +731,7 @@
                                             temp = temp.replace('varEtat', '1');
                                             window.location.href = temp
                                         }
-                                    {#}#}
-                                    {#else{#}
-                                        {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat'})|escape('js') }}';#}
-                                        {#temp = temp.replace('varBl', cmd);#}
 
-                                        {#if ((blT.date_production).substr(0, 11) === '-0001-11-30') {#}
-                                            {#temp = temp.replace('varEtat', '0');#}
-                                            {#if (html.responseText['zpl'] !== null){#}
-                                                {#selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);#}
-                                            {#}#}
-                                            {#else{#}
-                                                {#temp = temp.replace('varEtat', '2');#}
-                                                {#window.location.href = temp#}
-                                            {#}#}
-                                        {#}#}
-                                        {#else {#}
-
-                                            {#temp = temp.replace('varEtat', '1');#}
-                                            {#window.location.href = temp#}
-                                        {#}#}
-                                    {#}#}
 
                                 }
                                 else if (html.status === 400 ) {
@@ -686,69 +748,10 @@
                                     temp = temp.replace('varDate', dateString);
                                     window.location.href = temp;
                                 }
-
-                            },
-                            error: function (request, status, error) {
-//                                alert(request.responseText);
-//                                $('.modalErrorZpl').modal('show');
-
-                                {#window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';#}
-
-                                {#setTimeout((function() {  window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';}), 2500);#}
-
-                            }
-                        })
-                    }
-                    if (message === "verif" ) {
-                        var cmd = $('#entered_name').val();
-                        $.ajax({
-                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
-                            type: "POST",
-                            data: {numCmd: cmd, date: dateString},
-                            dataType: "json",
-                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                            complete: function (html) {
-                                if (html.status !== 400 && html.status !== 401 ) {
-                                    var bl = html.responseText;
-                                    var obj = JSON.parse(bl);
-                                    var blT = JSON.parse(obj['bl']);
-
-                                    var objb = JSON.parse(bl);
-                                    var dateT = JSON.parse(objb['donne']);
-
-                                    hideLoading();
-
-//                                    if (dateT.date !== '') {
+                                else if (html.status === 405 ) {
                                     var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
                                     temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varDate', dateT.date);
-                                    if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
-                                        temp = temp.replace('varEtat', '0');
-                                        if (html.responseText['zpl'] !== null){
-                                            window.location.href = temp;
-                                        }
-                                        else{
-                                            temp = temp.replace('varEtat', '2');
-                                            window.location.href = temp
-                                        }
-                                    }
-                                    else {
-                                        temp = temp.replace('varEtat', '1');
-                                        window.location.href = temp
-                                    }
-
-                                }
-                                else if (html.status === 400 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '4');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
-                                }
-                                else if (html.status === 401 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '3');
+                                    temp = temp.replace('varEtat', '5');
                                     temp = temp.replace('varDate', dateString);
                                     window.location.href = temp;
                                 }
@@ -765,11 +768,12 @@
                             }
                         })
                     }
+
                     else {
                         $.ajax({
                             url: "{{ path('tmd_zpl_imprimEtiq') }}",
                             type: "POST",
-                            data: 'numCmd=' + message,
+                            data: {numCmd: message , verif: 1},
                             dataType: "json",
                             contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                             complete: function (html) {

@@ -196,7 +196,6 @@ class CoriolisController extends Controller
                 while (!$updateProdOK and $break3 < 3) {
                     $dateProdVerif = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $numBLUpdate, 'dateProduction' => $dateProdAverif));
                     if (sizeof($dateProdVerif) == 0) {
-                        dump('4');
                         $break3++;
                         $BlaProduire->setDateProduction($dateProdAverif);
                         $em->flush();
