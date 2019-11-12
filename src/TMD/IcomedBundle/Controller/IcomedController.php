@@ -9,7 +9,7 @@ class IcomedController extends Controller
 {
     public function indexAction()
     {
-//        return $this->render('@TMDIcomed/Icomed/index.html.twig');
+//        return $this->render('TMDIcomed/Icomed/index.html.twig');
 
         return new RedirectResponse('http://tmdsws801/portail/icomed/index.php');
     }
