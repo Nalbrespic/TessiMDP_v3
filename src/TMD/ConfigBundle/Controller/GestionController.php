@@ -17,6 +17,10 @@ class GestionController extends Controller
         $users = $em->getRepository('TMDUserBundle:User')->findAll();
 
         $user = new User();
+
+
+
+
         $form   = $this->get('form.factory')->create(UserType::class, $user);
 
         if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {

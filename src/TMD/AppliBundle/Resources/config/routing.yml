@@ -14,18 +14,55 @@ tmd_appli_listeCarte:
     defaults: { _controller: TMDAppliBundle:Appli:listeCarte }
 
 tmd_appli_production:
-    path: /production/{bl}/{etat}/{dateDepot}/{verif}
+    path: /production/{bl}/{etat}/{dateDepot}/{verif}/{vue}/{error}/{appAverif}
     defaults:
         _controller: TMDAppliBundle:Appli:production
         bl: 0
         etat: nc
         dateDepot: 0
         verif: false
+        vue: 0
+        error: na
+        appAverif: false
 
-tmd_appli_testCol:
-    path:     /testCol
-    defaults: { _controller: TMDAppliBundle:Appli:testCol }
 
-tmd_appli_col:
+tmd_appli_colissimo:
     path:     /colissimo
     defaults: { _controller: TMDAppliBundle:Appli:colissimo }
+
+tmd_appli_colissimoInfo:
+    path:     /colissimoInfo
+    defaults: { _controller: TMDAppliBundle:Appli:colissimoInfo }
+
+tmd_appli_fichier:
+    path:     /fichier
+    defaults: { _controller: TMDAppliBundle:Appli:fichier }
+
+tmd_appli_traitementFichier:
+    path: /traitementFichier
+    defaults:
+        _controller: TMDAppliBundle:Appli:traitementFichier
+
+tmd_appli_verifArticle:
+    path: /verifArticle
+    defaults:
+        _controller: TMDAppliBundle:Appli:verifArticle
+
+tmd_appli_verifEletion:
+    path: /verifElection/{statut}/{jour}
+    defaults:
+        _controller: TMDAppliBundle:Appli:verifElection
+        statut: 11
+        jour: 99
+
+tmd_appli_editStatut:
+    path: /editStatut/{bl}/{statut}
+    defaults:
+        _controller: TMDAppliBundle:Appli:editStatut
+        bl: 0
+        statut: nc
+
+tmd_appli_editCodeHeineken:
+    path: /editCodeHeineken
+    defaults:
+        _controller: TMDAppliBundle:Appli:editCodeHeineken

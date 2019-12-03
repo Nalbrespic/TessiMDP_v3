@@ -4,6 +4,8 @@ namespace TMD\ProdBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use TMD\ProdBundle\Repository\ClientRepository;
@@ -17,19 +19,53 @@ class EcommTrackingType extends AbstractType
     {
         $builder
 //            ->add('refclient')
-//            ->add('numCmdeClient')
-//            ->add('destinataire')
-//            ->add('destRue')
-//            ->add('destAd2')
-//            ->add('destAd3')
-//            ->add('destAd4')
-//            ->add('destAd5')
-//            ->add('destAd6')
-//            ->add('destCp')
-//            ->add('destVille')
-//            ->add('destPays')
-//            ->add('destTel')
-//            ->add('destMail')
+//            ->add('expRef', TextType::class)
+            ->add('destinataire', TextType::class)
+            ->add('destRue', TextType::class)
+            ->add('destAd2', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Adresse2'
+            ))
+            ->add('destAd3', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Adresse3'
+            ))
+            ->add('destAd4', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Adresse4'
+            ))
+            ->add('destAd5', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Adresse5'
+            ))
+            ->add('destAd6', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Adresse6'
+                        ))
+            ->add('destCp', TextType::class, array(
+                'label' => 'CP'
+            ))
+            ->add('destVille', TextType::class, array(
+                'label' => 'Ville'
+            ))
+            ->add('destPays', TextType::class, array(
+                'label' => 'Pays'
+            ))
+            ->add('destTel', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Téléphone'
+            ))
+            ->add('destMail', TextType::class, array(
+                'required' => false,
+                'empty_data' => " ",
+                'label' => 'Mail'
+            ));
 //            ->add('expCompte')
 //            ->add('expRef')
 //            ->add('codeAgenceTransp')
@@ -38,7 +74,9 @@ class EcommTrackingType extends AbstractType
 //            ->add('nbEtiquettes')
 //            ->add('typeTransport')
 //            ->add('tabNumblPoids')
-//            ->add('poids')
+//            ->add('poids', EntityType::class, array(
+//                'class'     => 'TMD\ProdBundle\Entity\EcommLignes'
+//            ))
 //            ->add('expTel')
 //            ->add('expMail')
 //            ->add('relaisCode')
@@ -64,14 +102,15 @@ class EcommTrackingType extends AbstractType
 //            ->add('type')
 //            ->add('crj')
 //            ->add('idfile')
-            ->add('idclient',   EntityType::class, array(
-                'class'        => 'TMD\ProdBundle\Entity\Client',
-                'choice_label' => 'nomclient',
-                'multiple'     => false,
-                'query_builder' => function(ClientRepository $repository) {
-                    return $repository->myFindClientAsc();
-                }
-            ));
+//            ->add('idclient',   EntityType::class, array(
+//                'class'        => 'TMD\ProdBundle\Entity\Client',
+//                'choice_label' => 'nomclient',
+//                'multiple'     => false,
+//                'query_builder' => function(ClientRepository $repository) {
+//                    return $repository->myFindClientAsc();
+//                }
+//            ));
+
     }
     
     /**

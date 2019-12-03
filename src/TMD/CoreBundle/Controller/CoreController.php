@@ -7,6 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use TMD\ProdBundle\Entity\EcommArticles;
+use TMD\ProdBundle\Entity\EcommCmdep;
+use TMD\ProdBundle\Form\EcommLignesType;
+use TMD\ProdBundle\Form\EcommTrackingType;
 
 class CoreController extends Controller
 {
@@ -16,12 +20,22 @@ class CoreController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $operationsCournates = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsCourantes();
+        $operationsCournates = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsCourantes(6);
+
+//        $oracle = $this->getDoctrine()->getManager('minos');
+//        $req = "SELECT TRAVEE_EMPL FROM EMPLACEMENT";
+//        $result = $oracle->createQuery($req);
+//        $data = $result->execute();
+//        dump($data);
+
+//        $eo = $this->getDoctrine()->getManager('minos');
+//        $client = $eo->getRepository('TMDMinosBundle:Client')->findAll();
+//dump($client);
 
         $user = $this->getUser();
         $roles = $user->getRole()->getOwner()->getRoles();
         foreach ($roles as $role){
-            if ($role === 'ROLE_SUPER_ADMIN' or $role === 'ROLE_PROD' or $role === 'ROLE_ATC' or $role === 'ROLE_ADMIN'){
+            if ($role === 'ROLE_SUPER_ADMIN' or $role === 'ROLE_PROD' or $role === 'ROLE_SUPER_PROD' or $role === 'ROLE_ATC' or $role === 'ROLE_ADMIN'){
                 $new = $em->getRepository('TMDConfigBundle:News')->findOneBy(array('role' => 1, 'published' => 1));
             }
             else{
@@ -60,7 +74,7 @@ class CoreController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $nbNumBl = $em->getRepository('TMDProdBundle:EcommBl')->findMaxIdBl();
-            $nbNumBl = intval($nbNumBl[0][1])-900000;
+            $nbNumBl = intval($nbNumBl[0][1])-200000;
 
             $operationsJour = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsDuJour($nbNumBl);
 
@@ -77,7 +91,7 @@ class CoreController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $nbNumBl = $em->getRepository('TMDProdBundle:EcommBl')->findMaxIdBl();
-            $nbNumBl = intval($nbNumBl[0][1])-900000;
+            $nbNumBl = intval($nbNumBl[0][1])-200000;
             $operationsVeille = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsVeille($date, $nbNumBl);
 
 
@@ -87,19 +101,82 @@ class CoreController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function rectificationWSAction(Request $request, $idOpe, $current)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsPbWSwithop($idOpe);
+
+        $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($trackingsErreurWS[$current]->getNumbl());
+        $trackLength = sizeof($trackingsErreurWS);
+
+        $form = $this->get('form.factory')->create(EcommLignesType::class, $trackingsErreurWS[$current]);
+
+        $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlbuerrorWS($trackingsErreurWS[$current]->getNumbl());
+        if ($histo ==  null){
+            $histoL ='Pas de motif d\'erreur';
+        }else{
+            $histoL = $histo[0]['observation'];
+        }
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+            $trackingsErreurWS[$current]->getNumligne()->setFlagEtikt(0);
+            $trackingsErreurWS[$current]->getNumligne()->setPoids($trackingsErreurWS[$current]->getPoids());
+            $em->flush();
+            $request->getSession()->getFlashBag()->add('erreurWSConfirmation', 'Modification enregistrée');
+
+            $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsPbWSwithop($idOpe);
+            $trackLength = sizeof($trackingsErreurWS);
+
+
+
+            if ($trackLength > 0){
+
+                if ($current == $trackLength) $current--;
+                $form = $this->get('form.factory')->create(EcommLignesType::class, $trackingsErreurWS[$current]);
+                $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($trackingsErreurWS[$current]->getNumbl());
+                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlbuerrorWS($trackingsErreurWS[$current]->getNumbl());
+                if ($histo ==  null){
+                    $histoL ='Pas de motif d\'erreur';
+                }else{
+                    $histoL = $histo[$current]['observation'];
+                }
+
+                return $this->render('TMDCoreBundle:Core:modifWS.html.twig',  array(
+                    'form' => $form->createView(),
+                    'autreErreur' => $trackLength,
+                    'current' => $current,
+                    'motif' => $histoL,
+                    'idope'   => $idOpe,
+                    'articles'  => $articles
+                ) );
+            }
+
+            return $this->redirectToRoute('tmd_core_homepage');
+        }
+
+        return $this->render('TMDCoreBundle:Core:modifWS.html.twig', array(
+            'form' => $form->createView(),
+            'autreErreur' => $trackLength,
+            'motif' => $histoL,
+            'current' => $current,
+            'idope'   => $idOpe,
+            'articles'  => $articles
+        ));
+    }
+
     public function resteProdAction(Request $request)
     {
         if ($request->isXmlHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
 
-            $allBlNonProd = $em->getRepository('TMDProdBundle:EcommBl')->donneNbAllBlnonProd();
+            $allBlNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->donneNbAllBlnonProd();
 
 
             $tabidAppli=[];
             foreach ($allBlNonProd as $key=>$val){
                 $tabidAppli[$key]=$val['idappli'];
             }
-            $allArtNonProd = $em->getRepository('TMDProdBundle:EcommBl')->donneNbAllArticlenonProd( );
+            $allArtNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->donneNbAllArticlenonProd( );
 
 
 
@@ -128,6 +205,17 @@ class CoreController extends Controller
 
 
             return new JsonResponse(array($allBlNonProdb));
+        };
+
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function erreurWSAction(Request $request){
+        if ($request->isXmlHttpRequest()) {
+            $em = $this->getDoctrine()->getManager();
+
+            $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingsPbWS();
+            return new JsonResponse(array($trackingsErreurWS));
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);

@@ -27,7 +27,7 @@ framework:
         handler_id: session.handler.native_file
         save_path: "%kernel.root_dir%/sessions"
         # handler_id set to null will use default session handler from php.ini
-        handler_id: ~
+#        handler_id: ~
 #        cookie_lifetime: 28800
     fragments: ~
     http_method_override: true
@@ -52,7 +52,7 @@ doctrine:
                 user: '%database_user%'
                 password: '%database_password%'
                 charset: UTF8
-#                schema_filter: /^ecomm_type_production/
+#                schema_filter: /^ecomm_stat/
                 mapping_types:
                     bit: boolean
             colisprive:
@@ -71,6 +71,18 @@ doctrine:
                 user: '%database_user3%'
                 password: '%database_password3%'
                 charset: UTF8
+            minos:
+                driver: oci8
+                host: '%database_host4%'
+                port: '%database_port4%'
+                dbname: '%database_name4%'
+                user: '%database_user4%'
+#                url: '%database_url4%'
+#                schema_filter: /^CLIENT/
+                password: '%database_password4%'
+                charset: UTF8
+                mapping_types:
+                    ty_noeud_contenant: string
 
     orm:
 
@@ -79,13 +91,14 @@ doctrine:
             default:
                 connection: default
                 mappings:
+                    TMDAppliBundle:  ~
                     TMDProdBundle:  ~
                     TMDUserBundle:  ~
-                    TMDAppliBundle:  ~
                     TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
                     TMDZplBundle: ~
                     TmsLogisticBundle: ~
+                    TMDStatBundle: ~
             colisprive:
                 connection: colisprive
                 mappings:
@@ -94,6 +107,11 @@ doctrine:
                 connection: dpd
                 mappings:
                     TMDDpdBundle: ~
+            minos:
+                connection: minos
+                mappings:
+                    TMDMinosBundle: ~
+
 
 # FOSRest Configuration
 fos_rest:

@@ -14,13 +14,14 @@ tmd_prod_client:
         page: \d*
 
 tmd_prod_suiviCourant:
-    path:     /suiviOpeCourant/{page}/{nbFichierPage}/{idClient}/{idOpe}
+    path:     /suiviOpeCourant/{page}/{nbFichierPage}/{idClient}/{idOpe}/{blR}
     defaults:
         _controller: TMDProdBundle:Prod:viewSuiviCourant
         page: 1
         nbFichierPage: 20
         idClient: 0
         idOpe:    0
+        blR:      0
     requirements:
         page: \d*
 
@@ -53,11 +54,22 @@ tmd_prod_donneBlNonProd:
         _controller: TMDProdBundle:Prod:donneBlNonProd
     methods: [POST]
 
+tmd_prod_donneRuptureByFile:
+    path: /rupturebyFile
+    defaults:
+        _controller: TMDProdBundle:Prod:donneRuptureByFile
+    methods: [POST]
 
 tmd_prod_calendar:
     path: /calendar
     defaults:
         _controller: TMDProdBundle:Prod:calendar
+    methods: [GET]
+
+tmd_prod_calendarDepot:
+    path: /calendarDepot
+    defaults:
+        _controller: TMDProdBundle:Prod:calendarDepot
     methods: [GET]
 
 tmd_prod_donneTrackingsByFile:
@@ -66,30 +78,82 @@ tmd_prod_donneTrackingsByFile:
         _controller: TMDProdBundle:Prod:donneTrackingsByFile
     methods: [POST]
 
+
+
 tmd_prod_exportTrackings:
     path: /rTracking/{idFile}/{prod}
     defaults:
         _controller: TMDProdBundle:Prod:exportTrackingExcel
 
-#tmd_prod_exportTracking:
-#    path: /exportTracking/{idFiles}
-#    defaults:
-#        _controller: TMDProdBundle:Prod:exportTrackingchoice
+tmd_prod_exportTrackingsArticles:
+    path: /rTrackingArticle/{idFile}/{prod}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingArticleExcel
+
+tmd_prod_exportResteProd:
+    path: /resteProd/{idoperation}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportResteProdExcel
+
+tmd_prod_exportarticleRupture:
+    path: /ruptureProd/{idoperation}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportRuptureProdExcel
+
+tmd_prod_exportTrackingExcelbyBL:
+    path: /rTrackingBL/{idBLs}/{code}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingExcelbyBL
+
+tmd_prod_exportTrackingExcelbyDate:
+    path: /rTrackingDate/{date}/{appli}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingExcelbyDate
+
+tmd_prod_exportTrackingExcelbyBLArticle:
+    path: /rTrackingBLArticle/{date}/{appli}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingExcelbyBLArticle
+
+tmd_prod_exportTrackingPresse:
+    path: /rTrackingPresse/{date}/{appli}
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingPresse
 
 tmd_prod_donneTrackingsByDateProd:
     path: /rTrackingDate
     defaults:
         _controller: TMDProdBundle:Prod:exportTrackingbyDate
 
+tmd_prod_donneTrackingsByDateDepot:
+    path: /rTrackingDateDepot
+    defaults:
+        _controller: TMDProdBundle:Prod:exportTrackingbyDateDepot
+
 tmd_prod_donneSyntheseByDateProd:
     path: /syntheseDate
     defaults:
         _controller: TMDProdBundle:Prod:exportSynthesebyDate
 
+tmd_prod_donneSyntheseByDateDepot:
+    path: /syntheseDateDepot
+    defaults:
+        _controller: TMDProdBundle:Prod:exportSynthesebyDateDepot
+
 tmd_prod_rechercheCmd:
     path: /rechercheCmd
     defaults:
         _controller: TMDProdBundle:Prod:rechercheByCmd
+
+tmd_prod_rechercheCodeArticle:
+    path: /rechercheCodeArticle
+    defaults:
+        _controller: TMDProdBundle:Prod:rechercheByCodeArticle
+
+tmd_prod_rechercheModif:
+    path: /rechercheModif
+    defaults:
+        _controller: TMDProdBundle:Prod:rechercheModif
 
 tmd_prod_donneArticleByBl:
     path: /articleByBl
@@ -111,7 +175,32 @@ tmd_prod_syntheseArtCoke:
     defaults:
         _controller: TMDProdBundle:Prod:syntheseCoke
 
+tmd_prod_syntheseCoriolis:
+    path: /syntheseCoriolis/{date}
+    defaults:
+        _controller: TMDProdBundle:Prod:syntheseCoriolis
+
 tmd_prod_addApplication:
     path: /addApplication
     defaults:
         _controller: TMDProdBundle:Prod:addApplication
+
+tmd_prod_modifDateDepotProdTraccking:
+    path: /modifDateProductionDepotTracking
+    defaults:
+        _controller: TMDProdBundle:Prod:modifDateProductionDepotTracking
+
+tmd_prod_modifDateDepotProd:
+    path: /modifDateProductionDepot
+    defaults:
+        _controller: TMDProdBundle:Prod:modifDateProductionDepot
+
+tmd_prod_suppNameOperation:
+    path: /suppNameOperation
+    defaults:
+        _controller: TMDProdBundle:Prod:suppNameOperation
+
+tmd_prod_donneTransport:
+    path: /donneAllTransport
+    defaults:
+        _controller: TMDProdBundle:Prod:donneAllTransport

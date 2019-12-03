@@ -114,7 +114,7 @@
             <h4><span id="nbCarteDis" style="font-size: 1.2em;"></span> cartes disponibles</h4>
             <h5 style="color: #555555;">Lots de cartes non entamés en stock:</h5>
 
-                <div id="tabListeCarte" style="overflow-y: auto; height: 372px;"></div>
+                <div id="tabListeCarte" style="overflow-y: auto; height: 316px;"></div>
 
 
     </div>
@@ -154,13 +154,15 @@
                     }
                     else {
                         html += '<table class="table table-bordered table-striped tableSynthese " style="text-align: center;"><tr class="active">' +
+                            '<th style="text-align: center;padding-bottom: 0px;">Date réception</th>' +
                             '<th style="text-align: center;padding-bottom: 0px;">Réference du colis</th>' +
                             '<th style="text-align: center;padding-bottom: 0px;">Plage de début</th>' +
                             '<th style="text-align: center;padding-bottom: 0px;">Plage de fin</th>' +
                             '<th style="text-align: center;padding-bottom: 0px;">Nombre de cartes</th>' +
                             '<th style="text-align: center;padding-bottom: 0px;">Supprimer</th></tr>';
                         for (var i = 0; i < len; i++) {
-                            html += '<tr><td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['box'] + '</td>' +
+                            html += '<tr><td style="text-align: center;padding-bottom: 0px;">' + moment(obj[0][i]['dateattrib']['date'].split(" ")[0]).format('DD-MM-YYYY') + '</td>' +
+                                '<td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['box'] + '</td>' +
                                 '<td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['plagedebut'] + '</td>' +
                                 '<td style="text-align: center;padding-bottom: 0px;">' + obj[0][i]['plagefin'] + '</td>' +
                                 '<td style="text-align: center;padding-bottom: 0px;">' + (((obj[0][i]['plagefin']).slice(5, -1)) - ((obj[0][i]['plagedebut']).slice(5, -1)) + 1) + '</td>';

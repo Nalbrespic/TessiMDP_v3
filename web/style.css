@@ -83,7 +83,7 @@ a
 .ongletMenu
 {
     color: white;
-    background-color: #9698c9;
+    background-color: #646db2;
     border-radius: 5px;
     width: 166px;
     margin-top: 6px;
@@ -152,7 +152,7 @@ table.table-bordered.table-striped.tableSynthese tbody tr th
 
 table.table-bordered.table-striped.tableSynthese tbody tr td
 {
-    padding: inherit;
+    padding: 0 5px 0 5px;
     vertical-align: inherit;
 }
 
@@ -203,6 +203,8 @@ td a
     color: #002a80;
 }
 
+
+
 hr.menutr
 {
     border-bottom: 2px solid #504A62;
@@ -220,6 +222,15 @@ hr.menutr
     /*overflow: auto;*/
 }
 
+.fondBlanc2
+{
+    background: url('Images/fondBlanc.png') repeat;
+    border: 2px solid #504A62;
+    width: 100%;
+    z-index: 100;
+    /*overflow: auto;*/
+}
+
 tr.tabSyntheseBlanc
 {
     padding: 0 5px 0 5px;
@@ -232,7 +243,28 @@ tr.tabSyntheseBlanc
 
 /*modal*/
 .modal {
-    display: none; /* Hidden by default */
+     display: none; /* Hidden by default */
+     position: fixed; /* Stay in place */
+     z-index: 200; /* Sit on top */
+     left: 0;
+     top: 0;
+     width: 100%; /* Full width */
+     height: 100%; /* Full height */
+     overflow: auto; /* Enable scroll if needed */
+     background-color: rgb(0,0,0); /* Fallback color */
+     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+ }
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 2px solid #504A62;
+    width: 50%; /* Could be more or less, depending on screen size */
+}
+
+.modalCN23 {
     position: fixed; /* Stay in place */
     z-index: 200; /* Sit on top */
     left: 0;
@@ -313,4 +345,10 @@ table.coriolis tr td{
     margin-right:30px;
 }
 
+#borderShow:hover{
+    border: 1px solid #504A62;
+}
 
+svg {
+
+}

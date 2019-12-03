@@ -5,8 +5,11 @@ security:
         Symfony\Component\Security\Core\User\User: sha512
         TMD\UserBundle\Entity\User: sha512
     role_hierarchy:
-        ROLE_ADMIN:       [ROLE_ATC, ROLE_PROD]
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN,ROLE_PROD_USER, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_EXT:         [ROLE_TMS]
+        ROLE_PROD:        [ROLE_USER_PROD]
+        ROLE_SUPER_PROD:  [ROLE_PROD]
+        ROLE_ADMIN:       [ROLE_ATC, ROLE_SUPER_PROD]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
 
     # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
@@ -29,8 +32,8 @@ security:
                 pattern:   ^/login$
                 anonymous: true
         api:
-                    pattern:  ^/api
-                    security: false
+                pattern:  ^/api
+                security: false
         main:
             pattern: ^/
             anonymous: false

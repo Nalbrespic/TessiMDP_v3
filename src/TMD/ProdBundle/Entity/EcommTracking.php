@@ -91,35 +91,35 @@ class EcommTracking
      *
      * @ORM\Column(name="dest_ad2", type="string", length=65, nullable=false)
      */
-    private $destAd2 = '';
+    private $destAd2;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_ad3", type="string", length=65, nullable=false)
      */
-    private $destAd3 = '';
+    private $destAd3;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_ad4", type="string", length=65, nullable=false)
      */
-    private $destAd4 = '';
+    private $destAd4;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_ad5", type="string", length=40, nullable=false)
      */
-    private $destAd5 = '';
+    private $destAd5;
 
     /**
      * @var string
      *
      * @ORM\Column(name="dest_ad6", type="string", length=40, nullable=false)
      */
-    private $destAd6 = '';
+    private $destAd6;
 
     /**
      * @var string
@@ -191,12 +191,18 @@ class EcommTracking
      */
     private $instrLivrais2;
 
+
+
+
     /**
-     * @var boolean
+     * @var EcommStatut
      *
-     * @ORM\Column(name="nb_etiquettes", type="boolean", nullable=false)
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommStatut")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idStatut", referencedColumnName="idStatut")
+     * })
      */
-    private $nbEtiquettes;
+    private $idStatut;
 
     /**
      * @var string
@@ -304,9 +310,12 @@ class EcommTracking
     private $transNotification = '';
 
     /**
-     * @var integer
+     * @var Client
      *
-     * @ORM\Column(name="exp_id", type="smallint", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="exp_id", referencedColumnName="idClient", nullable=false)
+     * })
      */
     private $expId = '0';
 
@@ -391,14 +400,21 @@ class EcommTracking
      * @var integer
      * @ORM\Id
      * @ORM\Column(name="numLigne", type="integer")
-     *
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $numligne;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="json", type="string", length=1024, nullable=false)
+     */
+    private $json;
+
+    /**
      * @return Client
      */
+
     public function getIdclient()
     {
         return $this->idclient;
@@ -1146,6 +1162,7 @@ class EcommTracking
     public function setDateDepot($dateDepot)
     {
         $this->dateDepot = $dateDepot;
+        $this->dateDepot = $dateDepot;
     }
 
     /**
@@ -1258,6 +1275,22 @@ class EcommTracking
     public function setDestNom($dest_nom)
     {
         $this->dest_nom = $dest_nom;
+    }
+
+    /**
+     * @return EcommStatut
+     */
+    public function getIdStatut()
+    {
+        return $this->idStatut;
+    }
+
+    /**
+     * @param EcommStatut $idStatut
+     */
+    public function setIdStatut($idStatut)
+    {
+        $this->idStatut = $idStatut;
     }
 
 

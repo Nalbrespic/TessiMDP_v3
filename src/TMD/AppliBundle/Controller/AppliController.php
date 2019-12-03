@@ -2,6 +2,17 @@
 
 namespace TMD\AppliBundle\Controller;
 
+
+
+use BeSimple\SoapBundle\BeSimpleSoapBundle;
+use BeSimple\SoapBundle\Controller\SoapWebServiceController;
+use BeSimple\SoapClient\SoapClient;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\CalendarChart;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\Histogram;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\LineChart;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
+use DateTime;
+use DateTimeZone;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -9,12 +20,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use TMD\AppliBundle\Entity\NTracking;
 use TMD\AppliBundle\Form\NTrackingType;
+use TMD\ProdBundle\Entity\EcommBl;
+use TMD\ProdBundle\Entity\EcommCmdep;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
+use TMD\ProdBundle\TMDProdBundle;
 
 class AppliController extends Controller
 {
     public function carteAction(Request $request, $idClient)
     {
+
+
         $em = $this->getDoctrine()->getManager();
 
         $clients = $em
@@ -130,8 +146,286 @@ class AppliController extends Controller
 
     }
 
+    public function editCodeHeinekenAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            $bl = $request->get('numBL');
+            $tabCode = $request->get('tabCode');
+            $em = $this->getDoctrine()->getManager();
+//dump($tabCode);
+            $cmdps = $em->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl , 'codearticle' => '0001' ));
+//dump($cmdps);
+            foreach ($cmdps as $key=>$val){
+                if (isset($tabCode[$key]))
+                $val->setPerso2($tabCode[$key]);
+            }
+            $em->flush();
+
+
+
+                return new JsonResponse(array('OK VERIF'));
+
+        };
+
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function editStatutAction($bl, $statut, Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+
+        if ($statut != 0 ) {
+            $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
+
+            $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => $statut));
+
+            if (sizeof($Cmd) == 0){
+                $request->getSession()->getFlashBag()->add('PbBlexistepas', $bl);
+                return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                    'statut' => $statut
+
+                ));
+            }
+
+
+            if (sizeof($histo) > 0){
+                $request->getSession()->getFlashBag()->add('PbStatutidentique', $Cmd->getBl()->getNumbl());
+                return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                    'statut' => $statut
+
+                ));
+            }
+            if ( $statut === '12'){
+                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '11'));
+                if (sizeof($histo) == 0 ){
+                    $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
+                    return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                        'statut' => $statut
+
+                    ));
+                }
+            }
+
+            if ( $statut === '2'){
+                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '12'));
+                if (sizeof($histo) == 0 ){
+                    $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
+                    return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                        'statut' => $statut
+
+                    ));
+                }
+            }
+
+
+////////////////Mis sous pli
+            if ($statut == 11) {
+                $user = $this->getUser();
+
+                $jouristo = new EcommHistoStatut();
+                $jouristo->setDatestatut(new \DateTime());
+                $jouristo->setIdstatut(11);
+                $jouristo->setObservation("Mis sous pli");
+                $jouristo->setNumbl($Cmd->getBl()->getNumbl());
+                $jouristo->setIduser($user->getId());
+
+                $em->persist($jouristo);
+
+                $em->flush();
+
+                $updateHistoOK = false;
+
+                $break = 0;
+                while (!$updateHistoOK and $break < 3) {
+                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '11'));
+                    if (sizeof($jouristoVerif) == 0) {
+                        $break++;
+                        $em->persist($jouristo);
+                        $em->flush();
+                    } else {
+                        $updateHistoOK = true;
+                        break;
+                    }
+                }
+                if (!$updateHistoOK){
+                    $request->getSession()->getFlashBag()->add('NOConfirmMissouspli', $Cmd->getBl()->getNumbl());
+
+                    return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                        'statut' => $statut
+                    ));
+                }
+
+                $request->getSession()->getFlashBag()->add('ConfirmMissouspli', $Cmd->getBl()->getNumbl());
+            }
+////////////////Assemblage
+            if ($statut == 12) {
+                $user = $this->getUser();
+
+                $jouristo = new EcommHistoStatut();
+                $jouristo->setDatestatut(new \DateTime());
+                $jouristo->setIdstatut(12);
+                $jouristo->setObservation("Collage");
+                $jouristo->setNumbl($Cmd->getBl()->getNumbl());
+                $jouristo->setIduser($user->getId());
+
+                $dateProdAverif = new \DateTime();
+                $Cmd->setDateProduction($dateProdAverif);
+
+                $em->persist($jouristo);
+
+                $em->flush();
+
+                $updateHistoOK = false;
+                $updateProdOK = false;
+
+                $break = 0;
+                while (!$updateHistoOK and $break < 3) {
+                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '12'));
+                    if (sizeof($jouristoVerif) == 0) {
+                        $break++;
+                        $em->persist($jouristo);
+                        $em->flush();
+                    } else {
+                        $updateHistoOK = true;
+                        break;
+                    }
+                }
+                $break3 = 0;
+                while (!$updateProdOK and $break3 < 3) {
+                    $dateProdVerif = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $Cmd->getBl()->getNumbl(), 'dateProduction' => $dateProdAverif));
+                    if (sizeof($dateProdVerif) == 0) {
+                        $break3++;
+                        $Cmd->setDateProduction($dateProdAverif);
+                        $em->flush();
+                    } else {
+                        $updateProdOK = true;
+                        break;
+                    }
+                }
+                if (!$updateHistoOK OR !$updateProdOK){
+                    $request->getSession()->getFlashBag()->add('NOConfirmAssemblage', $Cmd->getBl()->getNumbl());
+
+                    return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                        'statut' => $statut
+                    ));
+                }
+
+                $request->getSession()->getFlashBag()->add('ConfirmAssemblage', $Cmd->getBl()->getNumbl());
+            }
+
+////////////////Validation Commande
+            if ($statut == 2) {
+                $user = $this->getUser();
+
+                $jouristo = new EcommHistoStatut();
+                $jouristo->setDatestatut(new \DateTime());
+                $jouristo->setIdstatut(2);
+                $jouristo->setObservation("Validation commande");
+                $jouristo->setNumbl($Cmd->getBl()->getNumbl());
+                $jouristo->setIduser($user->getId());
+
+                $dateProdAverif = new \DateTime();
+                $Cmd->getBl()->getNumligne()->setDateDepot($dateProdAverif);
+
+
+                $em->persist($jouristo);
+                $em->flush();
+
+                $updateHistoOK = false;
+                $updateDateDepotOK = false;
+
+                $break = 0;
+                while (!$updateHistoOK and $break < 3) {
+                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '2'));
+                    if (sizeof($jouristoVerif) == 0) {
+                        $break++;
+                        $em->persist($jouristo);
+                        $em->flush();
+                    } else {
+                        $updateHistoOK = true;
+                        break;
+                    }
+                }
+                $break2 = 0;
+                while (!$updateDateDepotOK and $break2 < 3) {
+                    $dateVerif = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('expRef' => $Cmd->getBl()->getNumligne()->getExpRef(), 'dateDepot' => DateTime::createFromFormat('Y-m-d', $dateProdAverif->format('Y-m-d')) ));
+                    if (sizeof($dateVerif) == 0) {
+                        $break2++;
+                        $Cmd->getBl()->getNumligne()->setDateDepot($dateProdAverif);
+                        $em->flush();
+                    } else {
+                        $updateDateDepotOK = true;
+                        break;
+                    }
+                }
+
+
+
+
+
+                if (!$updateHistoOK  OR !$updateDateDepotOK){
+                    $request->getSession()->getFlashBag()->add('NOConfirmValidationcommande', $Cmd->getBl()->getNumbl());
+
+                    return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                        'statut' => $statut
+                    ));
+                }
+
+                $request->getSession()->getFlashBag()->add('ConfirmValidationcommande', $Cmd->getBl()->getNumbl());
+            }
+
+
+
+
+
+            return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+                'statut' => $statut
+            ));
+        }
+
+
+
+
+        return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
+            'statut' => $statut
+
+        ));
+
+    }
+
+    public function fichierAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $nbBlforBordreau = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlForBordereau();
+
+        return $this->render('TMDAppliBundle:Appli:fichier.html.twig', array(
+            'bls'  => $nbBlforBordreau
+
+        ));
+    }
+
+    public function traitementFichierAction(Request $request)
+    {
+
+        if ($request->isXmlHttpRequest()) {
+            $id = $request->get('carteLot');
+            $em = $this->getDoctrine()->getManager();
+
+            $lotCarte = $em->getRepository('TMDAppliBundle:NTracking')->findOneBy(array('numplage' => $id ));
+
+
+            return new JsonResponse(array('OK MODIF'));
+
+        };
+
+        return new Response("erreur: ce n'est pas du Json", 400);
+
+    }
+
     public function listeCarteAction(Request $request)
     {
+
 
         if ($request->isXmlHttpRequest()) {
             $idClient = $request->get('idClient');
@@ -148,241 +442,408 @@ class AppliController extends Controller
     }
 
 
-    public function productionAction($bl, $etat, $dateDepot, $verif)
+    public function productionAction($bl, $etat, $dateDepot, $verif, $vue, $error, $appAverif)
     {
         $em = $this->getDoctrine()->getManager();
-        $button = false;
+        $button = true;
 
 
 
 
-        if ($etat != 'nc' and $etat != '3') {
-            $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
+        if ($etat != 'nc' and $etat != '3' ) {
+            if ($etat != '9'){
+                $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
 
-            if ($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage() != null) {
-                $CmdAppliImage['appliImage'] = (base64_encode(stream_get_contents($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage())));
-            } else {
-                $CmdAppliImage['appliImage'] = '';
-            }
+                if ($Cmd->getBl()->getNumligne()->getTypeProduction() == 1 or
+                    $Cmd->getBl()->getNumligne()->getTypeProduction() == 3 or
+                    $Cmd->getBl()->getNumligne()->getTypeProduction() == 4 or
+                    $Cmd->getBl()->getNumligne()->getTypeProduction() == 6 or
+                    $Cmd->getBl()->getNumligne()->getTypeProduction() == 11)
+                {
+                    $button = false;
+                }
+    //            $NumHeineken = $em->getRepository('TMDProdBundle:EcommTempHeineken')->findallCodeUnused();
 
-            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl));
+                if ($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage() != null) {
+                    $CmdAppliImage['appliImage'] = (base64_encode(stream_get_contents($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage())));
+                } else {
+                    $CmdAppliImage['appliImage'] = '';
+                }
 
-
-            $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
-            $env = $this->container->get('kernel')->getEnvironment();
-
-            if ($env != 'dev'){
-                $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
-                $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
-            }else{
-                $chemeinImageMod1 = $cheminImage;
-            }
-
-
+                $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl));
 
 
-            $articleArray = array();
-            foreach ($articles as $k=>$v)
-            {
-                if (!$v->isFlagart()) {
-                    $articleArray['art'][$k]['Image'] = null;
-                    $articleArray['art'][$k]['perso1'] = $v->getPerso1();
-                    $articleArray['art'][$k]['perso2'] = $v->getPerso2();
-                    $articleArray['art'][$k]['libelle'] = $v->getLibelle();
-                    if (sizeof($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
-                        $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
+                $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
+                $env = $this->container->get('kernel')->getEnvironment();
+
+                if ($env != 'dev'){
+                    $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
+                    $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
+                }else{
+                    $chemeinImageMod1 = $cheminImage;
+                }
+
+
+
+                $articleArray = array();
+                $articlesAverif = array();
+                $indexeArtVerif = 0;
+                foreach ($articles as $k=>$v)
+                {
+                    if (!$v->isFlagart()) {
+                        $articleArray['art'][$k]['Image'] = null;
+                        if (substr($v->getCodearticle(),0,6) == '370072'){
+                            $articleArray['art'][$k]['artAverif']['codeArticle'] = $v->getCodearticle();
+                         }
+                        $articleArray['art'][$k]['id'] = $v->getNumero();
+                        $articleArray['art'][$k]['perso1'] = $v->getPerso1();
+                        $articleArray['art'][$k]['quantite'] = $v->getQuantite();
+                        $articleArray['art'][$k]['perso2'] = $v->getPerso2();
+                        $articleArray['art'][$k]['libelle'] = $v->getLibelle();
+                        if ($v->getQuantite() > 1){
+                            for ($u = 1 ; $u <= $v->getQuantite() ; $u++){
+                                $articlesAverif[$indexeArtVerif]['codeAverif'] = $v->getNumTrack();
+                                $articlesAverif[$indexeArtVerif]['id'] = $v->getNumero()."-".$u;
+                                $articlesAverif[$indexeArtVerif]['indexVerif'] = 0;
+                                $indexeArtVerif++;
+                            }
+
+                        }else{
+                            $articlesAverif[$indexeArtVerif]['codeAverif'] = $v->getNumTrack();
+                            $articlesAverif[$indexeArtVerif]['id'] = $v->getNumero()."-1";
+                            $articlesAverif[$indexeArtVerif]['indexVerif'] = 0;
+                            $indexeArtVerif++;
+                        }
+
+                        if (sizeof($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
+                            if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
+                                $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
+                                $dimensions = getimagesizefromstring(file_get_contents($chemeinImageMod1.$v->getNomimg()));
+                                $articleArray['art'][$k]['dimensionL'] = $dimensions[0];
+                                $articleArray['art'][$k]['dimensionH'] = $dimensions[1];
+                            }
+
+                        }
+                        $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
                     }
-                    $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
+                    else{
+                        if (sizeof($cheminImage . $v->getNomimg()) > 0 and $cheminImage . $v->getNomimg() != ""  ) {
+                            if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
+                                    $articleArray['emb'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
+                            }
+                        }
+                        $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
+                    }
+
+                }
+                $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
+                $articleArray['countArticle'] = $countArticle;
+                $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
+
+                if ($etat === '1') {
+                    $messageApresScan = "Commande N° " . $bl . " déjà produite !";
+    //                $button = true;
+                }elseif($etat === '0') {
+                    $messageApresScan = "La commande N° " . $bl . " a été mise à jour";
+                }elseif($etat === '0v') {
+                    $messageApresScan = "La commande N° " . $bl . " est en attente de production";
+                }elseif($etat === '0code') {
+                    $messageApresScan = "La commande N° " . $bl . " est en attente de rapprochement";
+                }
+                elseif($etat === '2') {
+                    $messageApresScan = "La commande N° " . $bl . " est en attente de production - ZPL inexistant";
+                }
+//                elseif($etat === '9'){
+//                $messageApresScan = "La commande N° " . $bl . " a été annulée !!";
+//                }
+                elseif($etat === '2.0') {
+                    $messageApresScan = "La commande N° " . $bl . " est en attente de production et ZPL inexistant";
+                }elseif($etat === '5') {
+                    $messageApresScan = "Probléme d'enregistrement ... Veuillez recommencer !";
+                }elseif($etat === '4') {
+                    $messageApresScan = " ZPL inexistant on non genéré";
+                }elseif($etat === '7') {
+                    $messageApresScan = "Impossible de generer l'etiquette transport";
                 }
                 else{
-                    if (sizeof($cheminImage . $v->getNomimg()) > 0) {
-                        $articleArray['emb'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
-                    }
-                    $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
+                    $messageApresScan = "Probleme de reseau !";
                 }
 
+                if ($dateDepot == 0){
+                    $dateDepot = null;
+                }
+
+                return $this->render('TMDAppliBundle:Appli:production.html.twig', array(
+                    'etat'          =>$etat,
+                    'apresScan'     =>$messageApresScan,
+                    'blCmd'         =>$Cmd,
+                    'logoAppli'     =>$CmdAppliImage,
+                    'articles'      =>$articleArray,
+                    'articlesAverif' => $articlesAverif,
+                    'button'        =>$button,
+                    'histo'         =>$jouristo,
+                    'dateDepotN'    =>$dateDepot,
+                    'verif'         =>$verif,
+                    'vue'           =>$vue,
+                    'error'         =>$error,
+                    'appAverif'     =>$appAverif
+    //                'numHeineken'   => $NumHeineken
+                ));
             }
-            $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
-            $articleArray['countArticle'] = $countArticle;
-
-            $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
-
-            if ($etat === '1') {
-                $messageApresScan = "Commande N° " . $bl . " déjà produite !";
-                $button = true;
-            }elseif($etat === '0') {
-                $messageApresScan = "La commande N° " . $bl . " a été mise à jour";
-            }elseif($etat === '0v') {
-                $messageApresScan = "La commande N° " . $bl . " est en attente de production";
-            }elseif($etat === '2') {
-                $messageApresScan = "La commande N° " . $bl . " a été mise à jour et ZPL inexistant on non genéré";
-            }elseif($etat === '2.0') {
-                $messageApresScan = "La commande N° " . $bl . " est en attente de production et ZPL inexistant on non genéré";
-            }elseif($etat === '5') {
-                $messageApresScan = "Probléme d'enregistrement ... Veuillez recommencer !";
-            }
-            else{
-                $messageApresScan = "Probleme de reseau !";
-            }
-
-
-
-
-
-
-
-
-            return $this->render('TMDAppliBundle:Appli:production.html.twig', array(
-                'etat'          =>$etat,
-                'apresScan'     =>$messageApresScan,
-                'blCmd'         =>$Cmd,
-                'logoAppli'     =>$CmdAppliImage,
-                'articles'      =>$articleArray,
-                'button'        =>$button,
-                'histo'         =>$histo,
-                'dateDepotN'    =>$dateDepot,
-                'verif'         =>$verif
-            ));
         }
-//        if ( $etat == '2'){
-//
-//            return $this->render('TMDAppliBundle:Appli:production.html.twig', array(
-//                'etat'          =>$etat,
-//                'apresScan'     =>$messageApresScan,
-//                'button'        =>$button,
-//                'dateDepotN'    =>$dateDepot
-//            ));
-//        }
 
-        $messageApresScan = "La commande N° " . $bl . " n'existe pas !";
-
+        if ($etat == '9') {
+            $messageApresScan = "La commande a été annulée !";
+        }else {
+            $messageApresScan = "La commande N° " . $bl . " n'existe pas !";
+        }
         if ($dateDepot == 0){
             $dateDepot = null;
 
         }
 
+        $articlesAverif = null;
         return $this->render('TMDAppliBundle:Appli:production.html.twig', array(
             'etat'          =>$etat,
             'apresScan'     =>$messageApresScan,
             'dateDepotN'    =>$dateDepot,
-            'verif'         =>$verif
+            'verif'         =>$verif,
+            'vue'           =>$vue,
+            'error'         =>$error,
+            'appAverif'     =>$appAverif,
+            'articlesAverif' => $articlesAverif,
 
         ));
 
     }
 
-    public function testColAction()
+    public function verifArticleAction(Request $request)
     {
-
-        return $this->render('TMDAppliBundle:Appli:colissimo.html.twig', array(
-
-        ));
-    }
-
-    public function colissimoAction(Request $request)
-    {
-
         if ($request->isXmlHttpRequest()) {
+            $cab = $request->get('cab');
+            $numero = $request->get('cmdp');
+            $em = $this->getDoctrine()->getManager();
 
-            define("SERVER_NAME", 'https://ws.colissimo.fr'); //TODO : Change server name
-            define("LABEL_FOLDER",'./labels/'); //TODO : Change OutPut Folder: this is where the label will be saved
+            $article = $em->getRepository('TMDProdBundle:EcommCmdep')->findOneBy(array('numero' => $numero ));
 
-//Build the input request : adapt parameters according to your parcel info and options
-$requestParameter = array(
-    'contractNumber' => '923108', //TODO : Change contractNumber
-    'password' => 'dhu48/y!', //TODO : Change password
-    'outputFormat' => array(
-        'outputPrintingType' => 'ZPL_10x15_203dpi'
-    ),
-    'letter' => array(
-        'service' => array(
-            'productCode' => 'DOM',
-            'depositDate' => '2017-04-30' //TODO : Change depositDate (must be at least equal to current date)
-                                ),
-                        'parcel' => array(
-                'weight' => '3',
-            ),
-                        'sender' => array(
-                'address' => array(
-                    'companyName' => 'companyName',
-                    'line2' => 'main address',
-                    'countryCode' => 'FR',
-                    'city' => 'Paris',
-                    'zipCode' => '75007'
-                )
-            ),
-                        'addressee' => array(
-                'address' => array(
-                    'lastName' => 'lastName',
-                    'firstName' => 'firstName',
-                    'line2' => 'main address',
-                    'countryCode' => 'FR',
-                    'city' => 'Paris',
-                    'zipCode' => '75017'
-                )
-            )
-                        )
-                    );
+            if ($article->getCodearticle() == $cab){
 
-            function array_to_xml($soapRequest, $soapRequestXml) {
-                foreach($soapRequest as $key => $value) {
-                    if(is_array($value)) {
-                        if(!is_numeric($key)){
-                            $subnode = $soapRequestXml->addChild("$key");
-                            array_to_xml($value, $subnode);
-                        }
-                        else{
-                            $subnode = $soapRequestXml->addChild("item$key");
-                            array_to_xml($value, $subnode);
-                        }
-                    }
-                    else {
-                        $soapRequestXml->addChild("$key",htmlspecialchars("$value"));
-                    }
-                }
+                return new JsonResponse(array('OK VERIF'));
             }
-
-
-        //+ Generate SOAPRequest
-        $xml = new \SimpleXMLElement('<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" />');
-        $xml->addChild("soapenv:Header");
-        $children = $xml->addChild("soapenv:Body");
-        $children = $children->addChild("sls:generateLabel", null, 'http://sls.ws.coliposte.fr');
-        $children = $children->addChild("generateLabelRequest", null, "");
-        array_to_xml($requestParameter,$children);
-
-        $requestSoap = $xml->asXML();
-        dump($requestSoap);
-        //- Generate SOAPRequest
-
-        //+ Call Web Service
-
-            $options = array(
-                'cache_wsdl' => 0,
-                'trace' => 1,
-                'stream_context' => stream_context_create(array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                ))
-            );
-            try {
-                    $resp = new \SoapClient ( 'https://ws.colissimo.fr/sls-ws/SlsServiceWS?wsdl', $options);
-        $response = $resp->__doRequest ( $requestSoap, SERVER_NAME .'/sls-ws/SlsServiceWS', 'generateLabel', '2.0', 1 );
-            } catch (\Exception $e) {
-                var_dump($e->getMessage(), die());
+            else{
+                return new JsonResponse(array('pas bon'));
             }
-
-
-
-
-
-
-            return new $response;
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function insertNumHeineken(Request $request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            $cab = $request->get('cab');
+            $numero = $request->get('cmdp');
+            $em = $this->getDoctrine()->getManager();
+
+            $article = $em->getRepository('TMDProdBundle:EcommCmdep')->findOneBy(array('numero' => $numero ));
+
+            if ($article->getCodearticle() == $cab){
+
+                return new JsonResponse(array('OK VERIF'));
+            }
+            else{
+                return new JsonResponse(array('pas bon'));
+            }
+        };
+
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function verifElectionAction($statut , $jour)
+    {
+
+//       $jour = 6;
+//
+
+        $dateJour = ['2019-05-13',
+            '2019-05-14 ',
+            '2019-05-15 ',
+            '2019-05-16 ',
+            '2019-05-17 ',
+            '2019-05-18 ',
+            '2019-05-20 ',
+            '2019-05-21 ',
+            '2019-05-22 ',];
+        $joureureInterro = ['06:00:00',
+            '07:00:00',
+            '08:00:00',
+            '09:00:00',
+            '10:00:00',
+            '11:00:00',
+            '12:00:00',
+            '13:00:00',
+            '14:00:00',
+            '15:00:00',
+            '16:00:00',
+            '17:00:00',
+            '18:00:00',
+            '19:00:00',
+            '20:00:00',
+            '21:00:00'];
+        
+        $em = $this->getDoctrine()->getManager();
+
+//        dump($dateJour[$jour]);
+
+            $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(0);
+            $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(0);
+
+            $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour]);
+            $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour]);
+
+
+
+            $pieChart = new PieChart();
+            $pieChart->getData()->setArrayToDataTable(
+                [
+                    ['Etat', 'Mise sous pli'],
+                    ['MSP', sizeof($nbKubByStatut)],
+                    ['Reste à produire', sizeof($nbKubTotal)-sizeof($nbKubByStatut)]
+
+                ]
+            );
+            $pieChart->getOptions()->setPieSliceText('label');
+            //        $pieChart->getOptions()->setTitle('Par KUB');
+            $pieChart->getOptions()->setPieStartAngle(0);
+            $pieChart->getOptions()->setHeight(180);
+            $pieChart->getOptions()->setWidth(350);
+            $pieChart->getOptions()->getLegend()->setPosition('none');
+
+
+            $pieChart2 = new PieChart();
+            $pieChart2->getData()->setArrayToDataTable(
+                [
+                    ['Etat', 'Mise sous pli'],
+                    ['MSP', intval($nbElecteurByStatut[0][1])],
+                    ['Reste à produire', intval($nbElecteurTotal[0][1])-intval($nbElecteurByStatut[0][1])]
+
+                ]
+            );
+            $pieChart2->getOptions()->setPieSliceText('label');
+            //        $pieChart2->getOptions()->setTitle('Par électeur');
+            $pieChart2->getOptions()->setPieStartAngle(0);
+            $pieChart2->getOptions()->setHeight(180);
+            $pieChart2->getOptions()->setWidth(350);
+            $pieChart2->getOptions()->getLegend()->setPosition('none');
+
+
+            
+                for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+                    $nbKubByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
+                    $nbElecteurByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
+                }
+
+
+
+//                dump( date_format(new DateTime(),"d" ));
+//                dump(intval(date_format(new DateTime(),"d" )));
+
+                $tabLine=[];
+                for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+                    if ($j == 0) {
+                        array_push($tabLine, ['', 'Nombre de plis', 'Nombre de KUB']);
+                    }
+                    if (intval(substr($joureureInterro[$j],0,2)) <= intval(date_format(new DateTime(),"H")) or
+                            intval(substr($dateJour[$jour],8,2)) < intval(date_format(new DateTime(),"d" ))){
+                        array_push($tabLine, [new DateTime($joureureInterro[$j]), intval($nbElecteurByStatut[$j][0][1]), sizeof($nbKubByStatut[$j])]);
+                    }else{
+                        array_push($tabLine, [new DateTime($joureureInterro[$j]), 'none', 'none']);
+                    }
+                }
+        $tabChart=[];
+        $nbKubByStatut[-1]=null;
+        $nbElecteurByStatut[-1]=null;
+        for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+            if ($j == 0) {
+                array_push($tabChart, ['', 'Nombre de plis', 'Nombre de KUB']);
+            }
+            if (intval(substr($joureureInterro[$j],0,2)) <= intval(date_format(new DateTime(),"H")) or
+                intval(substr($dateJour[$jour],8,2)) < intval(date_format(new DateTime(),"d" ))){
+                array_push($tabChart, [new DateTime($joureureInterro[$j]),intval($nbElecteurByStatut[$j][0][1])-intval($nbElecteurByStatut[$j-1][0][1]), sizeof($nbKubByStatut[$j])-sizeof($nbKubByStatut[$j-1])]);
+            }else{
+                array_push($tabChart, [new DateTime($joureureInterro[$j]), 'none', 'none']);
+            }
+        }
+
+
+//
+//
+
+                $line = new \CMEN\GoogleChartsBundle\GoogleCharts\Charts\Material\LineChart();
+                $line->getData()->setArrayToDataTable(
+
+
+
+                     $tabLine
+
+
+                );
+                //        $line->getOptions()->getChart()
+                //            ->setTitle('Average Temperatures and Daylight in Iceland Throughout the Year');
+                $line->getOptions()
+                    ->setHeight(150)
+                    ->setWidth(800)
+                    ->setSeries([['axis' => 'Nombre de plis'], ['axis' => 'Nombre de KUB']])
+                    ->setAxes(['y' => ['Nombre de plis' => ['label' => 'Nombre de plis'], 'Nombre de KUB' => ['label' => 'Nombre de KUB']]]);
+
+                $line->getOptions()
+                    ->getHAxis()->setFormat('H:mm');
+
+
+
+                $chart = new \CMEN\GoogleChartsBundle\GoogleCharts\Charts\Material\ColumnChart();
+                $chart->getData()->setArrayToDataTable(
+//
+                    $tabChart
+
+                );
+
+//                $chart->getOptions()->getChart()
+//                    ->setTitle('Production journalier')
+//                    ->setSubtitle('Sales, Expenses, and Profit: 2014-2017');
+                $chart->getOptions()
+                    ->setBars('vertical')
+                    ->setHeight(150)
+                    ->setWidth(800)
+                    ->setColors(['#3366CC','#DC3912'])
+                    ->setSeries([['axis' => 'Nombre de plis'], ['axis' => 'Nombre de KUB']])
+                    ->setAxes(['y' => ['Nombre de plis' => ['label' => 'Nombre de plis'], 'Nombre de KUB' => ['label' => 'Nombre de KUB']]]);
+
+                $chart->getOptions()
+                    ->getHAxis()->setFormat('H:mm');
+
+        return $this->render('TMDAppliBundle:Appli:election.html.twig', array('statut' => $statut,'jour' => $jour, 'piechart' => $pieChart,'piechart2' => $pieChart2,'line' => $line, 'chart' => $chart));
+    }
+
+    public function colissimoAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $nbBlforBordreau = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlForBordereau();
+
+        return $this->render('TMDAppliBundle:Appli:colissimo.html.twig', array(
+            'bls'  => $nbBlforBordreau
+
+        ));
+    }
+
+    public function colissimoInfoAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $nbBlforBordreau = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlForBordereau();
+
+        return $this->render('TMDAppliBundle:Appli:Infocolissimo.html.twig', array(
+            'bls'  => $nbBlforBordreau
+
+        ));
     }
 }

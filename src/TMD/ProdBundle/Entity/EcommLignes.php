@@ -67,43 +67,64 @@ class EcommLignes
      */
     private $numligne;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="numOrder", type="smallint", nullable=true)
+     */
+    private $numOrder ;
+
 
     /**
      * @ORM\OneToMany(targetEntity="TMD\ProdBundle\Entity\EcommCmdep", mappedBy="numbl")
      */
     private $ecommCmdeps;
 
+    /**
+     * @ORM\OneToMany(targetEntity="TMD\ProdBundle\Entity\EcommBl", mappedBy="bl")
+     */
+    private $bls;
+
     public function __construct()
     {
         $this->ecommCmdeps = new ArrayCollection();
+        $this->bls = new ArrayCollection();
     }
 
 
     public function addEcommCmdep(EcommCmdep $ecommCmdep)
-
     {
-
         $this->ecommCmdeps[] = $ecommCmdep;
         $ecommCmdep->setNumbl($this);
-
     }
 
 
     public function removeEcommCmdep(EcommCmdep $ecommCmdep)
-
     {
-
         $this->ecommCmdeps->removeElement($ecommCmdep);
-
     }
 
 
     public function getEcommCmdeps()
-
     {
-
         return $this->ecommCmdeps;
+    }
 
+
+    public function addBl(EcommBl $bl)
+    {
+        $this->bls[] = $bl;
+        $bl->setBl($this);
+    }
+
+    public function removebl(EcommBl $bl)
+    {
+        $this->bls->removeElement($bl);
+    }
+
+    public function getbls()
+    {
+        return $this->bls;
     }
 
 
@@ -222,6 +243,23 @@ class EcommLignes
     {
         $this->numligne = $numligne;
     }
+
+    /**
+     * @return int
+     */
+    public function getNumOrder()
+    {
+        return $this->numOrder;
+    }
+
+    /**
+     * @param int $numOrder
+     */
+    public function setNumOrder($numOrder)
+    {
+        $this->numOrder = $numOrder;
+    }
+
 
 
 

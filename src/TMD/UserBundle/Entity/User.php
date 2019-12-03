@@ -26,6 +26,41 @@ class User implements UserInterface
     /**
      * @var string
      *
+     * @ORM\Column(name="matricule", type="string", length=35, nullable=true)
+     */
+    private $matricule;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nom", type="string", length=35, nullable=false)
+     */
+    private $nom;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="prenom", type="string", length=35, nullable=false)
+     */
+    private $prenom;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="service", type="string", length=20, nullable=false)
+     */
+    private $service;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="email", type="string", length=35, nullable=true)
+     */
+    private $email;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="username", type="string", length=255, unique=true)
      */
     private $username;
@@ -170,6 +205,88 @@ class User implements UserInterface
     {
         return $this->salt;
     }
+
+    /**
+     * @return string
+     */
+    public function getMatricule()
+    {
+        return $this->matricule;
+    }
+
+    /**
+     * @param string $matricule
+     */
+    public function setMatricule($matricule)
+    {
+        $this->matricule = $matricule;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getNom()
+    {
+        return $this->nom;
+    }
+
+    /**
+     * @param string $nom
+     */
+    public function setNom($nom)
+    {
+        $this->nom = $nom;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrenom()
+    {
+        return $this->prenom;
+    }
+
+    /**
+     * @param string $prenom
+     */
+    public function setPrenom($prenom)
+    {
+        $this->prenom = $prenom;
+    }
+
+    /**
+     * @return string
+     */
+    public function getService()
+    {
+        return $this->service;
+    }
+
+    /**
+     * @param string $service
+     */
+    public function setService($service)
+    {
+        $this->service = $service;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
 
 
 

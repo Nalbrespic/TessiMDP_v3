@@ -1,6 +1,16 @@
+
+{% set ISdeleteBL = 0 %}
+
 <table class="table table-bordered table-striped tableSynthese " style="text-align: center;">
+    <div id="suppArticle" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content" style="width: 12%;padding: 7px;margin: 19% auto;">
+            <div style="text-align: right;"><a href="#"><span class="closesupp">&times;</span></a></div>
+            <div id="modalSuppContenu"></div>
+        </div>
+    </div>
     <tr class="active">
-        <th colspan="4" style="text-align: center;padding-bottom: 0px;">Fichiers réceptionnés</th>
+        <th colspan="3" style="text-align: center;padding-bottom: 0px;">Fichiers réceptionnés</th>
         <th colspan="{{ nbColonne +4 }}" style="text-align: center;padding-bottom: 0px;">Production</th>
         <th style="text-align: center;padding-bottom: 0px;">Sites</th>
         <th style="text-align: center;padding-bottom: 0px;" colspan="{{ TypeTransport|length }}">Transport</th>
@@ -8,12 +18,18 @@
     <tr style="background-color: #DFD8DF;border-bottom: 2px solid #504A62;font-size: .9em;">
         <th style="text-align: center;padding-bottom: 0px;">Date Fichier</th>
         <th style="text-align: center;padding-bottom: 0px;">Nom Fichier</th>
+        {#old#}
+        {#<th style="text-align: center;padding-bottom: 0px;">Total Cdes</th>#}
+        {#<th style="text-align: center;padding-bottom: 0px;">Bl créés</th>#}
+        {#old#}
         <th style="text-align: center;padding-bottom: 0px;">Total Cdes</th>
-        <th style="text-align: center;padding-bottom: 0px;">Bl créés</th>
         <th style="text-align: center;padding-bottom: 0px;">Bl produits</th>
         <th style="text-align: center;padding-bottom: 0px;">Attente PROD</th>
         {% if retention == 1 %}
             <th style="text-align: center;padding-bottom: 0px;">Retention</th>
+        {% endif %}
+        {% if rupture == 1 %}
+            <th style="text-align: center;padding-bottom: 0px;">Rupture</th>
         {% endif %}
         {% if tagArticle == 1 %}
             <th style="text-align: center;padding-bottom: 0px;">Articles</th>
@@ -22,8 +38,8 @@
             <th style="text-align: center;padding-bottom: 0px;">Cmd Recla</th>
         {% endif %}
 
-        <th style="text-align: center;padding-bottom: 0px;">First PROD</th>
-        <th style="text-align: center;padding-bottom: 0px;">Last PROD</th>
+        <th style="text-align: center;padding-bottom: 0px;">PremièrePROD</th>
+        <th style="text-align: center;padding-bottom: 0px;">Dernière PROD</th>
         <th style="text-align: center;padding-bottom: 0px;"></th>
         {%  for trans in TypeTransport  %}
 
@@ -32,38 +48,192 @@
     </tr>
 
     {% for file in files %}
+
+        {% set nbRuturenyBL = 0 %}
+        {% if tabsyntheseStatut[file['idfile']] is defined %}
+            {% for tabS in tabsyntheseStatut[file['idfile']] %}
+                {% for key,donn in tabS %}
+                    {% if key == 10 %}
+                        {% set nbRuturenyBL = donn %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        {% set nbdeleteBL = 0 %}
+        {% if tabsyntheseStatut[file['idfile']] is defined %}
+            {% for tabS in tabsyntheseStatut[file['idfile']] %}
+                {% for key,del in tabS %}
+                    {% if key == 9 %}
+                        {% set nbdeleteBL = del %}
+                        {% set ISdeleteBL = 1 %}
+
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+
         <tr style="padding: 0 5px 0 9px;">
             <td>{{ file['dateFile']|date("d/m/Y") }}</td>
-            <td> <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilFile tableToggleButton" data-toggle="collapse" style="color: #333;" >
-                    {{ file['filename']   }}</a>
+            <td style="text-align: left;"> <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilFile tableToggleButton" data-toggle="collapse" style="color: #333;margin-right: 5px;" >
+                    {{ file['filename']   }} </a>
 
             </td>
-            {%  if  nbBlbyfile[file['idfile']]['nbBl'] is defined and nbBlByFileProd[file['idfile']]['totProd'] is defined and nbTrByFile[file['idfile']] == nbBlbyfile[file['idfile']]['nbBl'] and nbBlbyfile[file['idfile']]['nbBl'] == nbBlByFileProd[file['idfile']]['totProd']  %}
-                <td colspan="3" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
-                <td></td>
+            {#old#}
+            {#{%  if  nbBlbyfile[file['idfile']]['nbBl'] is defined and nbBlByFileProd[file['idfile']]['totProd'] is defined and nbTrByFile[file['idfile']] == nbBlbyfile[file['idfile']]['nbBl'] and nbBlbyfile[file['idfile']]['nbBl'] == nbBlByFileProd[file['idfile']]['totProd']   %}#}
+                {#<td colspan="3" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>#}
+                {#<td></td>#}
+            {#{%  elseif  nbBlbyfile[file['idfile']]['nbBl'] is defined and nbBlByFileProd[file['idfile']]['totProd'] is defined and nbBlByFileProd[file['idfile']]['totProd'] > nbTrByFile[file['idfile']] and nbBlByFileProd[file['idfile']]['totProd'] == nbBlbyfile[file['idfile']]['nbBl'] %}#}
+                {#<td style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;width: 150%"><span style="margin-left: -28px;" >{{ nbTrByFile[file['idfile']] }}</span></div></td>#}
+                {#<td colspan="2" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>#}
+                {#<td></td>#}
+            {#{% else %}#}
+                {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                    {#{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}#}
+                        {#<td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>#}
+                        {#<td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %} {% if nbTrByFile[file['idfile']]|number_format < nbBlbyfile[file['idfile']]['nbBl'] %} class="danger" {% endif %} {% endif %}{% endif %}style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{{ nbBlbyfile[file['idfile']]['nbBl'] }}{% else %}{% endif %}</td>#}
+                    {#{% else %}#}
+                        {#<td colspan="2" style="vertical-align: inherit;"><div style="background-color: #D34026;color: white;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</div></td>#}
+                    {#{% endif %}#}
+                {#{% else %}#}
+                    {#<td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>#}
+                    {#<td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                            {#{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}  class="danger"#}
+                            {#{% endif %}#}
+                        {#{% endif %}#}
+                            {#style="vertical-align: inherit;font-size: 1.2em;">#}
+                        {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                            {#{{ nbBlbyfile[file['idfile']]['nbBl'] }}#}
+                        {#{% else %}#}
+                        {#{% endif %}</td>#}
+                {#{% endif %}#}
+                {#<td  style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlByFileProd[file['idfile']]['totProd'] is defined %}{{ nbBlByFileProd[file['idfile']]['totProd'] }}{% endif %}</td>#}
+                {#<td>#}
+                    {#{% if nbBlByFileProd[file['idfile']]['totProd'] is defined %}#}
+                        {#{%  if   (nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']) != 0 %}#}
+                            {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class=" ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                {#{% if retention == 1 %}#}
+                                    {#{% if nbBlbyfile[file['idfile']]['flagXport'] is defined %}#}
+                                        {#{% if  (nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbBlbyfile[file['idfile']]['flagXport']) == 0 %}#}
+                                        {#{% else %}#}
+                                            {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbBlbyfile[file['idfile']]['flagXport'] }}#}
+                                        {#{% endif %}#}
+                                    {#{% else %}#}
+                                        {#{% if ( nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl']) >= 0 %}#}
+                                            {#{% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0 %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] }}</a>#}
+                                            {#{% else %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  }}</a>#}
+                                            {#{% endif %}#}
+                                        {#{% else %}#}
+                                            {#{% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0%}#}
+                                            {#{% else %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{{ nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] }}</a>#}
+                                            {#{% endif %}#}
+                                        {#{% endif %}#}
+                                    {#{% endif %}#}
+                                {#{% else %}#}
+                                    {#{% if  nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                                        {#{% if ( nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl']) >= 0 %}#}
+                                            {#{% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0 %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{% if nbRuturenyBL > 0 %}#}
+                                                        {#{% if nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbRuturenyBL == 0 %}#}
+                                                        {#{% else %}#}
+                                                            {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbRuturenyBL }}#}
+                                                        {#{% endif %}#}
+                                                    {#{% else %}#}
+                                                        {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] }}#}
+                                                    {#{% endif %}</a>#}
+                                            {#{% else %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{% if nbRuturenyBL > 0 %}#}
+                                                        {#{% if nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  - nbRuturenyBL == 0 %}#}
+                                                        {#{% else %}#}
+                                                            {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  - nbRuturenyBL }}#}
+                                                        {#{% endif %}#}
+                                                    {#{% else %}#}
+                                                        {#{{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  }}#}
+                                                    {#{% endif %}</a>#}
+                                            {#{% endif %}#}
+                                        {#{% else %}#}
+                                            {#{% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0%}#}
+                                            {#{% else %}#}
+                                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                                    {#{{ nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] }}</a>#}
+                                            {#{% endif %}#}
+                                        {#{% endif %}#}
+                                    {#{% endif %}#}
+                                {#{% endif %}#}
+                            {#</a>#}
+                        {#{% endif %}#}
+                    {#{% else %}#}
+                        {#{% if nbTrByFile[file['idfile']] and nbBlbyfile[file['idfile']]['nbBl'] is defined  and retention == 1 %}#}
+                            {#{% if nbBlbyfile[file['idfile']]['nbBl'] and nbBlbyfile[file['idfile']]['flagXport'] is defined %}#}
+                                {#{% if   nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl'] - nbBlbyfile[file['idfile']]['flagXport'] == 0 %}#}
+                                    {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                        {#{{ nbBlbyfile[file['idfile']]['nbBl'] }}</a>#}
+                                {#{% else %}#}
+                                    {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                        {#{{ nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl'] - nbBlbyfile[file['idfile']]['flagXport'] }}</a>#}
+                                {#{% endif %}#}
+                            {#{% else %}#}
+                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                    {#{{ nbTrByFile[file['idfile']] }}</a>#}
+                            {#{% endif %}#}
+                        {#{% else %}#}
+                            {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined and nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl'] == 0 %}#}
+                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                    {#{{  nbBlbyfile[file['idfile']]['nbBl']   }}</a>#}
+                            {#{% else %}#}
+                                {#<a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">#}
+                                    {#{{  nbTrByFile[file['idfile']]   }}</a>#}
+                            {#{% endif %}#}
+                        {#{% endif %}#}
+                    {#{% endif %}#}
+                {#</td>#}
+            {#{% endif %}#}
+            {#old#}
 
+            {#old#}{#{{ nbBlbyfile[file['idfile']]['nbBl'] }}#}
+            {%  if  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbTrByFile[file['idfile']]  == nbBlByFileProd[file['idfile']]['totProd']   %}
+                <td colspan="2" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;position: relative;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
+                 <td></td>
+            {%  elseif  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbBlByFileProd[file['idfile']]['totProd'] > nbTrByFile[file['idfile']] and nbBlByFileProd[file['idfile']]['totProd'] - nbBlbyfile[file['idfile']]['nbBl']  == 0 %}
+                <td style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;width: 150%"><span style="margin-left: -28px;" >{{ nbTrByFile[file['idfile']] }}</span></div></td>
+                <td  style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
+                <td></td>
+            {%  elseif  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbRuturenyBL == 0   and nbBlByFileProd[file['idfile']]['totProd'] - nbTrByFile[file['idfile']] + nbdeleteBL  == 0 and nbdeleteBL > 0 %}
+                <td style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;width: 150%;position: relative;"><span style="margin-left: -28px;" >{{ nbTrByFile[file['idfile']] }}</span>{% if nbdeleteBL > 0 %}<span style="position: absolute;top: 0;color: #D34026;padding-left: 10px;font-size: 10px;padding: initial;margin-top: -2px;" onclick="donnesuppBl({{ nbdeleteBL }})">({{ nbdeleteBL }})</span>{% endif %}</div></td>
+                <td  style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
+                <td></td>
             {% else %}
-                {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}
-                    {% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}
-                        <td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>
-                        <td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %} {% if nbTrByFile[file['idfile']]|number_format < nbBlbyfile[file['idfile']]['nbBl'] %} class="danger" {% endif %} {% endif %}{% endif %}style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{{ nbBlbyfile[file['idfile']]['nbBl'] }}{% else %}{% endif %}</td>
-                    {% else %}
-                        <td colspan="2" style="vertical-align: inherit;"><div style="background-color: #ffe2e5;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</div></td>
-                    {% endif %}
-                {% else %}
-                    <td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>
-                    <td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}
-                            {% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}  class="danger"
-                            {% endif %}
-                        {% endif %}
-                            style="vertical-align: inherit;font-size: 1.2em;">
-                        {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}
-                            {{ nbBlbyfile[file['idfile']]['nbBl'] }}
-                        {% else %}
-                        {% endif %}</td>
-                {% endif %}
-                <td  style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlByFileProd[file['idfile']]['totProd'] is defined %}{{ nbBlByFileProd[file['idfile']]['totProd'] }}{% endif %}</td>
-                <td >
+                {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                    {#{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}#}
+                        {#<td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>#}
+                        {#<td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %} {% if nbTrByFile[file['idfile']]|number_format < nbBlbyfile[file['idfile']]['nbBl'] %} class="danger" {% endif %} {% endif %}{% endif %}style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}{{ nbBlbyfile[file['idfile']]['nbBl'] }}{% else %}{% endif %}</td>#}
+                    {#{% else %}#}
+                        {#<td colspan="2" style="vertical-align: inherit;"><div style="background-color: #D34026;color: white;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</div></td>#}
+                    {#{% endif %}#}
+                {#{% else %}#}
+                    {#<td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>#}
+                    {#<td {% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                        {#{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}  class="danger"#}
+                        {#{% endif %}#}
+                    {#{% endif %}#}
+                            {#style="vertical-align: inherit;font-size: 1.2em;">#}
+                        {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
+                            {#{{ nbBlbyfile[file['idfile']]['nbBl'] }}#}
+                        {#{% else %}#}
+                        {#{% endif %}</td>#}
+                {#{% endif %}#}
+                <td  style="vertical-align: inherit;"><div style="font-size: 1.2em;position: relative;">{{ nbTrByFile[file['idfile']] }}{% if nbdeleteBL > 0 %}<span style="position: absolute;top: 0;color: #D34026;padding-left: 10px;font-size: 10px;padding: initial;margin-top: -2px;right: 0;" onclick="donnesuppBl({{ nbdeleteBL }})">({{ nbdeleteBL }})</span>{% endif %}</div></td>
+                <td  style="vertical-align: inherit;font-size: 1.2em;">{% if nbBlByFileProd[file['idfile']]['totProd'] is defined %}{{ nbBlByFileProd[file['idfile']]['totProd']  }}{% endif %}</td>
+                <td>
                     {% if nbBlByFileProd[file['idfile']]['totProd'] is defined %}
                         {%  if   (nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']) != 0 %}
                             <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class=" ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
@@ -77,10 +247,10 @@
                                         {% if ( nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl']) >= 0 %}
                                             {% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0 %}
                                                 <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
-                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] }}</a>
+                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL }}</a>
                                             {% else %}
                                                 <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
-                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  }}</a>
+                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL }}</a>
                                             {% endif %}
                                         {% else %}
                                             {% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0%}
@@ -95,10 +265,27 @@
                                         {% if ( nbTrByFile[file['idfile']] - nbBlbyfile[file['idfile']]['nbBl']) >= 0 %}
                                             {% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0 %}
                                                 <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
-                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] }}</a>
+                                                    {% if nbRuturenyBL > 0 %}
+                                                        {% if nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  - nbdeleteBL - nbRuturenyBL == 0 %}
+                                                        {% else %}
+                                                            {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbRuturenyBL - nbdeleteBL }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] }}
+                                                    {% endif %}</a>
                                             {% else %}
                                                 <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
-                                                    {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd']  }}</a>
+                                                    {% if nbRuturenyBL > 0 %}
+                                                        {% if nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL - nbRuturenyBL == 0 %}
+                                                        {% else %}
+                                                            {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL  - nbRuturenyBL }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL == 0 %}
+                                                            {% else %}
+                                                        {{ nbTrByFile[file['idfile']] - nbBlByFileProd[file['idfile']]['totProd'] - nbdeleteBL }}
+                                                            {% endif %}
+                                                    {% endif %}</a>
                                             {% endif %}
                                         {% else %}
                                             {% if  nbBlbyfile[file['idfile']]['nbBl'] - nbBlByFileProd[file['idfile']]['totProd'] == 0%}
@@ -131,15 +318,25 @@
                                     {{  nbBlbyfile[file['idfile']]['nbBl']   }}</a>
                             {% else %}
                                 <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}" class="  ProfilMini tableToggleButton" data-toggle="collapse"  style="color: brown;font-size: 1.2em;">
-                                    {{  nbTrByFile[file['idfile']]   }}</a>
+                                    {{  nbTrByFile[file['idfile']] -nbRuturenyBL  - nbdeleteBL }}</a>
                             {% endif %}
                         {% endif %}
                     {% endif %}
                 </td>
             {% endif %}
+            {#old#}
+
             {% if retention == 1 %}
                 <td>
                     {% if nbBlbyfile[file['idfile']]['flagXport'] is defined %}{{ nbBlbyfile[file['idfile']]['flagXport'] }}{%  endif %}
+                </td>
+            {% endif %}
+            {% if rupture == 1 %}
+                <td >
+                    {% if nbRuturenyBL > 0 %}
+                        <div style = "background-color:  #D34026;"><a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}"  class="ProfilRupture tableToggleButton" data-toggle="collapse"  style="color: white;">{{ nbRuturenyBL }}</a></div>
+                    {% endif %}
+
                 </td>
             {% endif %}
             {% if tagArticle %}
@@ -199,7 +396,61 @@
 
             </td>
         </tr>
+
+        <tr >
+            <td colspan="{{ nbColonne +9 +TypeTransport|length}}" class="toggleableRupture" id="afficherProfileRupture{{ file['idfile'] }}" style="font-family: initial;font-size: 0.7em;">
+
+            </td>
+        </tr>
     {% endfor %}
 </table>
 
+    {% if ISdeleteBL > 0 %}
+        <div style="color: #D34026;font-size: 18px;margin-top: -16px;margin-left: 11px;margin-bottom: 22px;">(*) <span style="font-size: 0.7em;color: #333;">: dont ( x ) commandes annulées.</span></div>
+    {% endif %}
 
+{% block javascriptsPlus %}
+    <script type="text/javascript">
+
+
+        function donnesuppBl(numBl){
+
+//
+//                        if (numBl > 1){
+//                            var html = numBl +' BLs annulés'
+//                        }else{
+//                            var html = numBl +' BL annulé'
+//                        }
+//
+//
+//                        $("#modalSuppContenu").html(html);
+//
+//
+//                    var modal = document.getElementById('suppArticle');
+//                    var span = document.getElementsByClassName("closesupp")[0];
+//                    window.onclick = function(event) {
+//                        if (event.target === modal) {
+//                            modal.style.display = "none";
+//                        }
+//                    }
+//                    span.onclick = function() {
+//                        modal.style.display = "none";
+//                    }
+//
+//                            modal.style.display = "block";
+
+
+
+        }
+
+
+    </script>
+
+    {#modal article#}
+    <script>
+
+
+
+
+    </script>
+{% endblock %}

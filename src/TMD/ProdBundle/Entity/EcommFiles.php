@@ -74,6 +74,14 @@ class EcommFiles
     private $idfile;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id_offer", type="integer", nullable=true)
+     */
+    private $idOffer;
+
+
+    /**
      * @return int
      */
     public function getIdclient()

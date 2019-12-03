@@ -24,6 +24,16 @@ class ClientRepository extends EntityRepository
             ;
     }
 
+    public function findallCLientCompte($findallCLientCompte)
+    {
+        return $this
+            ->createQueryBuilder('c')
+            ->where('c.idclient  IN (:date)')
+            ->setParameter('date', $findallCLientCompte)
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
 
 
 

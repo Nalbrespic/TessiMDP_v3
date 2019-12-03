@@ -19,12 +19,52 @@
 
 <body>
 <div class="container">
-    <div id="header" class="jumbotron">
-        <img src="{{ asset('Images/logo.png') }}" style="float: left;">
-        <h1 style="color: #514958"><span style="font-family: Colaborate">tessi</span> <span style="font-family: ColaborateThin; font-size: 0.6em;"> customer marketing </span></h1>
+    {#<div id="header" class="jumbotron">#}
+        {#<img src="{{ asset('Images/logo.png') }}" style="float: left;">#}
+        {#<h1 style="color: #514958"><span style="font-family: Colaborate">tessi</span> <span style="font-family: ColaborateThin; font-size: 0.6em;"> customer marketing </span></h1>#}
+    {#</div>#}
+    <div id="header" class="jumbotron" style="margin-top: 9px;background-color: #28274D;height: 103px;margin-left: 14px;margin-right: 14px;">
+        <a href="{{ path('tmd_core_homepage') }}">
+            <div>
+                <svg id="texteHeadertessi" style="position: absolute;margin-top: 34px;margin-left: 90px;" width="157px" height="49px" viewBox="0 0 157 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <!-- Generator: sketchtool 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+                    <title>BF05F063-A4D9-4C81-A213-F60231D63C3B</title>
+                    <desc>Created with sketchtool.</desc>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="HOME-V1" transform="translate(-93.000000, -50.000000)">
+                            <g id="00-HEAD">
+                                <g id="HEADER" transform="translate(93.000000, 35.000000)">
+                                    <g id="Icon/Logo/Blanc" transform="translate(0.000000, 15.000000)">
+                                        <g id="Logo">
+                                            <path d="M9.39951283,34.8656903 L9.39951283,29.4822079 L9.40133391,29.4822079 L9.3954154,19.3029615 L18.789465,19.3025073 L18.789465,11.7679937 L9.3954154,11.7679937 L9.3954154,0 L0,6.09746489 L0.0059185153,11.5922232 L0.0059185153,20.9275896 L0.0059185153,29.4822079 L0.012292301,29.4822079 L0.0063737857,35.0968717 C0.0063737857,43.4693609 5.47280557,49 15.0207366,49 C16.4115876,49 17.718669,48.876461 18.84,48.6834314 L18.84,40.8959355 C18.0605771,41.0303749 17.2529274,41.0880567 16.4061244,41.0880567 C11.1705147,41.0880567 9.39951283,38.5536914 9.39951283,34.8656903" id="Fill-1" fill="#FFFFFF"></path>
+                                            <polygon id="Fill-3" fill="#FFFFFF" points="146.952 49 147.125075 48.8939498 157 42.9146939 157 12.25 146.952 12.25"></polygon>
+                                            <path d="M34.553452,26.4428707 C35.5600466,20.9787353 39.191745,18.1638096 43.9137303,18.1638096 C48.6288556,18.1638096 51.7991028,20.7487988 52.5752005,26.4428707 L34.553452,26.4428707 Z M43.8336967,11.025 C33.0049152,11.025 25.12,18.8504754 25.12,30.0913161 C25.12,41.1022203 32.1556438,49 43.7568643,49 C54.3437155,49 59.614503,43.5048771 61.1977973,37.3096155 L52.2047591,37.3096155 C51.3271329,39.3961095 49.1113442,41.6308048 44.1446845,41.6308048 C38.7302938,41.6308048 35.0953941,38.2154395 34.3997874,32.1405353 L61.544,32.1405353 L61.544,30.2422119 C61.544,18.6241317 55.049841,11.025 43.8336967,11.025 Z" id="Fill-6" fill="#FFFFFF"></path>
+                                            <path d="M78.0488913,21.6580898 C78.0488913,19.3035141 80.1096168,17.7851428 84.6275593,17.7851428 C88.7485415,17.7851428 91.2057586,19.3798593 91.4433724,22.6456374 L99.9243566,22.6456374 C99.7654788,15.2778767 94.4554903,11.025 84.7062952,11.025 C74.7991596,11.025 68.6961879,15.2028787 68.6961879,21.8857781 C68.6961879,36.7717446 91.1260853,30.9241515 91.1260853,38.4432554 C91.1260853,40.7969329 88.986624,42.2403063 83.9934539,42.2403063 C78.6829967,42.2403063 76.4638621,40.4928994 76.2257796,37.3030174 L67.824,37.2280195 C67.9036733,44.7471233 73.2136617,49 83.9934539,49 C94.2966124,49 100.558462,44.8984665 100.479257,38.2146689 C100.479257,22.8737748 78.0488913,29.0249524 78.0488913,21.6580898" id="Fill-8" fill="#FFFFFF"></path>
+                                            <path d="M116.984567,21.6580898 C116.984567,19.3035141 119.045321,17.7851428 123.563327,17.7851428 C127.684836,17.7851428 130.141619,19.3798593 130.379705,22.6456374 L138.860809,22.6456374 C138.70146,15.2778767 133.391397,11.025 123.642533,11.025 C113.735258,11.025 107.6322,15.2028787 107.6322,21.8857781 C107.6322,36.7717446 130.061945,30.9241515 130.061945,38.4432554 C130.061945,40.7969329 127.922922,42.2403063 122.928744,42.2403063 C117.618681,42.2403063 115.399984,40.4928994 115.161429,37.3030174 L106.76,37.2280195 C106.839674,44.7471233 112.149738,49 122.928744,49 C133.233454,49 139.494923,44.8984665 139.415249,38.2146689 C139.415249,22.8737748 116.984567,29.0249524 116.984567,21.6580898" id="Fill-10" fill="#FFFFFF"></path>
+                                            <polygon id="Clip-13" points="0 49 157 49 157 0 0 0"></polygon>
+                                            <polygon id="Fill-12" fill="#FFFFFF" points="146.952 7.35 157 7.35 157 0 146.952 0"></polygon>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+                <img id="imgHeader" src="{{ asset('Images/2019Tessi_FondEcran.png') }}" style="position: absolute;width: 103px;margin-top: -1px;margin-left: -60px;">
+            </div></a>
+
+
+        {#<div style="text-align: right;margin-top: -22px;">{% if app.user.username is defined %}#}
+        {#Bonjour {{ app.user.username }}#}
+        {#<a href="{{ path('logout') }}" >Deconnexion</a></div>#}
+        {#{% else %}#}
+        {#<a href="{{ path('login') }}" >Connexion</a></div>#}
+        {#{% endif %}#}
     </div>
+
+
         <div class="row">
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2 col-md-offset-5">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.message }}</div>
                 {% endif %}

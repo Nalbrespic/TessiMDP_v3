@@ -2,9 +2,17 @@
     <div class="col-md-5" style="margin-top: 23px;">
         <div class="form-group">
             <label for="entered_search">Recherche par N°commande / N°BL / Destinataire</label>
-            <input name="entered_search" type="text" style="width: 150px;" class="form-control"  id="entered_cmd" >
+            <input name="entered_search" onchange="sendDatarechercheCmd()" type="text" style="width: 150px;" class="form-control"  id="entered_cmd" >
 
-        </div> <button type="submit" onclick="sendDatarechercheCmd();" class="btn btn-default">Rechercher</button>
+        </div>
+        {#<button type="submit" onclick="sendDatarechercheCmd();" class="btn btn-default">Rechercher</button>#}
+    </div>
+
+    <div class="col-md-5" style="margin-top: 23px;">
+        <div class="form-group">
+            <label for="entered_search2">Recherche par code article</label>
+            <input  name="entered_search2" onchange="sendDatarechercheCodeArtcicle()" type="text" style="width: 150px;" class="form-control"  id="entered_codeArticle" >
+        </div>
     </div>
 
 </div>
@@ -13,3 +21,106 @@
 
     </div>
 </div>
+
+
+
+{% block javascriptsPlus %}
+
+    {#recherche code article#}
+    <script type="text/javascript">
+        function sendDatarechercheCodeArtcicle(){
+            var code =  $('#entered_codeArticle').val();
+            var idClient =  $('#idClient').text();
+            var idope =  $('#idOperation').text();
+
+            $.ajax({
+                url: "{{ path('tmd_prod_rechercheCodeArticle') }}",
+                type: "POST",
+                data: {code:  code,idClient:  idClient,idope: idope },
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var len = obj['add'].length;
+
+                    if ( len != 0) {
+
+
+                        var titre = "Resultats: ("+len+") pour le code article:: \""+code+'"';
+                        var html ="";
+                        var afficheTout=false;
+
+                        html += tabTrackings(obj['add'], len, titre, afficheTout, html);
+
+//
+                        var tabdeBL =[];
+                        for (var i =0; i < len; i++){
+                            tabdeBL.push(obj['add'][i]['numbl'])
+                        }
+
+
+
+                        var expor = "{{ path('tmd_prod_exportTrackingExcelbyBL', {'idBLs': 'VBL', 'code':'Vcode' }) }}";
+                        expor = expor.replace("VBL", tabdeBL);
+                        expor = expor.replace("Vcode", code);
+
+                        html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse: </p><hr class="menutr">';
+                        var art = obj['articles'];
+                        var lenA = art.length;
+                        html += '<div class="row"><div class="col-md-5" style="overflow: auto;height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code article</td><td>Libelle</td><td>Quantité</td></tr>';
+                        for (var j = 0; j < lenA; j++) {
+
+                            html += '<tr class="tabSyntheseBlanc"><td ';
+                            if(!art[j]['flagart'] ){
+                                html+='Style="font-size: 1.2em;"';
+                            }
+                            html +='>' + art[j]['codearticle'] + '</td><td ';
+                            if(!art[j]['flagart'] ){
+                                html+='Style="font-size: 1.2em;"';
+                            }
+                            html +='>' + art[j]['libelle'] + '</td><td ';
+
+                            if(!art[j]['flagart']){
+                                html+='Style="font-size: 1.2em;"';
+                            }
+                            html+= '>' + art[j]['quantite'] + '</td></tr>';
+                        }
+                        html += '</table></div>';
+
+                        var perso = obj['perso'];
+                        var lenP = perso.length;
+                        if ( lenP > 1 && obj['perso'][0]['perso1'].length > 0) {
+                            html += '<div class="col-md-4" style="overflow: auto;height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 70%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Perso 1</td><td>Perso 2</td></tr>';
+
+                            for (var k = 0; k < lenP; k++) {
+
+                                html += '<tr class="tabSyntheseBlanc" ><td style="position: relative;">';
+                                if (perso[k][1] > 1) {
+                                    html += '<span class="badge" style="font-size: 0.9em;background-color: #9698C9;padding: 3px;text-align: -moz-right;position: absolute;right: 0;margin-right: 5px;">' + perso[k][1] + '</span>';
+                                }
+                                html += perso[k]['perso1'] + '</td><td>' + perso[k]['perso2'] + '</td></tr>';
+                            }
+                            html += '</table></div>';
+                        }
+                        html += '</div>';
+
+                        html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Export: </p><hr class="menutr">';
+
+                        html +=  '<p><a href="'+expor+'"  class="btn btn-success btn-xs" role="button">Export</a></p></div>'
+
+                        $("#resultatRecherche").html(html);
+
+                    }
+                    else{
+                        var htmlr = '<div class="fondBlanc"><p style="text-align: left;font-size: 1.6em;margin: 10px;">Pas de resultat pour le code article: "'+code+'"</p>';
+                        $("#resultatRecherche").html(htmlr);
+                    }
+                    document.getElementById("entered_codeArticle").value = "";
+
+                }
+            });
+        }
+    </script>
+{% endblock %}

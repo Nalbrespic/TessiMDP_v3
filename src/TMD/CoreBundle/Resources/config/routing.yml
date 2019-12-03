@@ -19,3 +19,16 @@ tmd_core_donneResteProd:
     defaults:
         _controller: TMDCoreBundle:Core:resteProd
     methods: [POST]
+
+tmd_core_erreurWS:
+    path: /erreurWS
+    defaults:
+        _controller: TMDCoreBundle:Core:erreurWS
+    methods: [POST]
+
+tmd_core_rectificationWS:
+    path: /rectificationWS/{idOpe}/{current}
+    defaults:
+        _controller: TMDCoreBundle:Core:rectificationWS
+        idOpe: 0
+        current: 0

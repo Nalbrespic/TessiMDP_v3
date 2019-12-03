@@ -1,12 +1,39 @@
-/web/bundles/
-/app/bootstrap.php.cache
+# Cache and logs (Symfony2)
 /app/cache/*
-/app/config/parameters.yml
 /app/logs/*
 !app/cache/.gitkeep
 !app/logs/.gitkeep
-/app/phpunit.xml
+
+# Parameters
+/app/config/parameters.yml
+/app/config/parameters.ini
+
+# Managed by Composer
+/app/bootstrap.php.cache
 /build/
-/vendor/
 /bin/
+/vendor/
+/app/SymfonyRequirements.php
+/web/config.php
+
+# Assets and user uploads
+/web/bundles/
+/web/uploads/
+
+# Assets managed by Bower
+/web/assets/vendor/
+
+# PHPUnit
+/app/phpunit.xml
+/phpunit.xml
+
+# Composer PHAR
 /composer.phar
+/composer.lock
+
+# Tests
+/Tests/cache
+/Tests/logs
+
+# Digifid deployment
+.env

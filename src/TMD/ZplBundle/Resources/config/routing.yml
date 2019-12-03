@@ -5,3 +5,11 @@ tmd_zpl_homepage:
 tmd_zpl_imprimEtiq:
     path:     /printZpl
     defaults: { _controller: TMDZplBundle:Default:imprimEtiq }
+
+tmd_zpl_imprimColissimoBordereau:
+    path:     /printBordereauCol
+    defaults: { _controller: TMDZplBundle:Default:imprimColissimoBordereau }
+
+tmd_zpl_imprimColissimoInformation:
+    path:     /printInfoBordereauCol
+    defaults: { _controller: TMDZplBundle:Default:imprimColissimoInformation }

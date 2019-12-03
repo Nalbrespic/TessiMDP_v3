@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Client
  *
  * @ORM\Table(name="r_client")
- * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\ClientRepository", readOnly=true)
+ * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\ClientRepository", readOnly=false)
  */
 class Client
 {

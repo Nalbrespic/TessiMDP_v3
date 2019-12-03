@@ -12,6 +12,6 @@ class DefaultController extends Controller
         $tr = $em->getRepository('TMDColissimoBundle:Trackings')->findAll();
 
 
-        return $this->render('TMDColissimoBundle:Default:index.html.twig');
+        return $this->render('TMDColissimoBundle:Colissimo:index.html.twig');
     }
 }

@@ -17,12 +17,227 @@
                 <div class="col-md-5">
                     <div class="well">
 
-                        {{ form(form) }}
+                        {{ form_start(form) }}
 
+                        <ul id="email-fields-list"
+                            data-prototype="{{ form_widget(form.configs.vars.prototype)|e }}"
+                            data-select-chooseTransport="{{ '<li></li>'|e }}"
+                            data-widget-tags="{{ '<li></li>'|e }}">
+                        </ul>
+
+                        <button type="button"
+                                id="buttonSelctionAutreTransport"
+                                class="add-another-collection-widget"
+                                data-list="#email-fields-list">Ajouter un transport</button>
+
+                        {{ form_end(form) }}
                     </div>
                 </div>
             </div>
 
 
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+<script type="text/javascript">
+    var counter = null;
+    var clientC = null;
+    var compte  = null;
+    var compteTransport  = null;
+    var transport = null;
+
+    $.ajax({
+        url: "{{ path('tmd_prod_donneTransport') }}",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+        complete: function (html) {
+            var donnTabTrans = html.responseText;
+            obj = JSON.parse(donnTabTrans);
+//            var blT = JSON.parse(obj['4']);
+            clientC = obj[4];
+            compte = obj[3];
+            compteTransport= obj[2];
+            transport = obj[0];
+        }
+    })
+
+    jQuery(document).ready(function () {
+        jQuery('.add-another-collection-widget').click(function (e) {
+            var list = jQuery(jQuery(this).attr('data-list'));
+            // Try to find the counter of the list
+             counter = list.data('widget-counter') | list.children().length;
+            // If the counter does not exist, use the length of the list
+            if (!counter) { counter = list.children().length; }
+
+            // grab the prototype template
+            var newWidget = list.attr('data-prototype');
+            // replace the "__name__" used in the id and name of the prototype
+            // with a number that's unique to your emails
+            // end name attribute looks like name="contact[emails][2]"
+            newWidget = newWidget.replace(/__name__/g, counter);
+            // Increase the counter
+            counter++;
+            // And store it, the length cannot be used if deleting widgets is allowed
+            list.data(' widget-counter', counter);
+
+            // create a new list element and add it to the list
+//            var newElem = jQuery(list.attr('data-widget-tags')).html(newWidget);
+//            newElem.appendTo(list);
+
+
+
+
+            var selectClient = '<select id="listClient'+counter+'" class="form-control" onchange="goTransporteur(this.options[this.selectedIndex].value, counter)" style="width: 210px;">' +
+                                    '<option>Choisir un client</option>';
+                                    for ( var v=0; v < clientC.length; v++) {
+                                         selectClient += '<option  value="'+clientC[v]['idclient']+'" class="list-group-item">'+clientC[v]['nomclient']+'</span> </option>';
+                                     }
+                                selectClient += '</select>';
+
+                                selectClient = selectClient.replace('counter', counter);
+
+                                selectClient += '<select id="listTransporteur'+counter+'" class="form-control" onchange="goTransport(this.options[this.selectedIndex].value, counter)" style="width: 210px;display:none;"><select>';
+
+                                selectClient += '<select id="listTransport'+counter+'" class="form-control" onchange="goFinishSelect()" style="width: 210px;display:none;"><select>';
+
+                                selectClient += '<p id="recaptrans'+counter+'"></p>';
+
+            var newElem = jQuery(list.attr('data-select-chooseTransport')).html(selectClient);
+            $('#buttonSelctionAutreTransport').hide();
+            newElem.appendTo(list);
+
+
+
+
+
+
+
+
+        });
+    });
+
+     function goTransporteur(idclient, counteur){
+
+
+        var id = "listTransporteur"+counteur;
+        document.getElementById(id).style.display = 'none';
+        var x = document.getElementById(id);
+//        $("#listTransporteur"+counter).html = '';
+        document.getElementById("listTransporteur"+counteur).innerHTML = "";
+        var option = document.createElement("option");
+        option.text = 'Choisir un transporteur';
+        x.add(option);
+
+        var id2 = "listTransport"+counteur;
+        document.getElementById(id2).style.display = 'none';
+
+        var allcompteClient = null;
+        var allcompteTransportClient = [];
+        for ( var v=0; v < compte.length; v++) {
+           if ( compte[v]['idclient'] == idclient ){
+               for ( var j=0; j < compteTransport.length; j++) {
+                   if ( compteTransport[j]['idcompte'] == compte[v][0]['idcompte'] ){
+                       allcompteTransportClient.push([compteTransport[j]['idtransport'],compte[v][0]['idcompte'], compte[v][0]['libelle']] )
+                   }
+               }
+               allcompteClient += compte[v][0]['idcompte']
+           }
+        }
+
+        var allTransporteur = {};
+        var allTransport = {};
+        var allcompteTransportClient1 = allcompteTransportClient;
+//        on verifie si plusieurs compte pour un meme transport
+         for ( var l=0; l < allcompteTransportClient.length; l++) {
+             for ( var n=0; n < allcompteTransportClient1.length; n++) {
+                 if (allcompteTransportClient1[n][0] === allcompteTransportClient[l][0] && n !== l){
+                     allcompteTransportClient[l][3] = 'true';
+                 }
+
+             }
+
+         }
+
+        for ( var k=0; k < transport.length; k++) {
+            for ( var i=0; i < allcompteTransportClient.length; i++) {
+                if ( allcompteTransportClient[i][0] == transport[k][0]['idtransport'] && allcompteTransportClient[i][3] === 'true'){
+                    allTransporteur[transport[k]['idtransporteur']] =(transport[k]['libelletransporteur']);
+                    allTransport[allcompteTransportClient[i][2]+' - '+transport[k][0]['libelletransport']] = ([transport[k][0]['idtransport'] , transport[k]['idtransporteur'], allcompteTransportClient[i][2], allcompteTransportClient[i][1]])
+                }else if(allcompteTransportClient[i][0] == transport[k][0]['idtransport'] ) {
+                    allTransporteur[transport[k]['idtransporteur']] =(transport[k]['libelletransporteur']);
+                    allTransport[transport[k][0]['libelletransport']] = ([transport[k][0]['idtransport'] , transport[k]['idtransporteur'], allcompteTransportClient[i][2], allcompteTransportClient[i][1]])
+                }
+            }
+        }
+
+
+
+
+        Object.keys(allTransporteur).forEach(function(key) {
+            option = document.createElement("option");
+            option.text = allTransporteur[key];
+            var  tab = [];
+            Object.keys(allTransport).forEach(function(kel) {
+                if ( key == allTransport[kel][1]){
+                    tab.push(kel,allTransport[kel][2],allTransport[kel][3])
+                }
+            });
+                option.value = tab;
+                x.add(option);
+            });
+
+        document.getElementById(id).style.display = '';
+
+    }
+
+    function goTransport(libellTransport, counteur) {
+        var id2 = "listTransport"+counteur;
+        document.getElementById(id2).style.display = 'none';
+        var x = document.getElementById(id2);
+        document.getElementById("listTransport"+counteur).innerHTML = "";
+
+
+        var tabL = libellTransport.split(',');
+
+
+
+        for ( var k=0; k < tabL.length; k = k+3) {
+            if (tabL.length > 3 && k === 0){
+                var option = document.createElement("option");
+                option.text = 'Choisir un transport';
+                x.add(option);
+            }
+            var option = document.createElement("option");
+            option.text = tabL[k];
+            x.add(option);
+        }
+
+        document.getElementById(id2).style.display = '';
+    }
+
+    function goFinishSelect(){
+        document.getElementById("listClient"+counter).style.display = 'none';
+        document.getElementById("listTransporteur"+counter).style.display = 'none';
+        document.getElementById("listTransport"+counter).style.display = 'none';
+        var html2=  '<table class="table table-striped">'+
+                        '<tr>'+
+                            '<td>Client</td>'+
+                            '<td>Transporteur</td>'+
+                            '<td>Transport</td>'+
+                        '</tr>'+
+                        '<tr>'+
+                            '<td id="clientRecap1"></td>'+
+                            '<td id="TransporteurRecap1"></td>'+
+                            '<td id="TransporttRecap1"></td>'+
+                        '</tr>'+
+                    '</table>';
+        $('#recaptrans'+counter).html(html2);
+        $('#buttonSelctionAutreTransport').show();
+    }
+
+
+</script>
 
 {% endblock %}

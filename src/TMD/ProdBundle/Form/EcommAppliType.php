@@ -4,11 +4,13 @@ namespace TMD\ProdBundle\Form;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use TMD\AppliBundle\Form\EcommAppliConfigType;
 use TMD\ProdBundle\Repository\ClientRepository;
 
 class EcommAppliType extends AbstractType
@@ -34,6 +36,7 @@ class EcommAppliType extends AbstractType
                 'required' => true
             ))
             ->add('trtappli')
+            ->add('mailing')
             ->add('idclient', EntityType::class, array(
                 'class'        => 'TMD\ProdBundle\Entity\Client',
                 'choice_label' => 'nomclient',
@@ -43,6 +46,16 @@ class EcommAppliType extends AbstractType
                         ->orderBy('u.nomclient', 'ASC');
                 },
             ))
+            ->add('configs', CollectionType::class, array(
+                'entry_type' => EcommAppliConfigType::class,
+//                'entry_options' => array(
+//                    'attr' => array('class' => 'TMD\AppliBundle\Entity\EcommAppliConfig')
+//                ),
+                'allow_add'     => true,
+
+            ))
+
+
             ->add('idtypeprod', EntityType::class, array(
                 'class'        => 'TMD\ProdBundle\Entity\EcommTypeProduction',
                 'choice_label' => 'libelle',
@@ -50,7 +63,22 @@ class EcommAppliType extends AbstractType
             ))
             ->add('Valider',      SubmitType::class)
         ;
-    }/**
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

@@ -1,3 +1,11 @@
+tmd_minos:
+    resource: "@TMDMinosBundle/Resources/config/routing.yml"
+    prefix:   /
+
+tmd_stat:
+    resource: "@TMDStatBundle/Resources/config/routing.yml"
+    prefix:   /
+
 tmd_coriolis:
     resource: "@TMDCoriolisBundle/Resources/config/routing.yml"
     prefix:   /coriolis

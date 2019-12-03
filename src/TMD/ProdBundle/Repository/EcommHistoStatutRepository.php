@@ -24,4 +24,19 @@ class EcommHistoStatutRepository extends EntityRepository
 
             ;
     }
+
+    public function donneHistoByBlbuerrorWS($bl)
+    {
+        return $this
+            ->createQueryBuilder('histo')
+            ->where('histo.numbl = :id')
+            ->setParameter('id', $bl)
+            ->andWhere('histo.idstatut = (:st)')
+            ->setParameter('st', -1)
+            ->orderBy('histo.datestatut','DESC')
+            ->getQuery()
+            ->getArrayResult()
+
+            ;
+    }
 }

@@ -21,7 +21,6 @@ class AppKernel extends Kernel
             new TMD\ProdBundle\TMDProdBundle(),
             new TMD\UserBundle\TMDUserBundle(),
             new TMD\ConfigBundle\TMDConfigBundle(),
-            new Liuggio\ExcelBundle\LiuggioExcelBundle(),
             new TMD\ColissimoBundle\TMDColissimoBundle(),
             new TMD\ColisPriveBundle\TMDColisPriveBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
@@ -33,6 +32,9 @@ class AppKernel extends Kernel
             new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
             new Tms\Bundle\RestBundle\TmsRestBundle(),
             new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
+            new TMD\StatBundle\TMDStatBundle(),
+            new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
+            new TMD\MinosBundle\TMDMinosBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

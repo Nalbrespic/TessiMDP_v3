@@ -37,16 +37,16 @@ class EcommCmdep
      * @var \TMD\ProdBundle\Entity\EcommLignes
      *
      * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommLignes", inversedBy="ecommCmdeps")
-* @ORM\JoinColumns({
-*   @ORM\JoinColumn(name="numBL", referencedColumnName="numBL")
-* })
-*/
-private $numbl;
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="numBL", referencedColumnName="numBL")
+     * })
+     */
+    private $numbl;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="codeArticle", type="string", length=20, nullable=false)
+     * @ORM\Column(name="codeArticle", type="string", length=25, nullable=false)
      */
     private $codearticle;
 
@@ -95,7 +95,7 @@ private $numbl;
     /**
      * @var integer
      *
-     * @ORM\Column(name="poids", type="smallint", nullable=false)
+     * @ORM\Column(name="poids", type="integer", nullable=false)
      */
     private $poids = '0';
 
@@ -170,6 +170,36 @@ private $numbl;
      * @ORM\Column(name="flagProd", type="boolean", nullable=false)
      */
     private $flagProd = 0;
+
+
+    /**
+     * @var EcommArticles
+     *
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommArticles")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idArticle", referencedColumnName="idArticle")
+     * })
+     */
+    private $idArticle ;
+
+//    /**
+//     * @var boolean
+//     *
+//     * @ORM\Column(name="idStatut", type="boolean", nullable=false)
+//     */
+//    private $idStatut;
+
+    /**
+     * @var EcommStatut
+     *
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommStatut")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idStatut", referencedColumnName="idStatut")
+     * })
+     */
+    private $idStatut;
+
+
 
     /**
      * @return int
@@ -522,6 +552,41 @@ private $numbl;
     {
         $this->flagProd = $flagProd;
     }
+
+    /**
+     * @return EcommArticles
+     */
+    public function getIdArticle()
+    {
+        return $this->idArticle;
+    }
+
+    /**
+     * @param EcommArticles $idArticle
+     */
+    public function setIdArticle($idArticle)
+    {
+        $this->idArticle = $idArticle;
+    }
+
+    /**
+     * @return EcommStatut
+     */
+    public function getIdStatut()
+    {
+        return $this->idStatut;
+    }
+
+
+
+    /**
+     * @param EcommStatut $idStatut
+     */
+    public function setIdStatut($idStatut)
+    {
+        $this->idStatut = $idStatut;
+    }
+
 
 
 

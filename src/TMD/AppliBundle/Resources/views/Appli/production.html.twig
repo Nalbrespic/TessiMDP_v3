@@ -13,15 +13,12 @@
     <script type="text/javascript">
         var OSName="Unknown OS";
         if (navigator.appVersion.indexOf("Win")!==-1) OSName="Windows";
-        //{
-        //OSName="Windows";
-//        document.write('<a href="ZebraWebPrint.exe" class="navbar-brand" href="#">Download the '+OSName+' App</a>');
-        //}
         if (navigator.appVersion.indexOf("Mac")!==-1) OSName="MacOS";
         if (navigator.appVersion.indexOf("X11")!==-1) OSName="UNIX";
         if (navigator.appVersion.indexOf("Linux")!==-1) OSName="Linux";
-
     </script>
+
+    {% if vue == 1 %}<p style="display: none;" id="verifVue">{{ vue }}</p>{% endif %}
 
 
     <div id ="jojotest" class="modal fade modalErrorZpl" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="false">
@@ -38,39 +35,63 @@
         </div>
     </div>
 
+    <div id ="VerikKO" class="modal fade modalErrorCAB" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="false">
+        <div class="modal-dialog modal-sm" role="document" >
+            <div class="modal-content" style="width: 100%;margin-top: 57%;">
+                <div class="modal-header" style="padding: 3px;">
+
+                    <h4 class="modal-title" id="myModalLabel">Erreur</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="error_message"></p> Le code saisi ne correspond pas ! !
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModalCN23" class="modalCN23" style="display: none;">
+        <!-- Modal content -->
+        <div class="modal-content" style="width: 55%;margin-top: 60px;">
+            <div style="text-align: right;"><a href="#"><span class="closeArticle2">&times;</span></a></div>
+            <div id="modalCN23Contenu">A imprimer ...</div>
+        </div>
+    </div>
+
+
+
+
 
 
 
 
     <div id="hideheaderRow" class="row" style="margin-top: -8px;">
-        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0;">
             <div class="titreFenetre" >
-                <h3 style="margin-bottom: 1px;">Etiquettes ZPL </h3>
+                <h3 style="margin-bottom: 1px;">{% if vue == 1 %}Detail commande{% else %}Etiquettes ZPL{% endif %} </h3>
             </div>
         </div>
     </div>
     {% if etat != "nc" %}
     <div class="row" >
 
-        <div class="col-md-7 col-md-offset-4" id="barre" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;font-family: initial;height: 34px;{% if etat == 1 or etat == 2 or etat == 3 or etat == 5 %}background: #d34026;{% endif %}">
+        <div class="col-md-7 col-md-offset-4" id="barre" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;max-height: 60px;font-family: initial;{% if etat == 1 or etat == 2 or etat == 3 or etat == 5 or etat == 9 or etat == 7 or etat == '0code' %}background: #d34026;{% endif %}">
             <div class="row">
-                <div  class="col-md-9">{{ apresScan }}{% if etat == '0' %}<span id="recupEtatProd" style="display: none;">{{ etat }}</span>  {% endif %} </div>
-                {% if button is defined and button %}
-                    <div class="col-md-2" style="margin-left: -20px;"><button onclick="sendData({{  blCmd.bl.numbl }})" style="margin-bottom: 9px;" type="button" class="btn btn-default  btn-xs">Re-imprimer etiquette</button></div>
+                <div  class="col-md-9">{{ apresScan }}{% if error  != 'na' %}<p>{{ error }}</p>{%  endif  %}{% if etat == '0' %}<span id="recupEtatProd" style="display: none;">{{ etat }}</span>  {% endif %} </div>
+                {% if button is defined and button and vue == 0 and etat == 1 %}
+                    <div class="col-md-2" style="margin-left: -20px;"><button onclick="sendData({{  blCmd.bl.numbl }}, 0)" style="margin-bottom: 9px;" type="button" class="btn btn-default  btn-xs">Re-imprimer etiquette</button></div>
                 {% endif %}
                 <div class="col-md-1 " id="fermer"></div>
             </div>
         </div>
     </div>
     {% endif %}
-
     <div class="row" style="margin-top: 5px;">
-        <div class="col-md-3" >
+        <div class="col-md-3" {% if vue == 1 %}style="display: none;"{% endif %} >
             <div class="row" >
                 <div class="col-md-12">
                     <div class="checkbox" style="margin-left: 1px;">
                         <label style="font-weight: 700;margin-right: 14px;"><input type="checkbox" id="checkVerifBL" value="">Consultation commande</label>
-                        <span id="veriOrNot" style="display: none;">{% if verif %}verif{% endif %}</span>
+                        <span id="veriOrNot" style="display: none;">{% if verif != 'false' and verif != "" %}verif{% endif %}</span>
                     </div>
                 </div>
             </div>
@@ -86,8 +107,9 @@
                     {#{% endif %}#}
                     {#<span style="" id="dateDepotProdInAdd">{% if dateDepotN is defined and dateDepotN != '0' %}{{ dateDepotN|date("Y-m-d") }}{% endif %}</span>#}
                 {#</div>#}
+
                 <div id="dateDepotProdIn" class="col-md-8">
-                    {% if dateDepotN is not null and not verif %}
+                    {% if dateDepotN is not null and  verif == 'false'   %}
                         <input type="text" readonly="readonly"  class="form-control" style="width: 200px;font-size: 1.2em;" value="{{ dateDepotN|date("d/m/Y") }}">
                     {% else %}
                         <input id="inputlettreColor" readonly="readonly"  type="text" class="form-control" style="width: 200px;font-size: 1.2em;color: #D34026" value="à renseigner">
@@ -99,7 +121,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="entered_name">N° BL</label>
-                        <input name="numCmd" type="text" style="width: 150px;" onchange="sendData('first')" class="form-control"  id="entered_name" placeholder={% if numCmd is not defined %}"cmd n°"{% else %}"{{ numCmd }}"{% endif %}>
+                        <input name="numCmd" type="text" style="width: 150px;" onchange="sendData('first', 0)" class="form-control"  id="entered_name" placeholder={% if numCmd is not defined %}"cmd n°"{% else %}"{{ numCmd }}"{% endif %}>
                     </div>
                 </div>
             </div>
@@ -108,21 +130,28 @@
 
 
         {% if blCmd is defined and blCmd != null %}
+            <span  style="display: none;" id ="recupEtat" >{{etat }}</span>
         <div class="col-md-5">
             <div class="row">
                 <div class="col-md-3 img-responsive" style="text-align: -moz-center;">
                     <div style="max-width: 130px;">
                         {% if logoAppli is defined and logoAppli != null %}
-                            <img  class="img-responsive" src="data:image/jpg;base64,{{ logoAppli['appliImage'] }}" style="padding: 0px;margin-top: -13px;">
+                            <img  class="img-responsive" src="data:image/jpg;base64,{{ logoAppli['appliImage'] }}" style="padding: 0;margin-top: -13px;">
                         {% else %}
-                            <img  class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;margin-top: -13px;">
+                            <img  class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0;filter: grayscale(86%);opacity: 0.3;margin-top: -13px;">
                         {% endif %}
                     </div>
                 </div>
                 <div class="col-md-9" style="padding-left: 0">
                     <p style="font-size: 1.4em;">{{ blCmd.bl.numligne.idclient.nomclient }}</p>
                     <p style="font-size: 1.1em;margin-top: -11px;">{{ blCmd.bl.numligne.idfile.idappli.appliname }}</p>
+                    <span id="appliID" style="display: none;">{{ blCmd.bl.numligne.idfile.idappli.idappli }}</span>
                 </div>
+
+                {#If CN23#}
+                {% if blCmd.bl.numligne.typeTransport == 'COM' or blCmd.bl.numligne.typeTransport == 'CDS' or blCmd.bl.numligne.typeTransport == 'ECO'  or blCmd.bl.numligne.typeTransport == 'CORI'%}
+                <p id="ifcn23" style="display: none;">1</p>
+                {% endif %}
 
                 <div class="col-md-12 ">
                     <table class="table">
@@ -136,12 +165,12 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="col-md-2 text-center">{{ blCmd.bl.numbl }}</td>
+                                <td class="col-md-2 text-center"  id ="blCmd">{{ blCmd.bl.numbl }}</td>
                                 <td class="col-md-2 text-center">{{ blCmd.bl.numligne.typeTransport }}</td>
-                                <td class="col-md-2 text-center">{{ (blCmd.poids|number_format)/100 }} Kgs</td>
+                                <td class="col-md-2 text-center">{{ (blCmd.poids)/100 }} Kgs</td>
                                 <td class="col-md-6 text-center">
                                     <div class="row">
-                                    <div class="col-md-12"style="margin-left: -15px;">
+                                    <div class="col-md-12" style="margin-left: -15px;">
                                     <div class="col-md-12"><p style="text-align: left;">{{ blCmd.bl.numligne.destinataire }}</p></div>
                                     <div class="col-md-12" style="margin-top: -10px;"><p style="text-align: left;">{{ blCmd.bl.numligne.destRue }}</p></div>
                                     {% if  blCmd.bl.numligne.destAd2|length > 0 %}
@@ -171,29 +200,42 @@
 
             </div>
         </div>
-        <div class="col-md-3 col-md-offset-1" >
-            <p style="margin-bottom: 1px;">Historique des traitements ({{ histo|length }}):</p>
-            <div style="overflow-y: auto;height: 128px;">
-                <table class="table table-bordered" style="font-size: 0.7em;">
-                    <thead>
-                        <tr>
-                            <th style="padding-bottom: 3px;padding-top: 3px;">Date</th>
-                            <th style="padding-bottom: 3px;padding-top: 3px;">Statut</th>
-                            <th style="padding-bottom: 3px;padding-top: 3px;">Operateur</th>
-                            <th style="padding-bottom: 3px;padding-top: 3px;">Observation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for his in histo  %}
-                        <tr>
-                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.datestatut|date("d/m/Y H:i") }}</td>
-                            <td style="padding-bottom: 3px;padding-top: 3px;{% if his.idstatut =='2'%}background-color: #BFD626{% endif %}">{{ his.idstatut }}</td>
-                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.iduser }}</td>
-                            <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.observation }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-md-3 {% if vue == 1 %}col-md-offset-3{% else %}col-md-offset-1{% endif %}" >
+            <div class="row">
+                <div class="col-md-12" style="height: 129px;">
+                    <p style="margin-bottom: 1px;">Historique des traitements ({{ histo|length }}):</p>
+                    <div style="overflow-y: auto;height: 86px;">
+                        <table class="table table-bordered" style="font-size: 0.7em;">
+                            <thead>
+                                <tr>
+                                    <th style="padding-bottom: 3px;padding-top: 3px;">Date</th>
+                                    <th style="padding-bottom: 3px;padding-top: 3px;">Statut</th>
+                                    <th style="padding-bottom: 3px;padding-top: 3px;">Operateur</th>
+                                    <th style="padding-bottom: 3px;padding-top: 3px;">Observation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for his in histo  %}
+                                <tr>
+                                    <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.datestatut|date("d/m/Y H:i") }}</td>
+                                    <td style="padding-bottom: 3px;padding-top: 3px;{% if his.idstatut =='2'%}background-color: #BFD626{% endif %}">{{ his.idstatut }}</td>
+                                    <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.iduser }}</td>
+                                    <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.observation }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if appAverif != 'false' %}
+                    <div id="saisicoderappro" class="col-md-12"  style="margin-top: -13px;">
+
+                        <label for="entered_verif"><span id="nacodeleftScan"> </span> Articles à scanner</label>
+                        <input name="numCmd" type="text" style="width: 150px;" onkeydown="reseterror()" onchange="scanCodeAverif()" class="form-control"  id="entered_verif" placeholder="saisir code">
+                        <p style="color : #D34026" id="erreurSaisiCode"></p>
+                    </div>
+                {% endif %}
+
             </div>
         </div>
 
@@ -202,182 +244,420 @@
     </div>
 
 
+    <div id="saisirCodeBefore">
+
+            {% if blCmd is defined and blCmd != null %}
 
 
-    {% if blCmd is defined and blCmd != null %}
-
-
-
-
-
-            {% set p1 = false %}
-            {% for pe1 in articles['art'] if p1 == false %}
-                {% if pe1['perso1']|length >0 %}
-                    {% set p1 = true %}
-                {% endif %}
-            {% endfor %}
-
-            {% set p2 = false %}
-            {% for pe2 in articles['art'] if p2 == false %}
-                {% if pe2['perso2']|length >0 %}
-                    {% set p2 = true %}
-                {% endif %}
-            {% endfor %}
-
-            {% set i1 = false %}
-            {% for ie1 in articles['art'] if i1 == false %}
-                {% if ie1['Image']|length >0 %}
-                    {% set i1 = true %}
-                {% endif %}
-            {% endfor %}
-
-            {% set i2 = false %}
-                {% if articles['emb'] is defined %}
-                    {% for ie2 in articles['emb'] if i2 == false %}
-                        {% if ie2['Image']|length >0 %}
-                            {% set i2 = true %}
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            <div class="row">
-                {% if p1 or p2 or p3 %}
-                    {% if articles['emb'] is defined %}
-                    <div class="col-md-2" style="background-color: #F9F9F9;margin-top: -23px;">
-
-                            <p style="text-align: center;font-size: 1.2em;">{{ articles['emb']|length }} {% if articles['emb']|length == 1 %}Emballage{% else %}Emballages{% endif %}</p>
-
-                            <div id="overflowEmbal" style="overflow-y: auto;max-height: 321px;overflow-x: hidden;">
-                                <table class="table table-bordered " style="border-collapse: inherit;background-color: white;">
-                                    {% for art in articles['emb'] %}
-                                        <tbody>
-                                        <tr>
-
-                                             {% if i2 %}<td >
-                                                {% if  art['Image']|length > 0 %}
-                                                    <div class="row" style="position: relative">
-                                                        {% for em in articles['countArticle'] %}
-                                                            {% if em['libelle'] == art['libelle'] %}
-                                                                <div style="position: absolute; top:0;right: 0;margin-right: 13px;font-size: 2em;">x{{ em['quantite']}} </div>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                        <div class="col-md-12">
-                                                            <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
-                                                        </div>
-                                                        <div class="col-md-12" >
-                                                            {{ art['libelle'] }}
-
-
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                            </td>{% endif %}
-                                        </tr>
-                                        </tbody>
-                                    {% endfor %}
-                                </table>
-                            </div>
-
-                    </div>
+                    {% set i1 = false %}
+                    {% if articles['art'] is defined %}
+                        {% for ie1 in articles['art'] if i1 == false %}
+                            {% if  ie1 is defined and ie1|length >0 %}
+                                {% set i1 = true %}
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
-                    <div  {% if articles['emb'] is defined %} class="col-md-9 col-md-offset-1 "{% else %}class=" col-md-9 col-md-offset-1 "{% endif %} style="background-color: #F9F9F9;margin-top: -23px;{% if articles['emb'] is defined %}margin-left: 72px;{% else %}padding-right: 0px;{% endif %}" >
-                        <p style="text-align: center;font-size: 1.2em;">{{ articles['art']|length }} {% if articles['art']|length == 1 %}Article{% else %}Articles{% endif %}</p>
 
 
-                        <div class="row">
-                            <div id="overflowArticles" class="col-md-12"style="overflow-y: auto;max-height:313px;">
-                                <div class="row" style="margin-left: 6px;margin-right: 6px;">
+                    {#on compte le nombre d'articles total#}
+                    {% set nbArticleTot = 0 %}
+                    {% if articles['countArticle'] is defined %}
+                        {% for artic in articles['countArticle'] %}
+                            {% if not artic['flagart'] %}
+                                {%  set nbArticleTot = nbArticleTot + (artic['quantite']|number_format) %}
+                                {% endif %}
+                        {% endfor %}
+                    {% endif %}
 
 
-                                {% for em in articles['countArticle'] %}
-                                    {% if not em['flagart'] %}
-                                        <p style="font-size: 1.1em;margin-top: -10px;margin-bottom: -6px;"><span style="font-size: 1.8em;">{{ em['quantite']}}x</span> {{ em['libelle'] }} </p>
-                                                    <table class="table table-bordered " style="border-collapse: inherit;margin-bottom:6px;background-color: white;{% if em['quantite'] == '1' %}width: 50%;margin-left: auto;margin-right: auto;{% endif %}">
-                                                        {% set recup = 1 %}
-                                                        {% for art in articles['art']  %}
-                                                        {% if recup == 2 %}{% set recup = 3 %}{% endif %}
-                                                            {% if recup == 1 %} <tr >{% endif %}
-                                                            {% if art['libelle'] == em['libelle']  and recup == 1 %}
-                                                                {% set recup = 2 %}
-                                                                {% set der = 1 %}
-                                                                                    <td  class="col-md-1">{{ loop.index }}</td>
-                                                                                    {% if p1 %}
+                    {% set i2 = false %}
+                        {% if articles['emb'] is defined %}
+                            {% for ie2 in articles['emb'] if i2 == false %}
+                                {% if ie2['Image']is defined and ie2['Image']|length >0 %}
+                                    {% set i2 = true %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+
+                {#articla a verif ?#}
+                {% set aVer = false %}
+                {% if articles['artAverif'] is defined and vue != 1%}
+                    <span style="display: none;" id="articleAverifCount">{{ articles['artAverif']|length }}</span>
+                    {% set aVer = true %}
+                {% endif %}
+
+
+
+                    <div class="row">
+                        {#{% if p1 or p2 or p3 %}#}
+                        {% if i1 or i2  %}
+                            {% if articles['emb'] is defined %}
+                            <div class="col-md-2" style="background-color: #F9F9F9;margin-top: -23px;">
+
+                                    <p style="text-align: center;font-size: 1.2em;">{{ articles['emb']|length }} {% if articles['emb']|length == 1 %}Emballage{% else %}Emballages{% endif %}</p>
+
+                                    <div id="overflowEmbal" style="overflow-y: auto;max-height: 321px;overflow-x: hidden;">
+                                        <table class="table table-bordered " style="border-collapse: inherit;background-color: white;">
+                                            {% for art in articles['emb'] %}
+                                                <tbody>
+                                                <tr>
+
+                                                     {% if i2 %}<td >
+                                                        {% if  art['Image'] is defined  %}
+                                                            <div class="row" style="position: relative">
+                                                                {% for em in articles['countArticle'] %}
+                                                                    {% if em['libelle'] == art['libelle'] %}
+                                                                        <div style="position: absolute; top:0;right: 0;margin-right: 13px;font-size: 2em;">x{{ em['quantite']}} </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <div class="col-md-12">
+                                                                    <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                                </div>
+                                                                <div class="col-md-12" >
+                                                                    {{ art['libelle'] }}
+
+
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="row" >
+                                                                <div class="col-md-6" >
+                                                                    {{ art['libelle'] }}
+                                                                </div>
+                                                                {% for em in articles['countArticle'] %}
+                                                                    {% if em['libelle'] == art['libelle'] %}
+                                                                        <div class="col-md-2" style="font-size: 2em;"> x{{ em['quantite']}} </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+
+
+                                                            </div>
+                                                        {% endif %}
+                                                                </td>
+                                                     {% else %}<td >
+                                                            <div class="row" style="position: relative">
+                                                                {% for em in articles['countArticle'] %}
+                                                                    {% if em['libelle'] == art['libelle'] %}
+                                                                        <div style="position: absolute; top:0;right: 0;margin-right: 13px;font-size: 2em;">x{{ em['quantite']}} </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <div class="col-md-12" >
+                                                                    {{ art['libelle'] }}
+                                                                </div>
+                                                            </div>
+                                                     {% endif %}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+
+                            </div>
+                            {% endif %}
+                            <div  {% if articles['emb'] is defined %} class="col-md-9 col-md-offset-1 "{% else %}class=" col-md-10 col-md-offset-1 "{% endif %} style="background-color: #F9F9F9;margin-top: -23px;{% if articles['emb'] is defined %}margin-left: 72px;{% else %}padding-right: 0px;padding-bottom: 26px;{% endif %}" >
+                                <p style="text-align: center;font-size: 1.2em;">{{ nbArticleTot }} {% if articles['art']|length == 1 %}article{% else %}articles{% endif %}</p>
+
+
+                                <div class="row">
+                                    <div id="overflowArticles" class="col-md-12" style="overflow-y: auto;max-height:313px;">
+                                        <div class="row" style="margin-left: 6px;margin-right: 6px;">
+
+
+                                        {% for em in articles['countArticle'] %}
+
+                                            {% set i1_longueur = false %}
+                                                {% for ie1_longueur in articles['art'] if i1_longueur == false %}
+                                                    {% if  ie1_longueur['libelle'] == em['libelle']%}
+                                                        {% if  ie1_longueur['dimensionL'] is defined and ie1_longueur['dimensionL']|length >0  and ie1_longueur['dimensionL'] > 600%}
+                                                            {% set i1_longueur = true %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+
+
+
+                                            {% if not em['flagart'] and  not i1_longueur %}
+                                                <p style="font-size: 1.1em;margin-top: -10px;"><span style="font-size: 1.8em;">{{ em['quantite']}}x</span><span style="font-size: 1.4em;"> {{ em['codearticle'] }} </span> - {{ em['libelle'] }}</p>
+
+                                                {% set articleComp = null %}
+                                                {% for art in articles['art']  %}
+                                                        {% if art['libelle'] == em['libelle'] %}
+                                                            {% set articleComp = art %}
+                                                        {% endif %}
+                                                {% endfor %}
+
+                                                    {%  if articleComp['perso1']|length  != 0 or articleComp['perso2']|length  != 0 or articleComp['Image'] != null %}
+                                                            <table class="table " style="margin-bottom:6px;background-color: white;{% if em['quantite'] == '1' %}width: 50%;margin-left: auto;margin-right: auto;{% endif %}">
+                                                                {% set recup = 1 %}
+                                                                {% for art in articles['art']  %}
+
+
+
+
+                                                                {% if recup == 2 %}{% set recup = 3 %}{% endif %}
+                                                                    {% if recup == 1 %} <tr >{% endif %}
+                                                                    {% if art['libelle'] == em['libelle']  and recup == 1 %}
+                                                                        {% set recup = 2 %}
+                                                                        {% set der = 1 %}
+
+                                                                        <td class="col-md-6" style="padding: 2px;border: inherit;">
+                                                                            <table class="table table-bordered " style="margin-bottom: 0px;">
+                                                                                <tr >
+                                                                                    <td  class="col-md-1" >
+                                                                                        <div style="position: relative;">
+                                                                                            <div style="top:0;right: 0;font-size: 1.8em;">x{{ art['quantite']}}</div>
+                                                                                        </div>
+                                                                                        {% if appAverif != 'false'%}
+                                                                                            {%  for qt in 1..art['quantite'] %}
+                                                                                                <span style="float: left;" id="imageAverif{{ art['id']  }}-{{ qt }}">
+                                                                                                    <img style="width: 40px;"  src="{{ asset('Images/croix_rouge.png') }}">
+                                                                                                </span>
+                                                                                                <span style="display: none;" id="imageverifok{{ art['id']  }}-{{ qt }}">
+                                                                                                    <img style="width: 24px;"  src="{{ asset('Images/croix_verte.png') }}">
+                                                                                                </span>
+                                                                                            {% endfor %}
+                                                                                        {%  endif %}
+                                                                                        <div style="position: absolute;">
+
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    {% if art['perso1']|length >0 %}
                                                                                         <td class="col-md-2">{{ art['perso1'] }}</td>
                                                                                     {% endif %}
-                                                                                    {% if p2 %}
+                                                                                    {% if art['perso2']|length >0 %}
                                                                                         <td class="col-md-1">{{ art['perso2'] }}</td>
                                                                                     {% endif %}
                                                                                     {% if i1 %}
-                                                                                        <td class="col-md-3" style="padding-bottom: 0px;padding-top: 0px;">
-                                                                                                {% if  art['Image']|length > 0 %}
-                                                                                                    <div class="row" >
-                                                                                                        <div class="col-md-11">
-                                                                                                            <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                                                        <td {%  if art['perso1']|length  == 0 and art['perso2']|length  == 0  %} class="col-md-11"{%  endif %} class="col-md-8" style="padding-bottom: 0px;padding-top: 0px;">
+                                                                                            <table class="table" style="margin-bottom: 0px;">
+                                                                                                <tr>
+                                                                                                    {% if  art['Image']|length > 0 %}
+                                                                                                        <td style="padding: 0px;border: inherit;">
+                                                                                                            <div class="row" >
+                                                                                                                <div class="col-md-12" style="text-align: center;">
+                                                                                                                    <img src="data:image/png;base64,{{ art['Image'] }}"  style="max-width: 290px;max-height: 130px;">
+                                                                                                                </div>
+                                                                                                                <div class="col-md-12" style="text-align: center;">
+                                                                                                                    {{ art['nameImage'] }}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                    {% endif %}
+
+                                                                                                    {% if art['artAverif'] is defined %}
+                                                                                                </tr>
+                                                                                                <tr>
+                                                                                                        <td >
+                                                                                                            <div class="row" >
+                                                                                                                <div class="col-md-5">
+                                                                                                                    <p>Saisir code barre: </p>
+                                                                                                                </div>
+                                                                                                                <div class="col-md-6 ">
+                                                                                                                    <input id="cabAverif{{ art['id']  }}" onchange="verifCAB({{ art['id'] }})" class="form-control" type="text" name="fname" style="height: 20px;">
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                    {% endif %}
+                                                                                                </tr>
+                                                                                            </table>
+                                                                                        </td>
+                                                                                    {% endif %}
+                                                                                </tr>
+                                                                            </table>
+                                                                        </td>
+
+                                                                    {% endif %}
+
+                                                                    {% if art['libelle'] == em['libelle']  and recup == 3  %}
+                                                                        {% set recup = 1 %}
+
+                                                                            <td class="col-md-6" style="padding: 2px;border: inherit;">
+                                                                                <table class="table table-bordered " style="margin-bottom: 0px;border: inherit;">
+                                                                                    <tr>
+                                                                                        <td  class="col-md-1" >
+                                                                                            <div style="position: relative;">
+                                                                                                <div style="top:0;right: 0;font-size: 1.8em;">x{{ art['quantite']}}</div>
+                                                                                            </div>
+                                                                                            {% if appAverif != 'false'%}
+                                                                                                {%  for qt in 1..art['quantite'] %}
+                                                                                                    <span style="" id="imageAverif{{ art['id']  }}-{{ qt }}">
+                                                                                                        <img style="width: 40px;"  src="{{ asset('Images/croix_rouge.png') }}">
+                                                                                                    </span>
+                                                                                                    <span style="display: none;" id="imageverifok{{ art['id']  }}-{{ qt }}">
+                                                                                                        <img style="width: 24px;"  src="{{ asset('Images/croix_verte.png') }}">
+                                                                                                    </span>
+                                                                                                {% endfor %}
+                                                                                            {%  endif %}
+                                                                                            <div style="position: absolute;">
+
+                                                                                            </div>
+                                                                                        </td>
+                                                                                        {% if art['perso1']|length >0 %}
+                                                                                            <td class="col-md-2">{{ art['perso1'] }}</td>
+                                                                                        {% endif %}
+                                                                                        {% if art['perso2']|length >0 %}
+                                                                                            <td class="col-md-1">{{ art['perso2'] }}</td>
+                                                                                        {% endif %}
+                                                                                        {% if i1 %}
+                                                                                            <td {%  if art['perso1']|length  == 0 and art['perso2']|length  == 0  %}class="col-md-11"{%  endif %} class="col-md-8" style="padding-bottom: 0;padding-top: 0px;">
+                                                                                                <table class="table" style="margin-bottom: 0;">
+                                                                                                    <tr>
+                                                                                                        {% if  art['Image']|length > 0 %}
+                                                                                                            <td style="padding: 0;border: inherit;">
+                                                                                                                <div class="row" >
+                                                                                                                    <div class="col-md-12" style="text-align: center;">
+                                                                                                                        <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 130px;">
+                                                                                                                    </div>
+                                                                                                                    <div class="col-md-12" style="text-align: center;">
+                                                                                                                        {{ art['nameImage'] }}
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                        {% endif %}
+
+                                                                                                        {% if art['artAverif'] is defined %}
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <td>
+                                                                                                            <div class="row" >
+                                                                                                                <div class="col-md-5">
+                                                                                                                    <p>Saisir code barre: </p>
+                                                                                                                </div>
+                                                                                                                <div class="col-md-6 ">
+                                                                                                                    <input id="cabAverif{{ art['id']  }}" onchange="verifCAB({{ art['id'] }})" class="form-control" type="text" name="fname" style="height: 20px;">
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                        {% endif %}
+                                                                                                    </tr>
+                                                                                                </table>
+                                                                                            </td>
+                                                                                        {% endif %}
+                                                                                    </tr>
+                                                                                </table>
+                                                                            </td>
+
+
+                                                                    {% endif %}
+
+                                                                    {% if recup == 1 %}</tr>{% endif %}
+                                                                {% endfor %}
+
+
+                                                            </table>
+                                                    {% endif %}
+
+                                            {% elseif not em['flagart'] %}
+                                                <p style="font-size: 1.1em;margin-top: -10px;margin-bottom: -6px;"><span style="font-size: 1.8em;">{{ em['quantite']}}x</span> {{ em['libelle'] }} </p>
+                                                {% set articleComp = null %}
+                                                {% for art in articles['art']  %}
+                                                    {% if art['libelle'] == em['libelle'] %}
+                                                        {% set articleComp = art %}
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                {%  if articleComp['perso1']|length  != 0 or articleComp['perso2']|length  != 0 or articleComp['Image'] != null %}
+                                                            <table class="table table-bordered " style="margin-bottom:6px;background-color: white;{% if em['quantite'] == '1' %}width: 50%;margin-left: auto;margin-right: auto;{% endif %}">
+                                                                {% for art in articles['art']  %}
+
+                                                                     <tr >
+                                                                        {% if art['libelle'] == em['libelle']   %}
+                                                                            <td  class="col-md-1" >
+                                                                                <div style="position: relative;">
+                                                                                    <div style="top:0;right: 0;font-size: 1.8em;">x{{ art['quantite']}}</div>
+                                                                                </div>
+                                                                                {% if appAverif != 'false'%}
+                                                                                    {%  for qt in 1..art['quantite'] %}
+                                                                                        <span style="float: left;" id="imageAverif{{ art['id']  }}-{{ qt }}">
+                                                                                                    <img style="width: 40px;"  src="{{ asset('Images/croix_rouge.png') }}">
+                                                                                                </span>
+                                                                                        <span style="display: none;" id="imageverifok{{ art['id']  }}-{{ qt }}">
+                                                                                                    <img style="width: 24px;"  src="{{ asset('Images/croix_verte.png') }}">
+                                                                                                </span>
+                                                                                    {% endfor %}
+                                                                                {%  endif %}
+                                                                                <div style="position: absolute;">
+
+                                                                                </div>
+                                                                            </td>
+                                                                            {% if   art['perso1']|length >0 %}
+                                                                                <td class="col-md-2">{{ art['perso1'] }}</td>
+                                                                            {% endif %}
+                                                                            {% if   art['perso2']|length >0 %}
+                                                                                <td class="col-md-1">{{ art['perso2'] }}</td>
+                                                                            {% endif %}
+                                                                            {% if i1 %}
+                                                                                <td {%  if art['perso1']|length  == 0 and art['perso2']|length  == 0  %}class="col-md-11"{%  endif %} class="col-md-8" style="padding-bottom: 0;padding-top: 0;">
+                                                                                    <table>
+                                                                                        <tr>
+                                                                                            {% if  art['Image']|length > 0 %}
+                                                                                                <td>
+                                                                                                    <div class="row">
+                                                                                                        <div class="col-md-11" >
+                                                                                                            <img src="data:image/png;base64,{{ art['Image'] }}"  style="max-width: 1065px;">
                                                                                                         </div>
                                                                                                         <div class="col-md-11" style="text-align: center;">
                                                                                                             {{ art['nameImage'] }}
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                {% endif %}
-                                                                                        </td>
-                                                                                    {% endif %}
+                                                                                                </td>
+                                                                                            {% endif %}
 
-
-                                                            {% endif %}
-
-                                                            {% if art['libelle'] == em['libelle']  and recup == 3  %}
-                                                                {% set recup = 1 %}
-                                                                            <td style="background-color:  #F4F2F7;border-bottom: 0;border-top: 0;"></td>
-                                                                            <td class="col-md-1">{{ loop.index }}</td>
-                                                                            {% if p1 %}
-                                                                                <td class="col-md-2">{{ art['perso1'] }}</td>
-                                                                            {% endif %}
-                                                                            {% if p2 %}
-                                                                                <td class="col-md-1">{{ art['perso2'] }}</td>
-                                                                            {% endif %}
-                                                                            {% if i1 %}
-                                                                                <td class="col-md-3" style="padding-bottom: 0px;padding-top: 0px;">
-                                                                                        {% if  art['Image']|length > 0 %}
-                                                                                            <div class="row" >
-                                                                                                <div class="col-md-11">
-                                                                                                    <img src="data:image/png;base64,{{ art['Image'] }}" style="max-width: 290px;max-height: 60px;">
+                                                                                            {% if art['artAverif'] is defined %}
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td>
+                                                                                                <div class="row" >
+                                                                                                    <div class="col-md-5">
+                                                                                                        <p>Saisir code barre: </p>
+                                                                                                    </div>
+                                                                                                    <div class="col-md-6 ">
+                                                                                                        <input id="cabAverif{{ art['id']  }}" onchange="verifCAB({{ art['id'] }})" class="form-control" type="text" name="fname" style="height: 20px;">
+                                                                                                    </div>
                                                                                                 </div>
-                                                                                                <div class="col-md-11" style="text-align: center;">
-                                                                                                    {{ art['nameImage'] }}
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        {% endif %}
+                                                                                            </td>
+                                                                                            {% endif %}
+                                                                                        </tr>
+                                                                                    </table>
                                                                                 </td>
                                                                             {% endif %}
-
-
-                                                            {% endif %}
-
-                                                            {% if recup == 1 %}</tr>{% endif %}
-                                                        {% endfor %}
-
-
-                                                    </table>
-
-
-                                    {% endif %}
-                                {% endfor %}
+                                                                        {% endif %}
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </table>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
 
 
 
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                    {% else %}
+                        <h4 style="text-align: center;">PAS DE PERSO SUR CETTE COMMANDE</h4>
+                    {% endif %}
                     </div>
-            {% else %}
-                <h2>PAS DE PERSO SUR CETTE COMMANDE</h2>
+
+
+
+
+
             {% endif %}
+    </div>
+
+        {% if numHeineken is defined and numHeineken|length > 0 %}
+            <div id ="zoneSaisiCode" style="display: none;"></div>
+            <div id="tableaucode">
+                {% for code in numHeineken %}
+                                    {{ code['NumCode'] }},
+                {% endfor %}
             </div>
 
-
-
-
-
-    {% endif %}
+        {% endif %}
 
 
 
@@ -387,6 +667,37 @@
 
 {% block javascriptsPlus %}
 
+    {#supprime WB Colissimo#}
+    {#<script>#}
+        {#var bl = $('#blCmd').text();#}
+        {#var etat = $('#recupEtat').text();#}
+        {#var isCN23 = $('#ifcn23').text();#}
+
+        {#if (bl !== '' && etat  == 0  && isCN23 === '1' ){#}
+        {#printIframe(bl);#}
+            {#document.getElementById('myModalCN23').style.display = '';#}
+
+            {#var modalcn = document.getElementById('myModalCN23');#}
+            {#var spancn = document.getElementsByClassName("closeArticle2")[0];#}
+            {#spancn.onclick = function() {#}
+                {#modalcn.style.display = "none";#}
+            {#}#}
+        {#}#}
+
+        {#function printIframe(blb) {#}
+            {#var objFra = document.createElement('iframe');   // CREATE AN IFRAME.#}
+            {#var asset = '{{ asset('Colissimo/Cn23/blb_CN23.pdf') }}';#}
+            {#asset = asset .replace('blb',blb );#}
+            {#objFra.src = asset;#}
+            {#objFra.width = '100%';#}
+            {#objFra.height = '480px';#}
+            {#var cont = document.getElementById('modalCN23Contenu');// SET SOURCE.#}
+            {#cont.appendChild(objFra);  // APPEND THE FRAME TO THE PAGE.#}
+        {#}#}
+
+    {#</script>#}
+
+
     <script>
         $('#checkVerifBL').change(function() {
             if($(this).prop('checked')){
@@ -394,7 +705,6 @@
                 document.getElementById('hideifnotdateProd').style.display = '';
                 $('#veriOrNot').html('verif');
                 document.getElementById("entered_name").focus();
-//
 
             }
             else{
@@ -402,8 +712,6 @@
                 document.getElementById('hideifnotdateProd').style.display = 'none';
                 $('#veriOrNot').html('');
                 document.getElementById("inputlettreColor").value = "à renseigner";
-
-
             }
 
         })
@@ -415,21 +723,207 @@
         }
     </script>
 
+
+
     <script>
+
         $(document).ready(function(){
+
             document.getElementById('contentMenu').style.marginLeft = '25px';
             document.getElementById('contentMenu').style.width = '98%';
-            document.getElementById('flecheMenuD').style.display = '';
+            if ($('#verifVue').text() === '1') {
+                document.getElementById('flecheMenuVue').style.display = '';
+            }else{
+                document.getElementById('flecheMenuD').style.display = '';
+            }
             document.getElementById('contentMenu').className = 'col-md-12';
             document.getElementById('header').style.height = '39px';
-            document.getElementById('imgHeader').style.width = '53px';
-            document.getElementById('texteHeadertessi').style.fontSize = '3em';
-            document.getElementById('texteHeadertessi').style.marginTop = '-8px';
+            document.getElementById('imgHeader').style.width = '39px';
+            document.getElementById('texteHeadertessi').style.width = '90px';
+            document.getElementById('texteHeadertessi').style.marginTop = '-6px';
+            document.getElementById('texteHeadertessi').style.marginLeft = '3px';
             document.getElementById('hideheaderRow').style.marginTop = '-29px';
             document.getElementById('hideHeaderNavConnec').style.marginTop = '25px';
             document.getElementById("entered_name").focus();
+            // recuperation numero de verre pour Heineken
+            if ($('#appliID').text() == 99999 && $('#veriOrNot').text() !== 'verif' && $('#verifVue').text() !== 1){
+                document.getElementById('saisirCodeBefore').style.display = 'none';
+                document.getElementById('zoneSaisiCode').style.display = '';
+                SelectAuSuivant(0);
+            }
+
+
+            if (document.getElementById("entered_verif") ){
+                document.getElementById("entered_verif").focus();
+                document.getElementById("entered_name").value = $('#blCmd').text();
+                var tab = {{ articlesAverif|json_encode|raw }}
+                $('#nacodeleftScan').text(tab.length)
+
+
+
+            }
+
+
 
         });
+
+        var tab = {{ articlesAverif|json_encode|raw }}
+
+        function scanCodeAverif(){
+            var code =  $('#entered_verif').val();
+            var codeDejaSaisi = 0;
+            for ( var i = 0 ; i < tab.length ; i++){
+
+                if ( code === tab[i]['codeAverif']) {
+                    if (tab[i]['indexVerif'] === 1) {
+                        if (codeDejaSaisi === 0){
+                            codeDejaSaisi = code;
+                        }
+
+                    } else {
+                        document.getElementById("imageAverif" + tab[i]['id']).style.display = 'none';
+                        document.getElementById("imageverifok" + tab[i]['id']).style.display = '';
+                        tab[i]['indexVerif'] = 1;
+                        var compt = 0;
+                        for (var i = 0; i < tab.length; i++) {
+                            if (tab[i]['indexVerif'] == 0) {
+                                compt++
+                            }
+                        }
+                        if (compt === 0){
+                            document.getElementById('saisicoderappro').style.display = 'none';
+                            sendData('first' , 1)
+
+
+                        }
+                        $('#nacodeleftScan').text(compt);
+                        document.getElementById("entered_verif").value = "";
+                        break;
+                    }
+
+                }else if (i === (tab.length-1 )&& codeDejaSaisi === code){
+                    var html = 'Code article deja saisi !';
+                    document.getElementById("entered_verif").value = "";
+//                    document.getElementById('erreurSaisiCode').style.color = '#D34026';
+//                    document.getElementById('erreurSaisiCode').style.marginTop = '-2px';
+//                    document.getElementById('erreurSaisiCode').style.marginBottom = '-6px';
+                    $('#erreurSaisiCode').text(html);
+                }else if (i === (tab.length-1)){
+                    var html = 'Code article n\'existe pas dans la commande!';
+                    document.getElementById("entered_verif").value = "";
+//                    document.getElementById('erreurSaisiCode').style.color = '#D34026';
+//                    document.getElementById('erreurSaisiCode').style.marginTop = '-2px';
+//                    document.getElementById('erreurSaisiCode').style.marginBottom = '-6px';
+                    $('#erreurSaisiCode').text(html);
+                }
+            }
+
+        }
+
+        function reseterror() {
+            $('#erreurSaisiCode').text("");
+        }
+
+//      verre pour Heineken
+
+        {#var tableauDeCodeTemp = ($("#tableaucode").text()).split(",");#}
+        {#var tableauDeCode = [];#}
+        {#for ( var item in tableauDeCodeTemp){#}
+            {#tableauDeCode[item]=tableauDeCodeTemp[item].trim()#}
+        {#}#}
+        {#function SelectAuSuivant(compteurCode){#}
+            {#var comp = compteurCode - 1;#}
+            {#if (compteurCode >= 1){#}
+                {#var saisiOK = false;#}
+                {#if ( saisiOK === false) {#}
+                    {#for (var item in tableauDeCode) {#}
+                        {#if (tableauDeCode[item] === document.getElementById("focusCodeentre" + compteurCode).value ) {#}
+                            {#document.getElementById("erreurSaisiCode"+compteurCode).style.display = 'none';#}
+                            {#saisiOK = true;#}
+                        {#}#}
+                    {#}#}
+                {#}#}
+                {#if (saisiOK === false){#}
+{#//                    alert('comp'+compteurCode)#}
+                    {#document.getElementById("focusCodeentre"+compteurCode).focus();#}
+                    {#document.getElementById("erreurSaisiCode"+compteurCode).style.display = '';#}
+                    {#document.getElementById("focusCodeentre"+compteurCode).value = '';#}
+                {#}else{#}
+                    {#compteurCode = compteurCode + 1#}
+                    {#var html =  '<div class="row" id="divNumCode'+compteurCode+'">'+#}
+                                {#'<div class="col-md-offset-3 col-md-3">'+#}
+                                    {#'<div class="input-group">'+#}
+                                        {#'<input type="text" id="focusCodeentre'+compteurCode+'" onchange="SelectAuSuivant('+compteurCode+')" class="form-control" placeholder="Code à saisir">'+#}
+                                        {#'<span class="input-group-btn">'+#}
+                                            {#'<button onclick="SelectAuSuivantSupprime('+compteurCode+')" class="btn btn-default" type="button">X</button>'+#}
+                                        {#'</span>'+#}
+                                    {#'</div>'+#}
+                                {#'</div>'+#}
+                                {#'<div class="col-md-3">'+#}
+                                    {#'<p id="erreurSaisiCode'+compteurCode+'" style="display: none;color: #D34026;">Erreur du code saisi !!</p>'#}
+                                {#'</div>'#}
+                            {#'</div>';#}
+
+                    {#if (!isFinishCode(compteurCode)){#}
+                        {#$('#zoneSaisiCode').append(html)#}
+                        {#document.getElementById("focusCodeentre" + compteurCode).focus();#}
+                    {#}#}
+                {#}#}
+            {#}#}
+            {#else{#}
+                {#compteurCode  = compteurCode + 1 ;#}
+                 {#var html =  '<div class="row" id="divNumCode'+compteurCode+'">'+#}
+                                {#'<div class="col-md-offset-3 col-md-3">'+#}
+                                    {#'<div class="input-group">'+#}
+                                        {#'<input type="text" id="focusCodeentre'+compteurCode+'" onchange="SelectAuSuivant('+compteurCode+')" class="form-control" placeholder="Code à saisir">'+#}
+                                        {#'<span class="input-group-btn">'+#}
+                                            {#'<button onclick="SelectAuSuivantSupprime('+compteurCode+')" class="btn btn-default" type="button">X</button>'+#}
+                                        {#'</span>'+#}
+                                    {#'</div>'+#}
+                                {#'</div>'+#}
+                                {#'<div class="col-md-3">'+#}
+                                    {#'<p id="erreurSaisiCode'+compteurCode+'" style="display: none;color: #D34026;">Erreur du code saisi !!</p>'#}
+                                {#'</div>'#}
+                            {#'</div>';#}
+                {#$('#zoneSaisiCode').append(html);#}
+                {#document.getElementById("focusCodeentre"+compteurCode).focus();#}
+            {#}#}
+        {#}#}
+
+        {#function SelectAuSuivantSupprime(compteur){#}
+            {#var obj = document.getElementById('zoneSaisiCode');#}
+            {#var old = document.getElementById('divNumCode'+compteur);#}
+            {#obj.removeChild(old);#}
+        {#}#}
+        {#function isFinishCode(compteur){#}
+            {#var tableauCodeOK = [];#}
+                {#for (var key = 0; key < compteur; key++) {#}
+                    {#if (document.getElementById("focusCodeentre" + key)) {#}
+                        {#if (document.getElementById("focusCodeentre" + key).value !== "") {#}
+                            {#tableauCodeOK.push(document.getElementById("focusCodeentre" + key).value)#}
+                            {#if (tableauCodeOK.length === 4) {#}
+                                {#var bl = $('#blCmd').text();#}
+                                {#$.ajax({#}
+                                    {#url: "{{ path('tmd_appli_editCodeHeineken') }}",#}
+                                    {#type: "POST",#}
+                                    {#data: {numBL: bl, tabCode: tableauCodeOK},#}
+                                    {#dataType: "json",#}
+                                    {#contentType: "application/x-www-form-urlencoded; charset=utf-8",#}
+                                    {#complete: function (html) {#}
+                                        {#document.getElementById('saisirCodeBefore').style.display = '';#}
+                                        {#document.getElementById('zoneSaisiCode').style.display = 'none';#}
+
+                                    {#}#}
+                                {#})#}
+                                {#return true#}
+                            {#}#}
+                        {#}#}
+                    {#}#}
+                {#}#}
+            {#return false#}
+        {#}#}
+
+
 
         function afficheMenu() {
             document.getElementById('contentMenu').style.marginLeft = '0px';
@@ -439,9 +933,10 @@
             document.getElementById('menuGauche').style.display = '';
             document.getElementById('contentMenu').className = 'col-md-10';
             document.getElementById('header').style.height = '103px'
-            document.getElementById('imgHeader').style.width = '';
-            document.getElementById('texteHeadertessi').style.fontSize = '';
-            document.getElementById('texteHeadertessi').style.marginTop = '';
+            document.getElementById('imgHeader').style.width = '103px';
+            document.getElementById('texteHeadertessi').style.width = '157px';
+            document.getElementById('texteHeadertessi').style.marginTop = '34px';
+            document.getElementById('texteHeadertessi').style.marginLeft = '90px';
             document.getElementById('hideheaderRow').style.marginTop = '-8px';
             document.getElementById('hideHeaderNavConnec').style.marginTop = '92px';
             document.getElementById('overflowArticles').style.maxHeight = '333px';
@@ -457,15 +952,18 @@
             document.getElementById('flecheMenuG').style.display = 'none';
             document.getElementById('menuGauche').style.display = 'none';
             document.getElementById('header').style.height = '39px';
-            document.getElementById('imgHeader').style.width = '53px';
-            document.getElementById('texteHeadertessi').style.fontSize = '3em';
+            document.getElementById('imgHeader').style.width = '39px';
+            document.getElementById('texteHeadertessi').style.width = '90px';
             document.getElementById('texteHeadertessi').style.marginTop = '-8px';
+            document.getElementById('texteHeadertessi').style.marginLeft = '3px';
             document.getElementById('hideheaderRow').style.marginTop = '-29px';
             document.getElementById('hideHeaderNavConnec').style.marginTop = '25px';
             document.getElementById('overflowArticles').style.maxHeight = '392px';
             document.getElementById('overflowEmbal').style.maxHeight = '392px';
         }
     </script>
+
+
 
     <script>
         $(document).ready(function() {
@@ -483,69 +981,46 @@
                     document.getElementById("entered_name").focus();
                     document.getElementById('inputlettreColor').style.color = '';
                 });
-
         });
-        //
-
-
-
     </script>
 
-
+    {#effet barre indication production#}
     <script>
         $(document).ready(function(){
-
-//au chargement de la page je règle le marginTop de #barre à 0 (il etait fixé à -50px dans le css) en 500ms
-
             $('#barre').animate({
                 marginTop: "-10px",
             }, 1000);
-
-
-//au clic sur #fermer qui est la croix j'anime le marginTop de #barre à -30px pour le faire remonter et laisser le border bottom apparent
-
             $("#fermer").mousedown(function(){
 
                 $('#barre').animate({
                     marginTop: "-50px",
                 }, 500);
-
             });
         });
-
-
-
     </script>
 
     <script>
             var etat = $('#recupEtatProd').text();
-//
             if (etat === '0') {
-
-//                function hideApresProd() {
-
-                    window.setTimeout(fonctionAExecuter, 5000); //On attend 5 secondes avant d'exécuter la fonction
-//                }
-
+                window.setTimeout(fonctionAExecuter, 5000);
                 function fonctionAExecuter() {
                     $('#barre').animate({
                         marginTop: "-50px",
                     }, 500);
                 }
             }
-
-
     </script>
+
     <script>
+        if ($('#verifVue').text() !== '1') {
+            var available_printers = sessionStorage.getItem("available_printers");
+            var selected_category = null;
+            var default_printer = sessionStorage.getItem("selected_printer");
+            var selected_printer = sessionStorage.getItem("selected_printer");
 
-        var available_printers = sessionStorage.getItem("available_printers");
-        var selected_category = null;
-        var default_printer = sessionStorage.getItem("selected_printer");
-        var selected_printer = sessionStorage.getItem("selected_printer");
-
-        var format_start = "^XA^LL200^FO80,50^A0N36,36^FD";
-        var format_end = "^FS^XZ";
-        var default_mode = true;
+            var format_start = "^XA^LL200^FO80,50^A0N36,36^FD";
+            var format_end = "^FS^XZ";
+            var default_mode = true;
 
 
             function setup_web_print() {
@@ -614,305 +1089,412 @@
             };
 
 
-        function showBrowserPrintNotFound()
-        {
-            showErrorMessage("An error occured while attempting to connect to your Zebra Printer. You may not have Zebra Browser Print installed, or it may not be running. Install Zebra Browser Print, or start the Zebra Browser Print Service, and try again.");
+            function showBrowserPrintNotFound() {
+                showErrorMessage("An error occured while attempting to connect to your Zebra Printer. You may not have Zebra Browser Print installed, or it may not be running. Install Zebra Browser Print, or start the Zebra Browser Print Service, and try again.");
+            };
 
-        };
-        function sendData(message)
-        {
+            function sendData(message, okverif) {
 
-//            var date = $("#dateDepotProdIn input").datepicker("getDate");
-//            var dateString = $.datepicker.formatDate("yy-mm-dd", date);
-            var dateString = $('#dateDepotProdInAdd').text();
-//            alert(dateString);
-            checkPrinterStatus( function (text) {
-                if (text === "Ready to Print") {
-                    if ( $('#veriOrNot').text() === "verif" && message === "first") {
-                        var cmd = $('#entered_name').val();
-                        $.ajax({
-                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
-                            type: "POST",
-                            data: {numCmd: cmd, date: dateString, verif: 1},
-                            dataType: "json",
-                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                            complete: function (html) {
-                                if (html.status !== 400 && html.status !== 401 && html.status !== 405  ) {
-                                    var bl = html.responseText;
-                                    var obj = JSON.parse(bl);
-                                    var blT = JSON.parse(obj['bl']);
-                                    var objb = JSON.parse(bl);
-                                    var dateT = JSON.parse(objb['donne']);
+                var dateString = $('#dateDepotProdInAdd').text();
+                checkPrinterStatus(function (text) {
+                    if (text === "Ready to Print") {
+                        if ($('#veriOrNot').text() === "verif" && message === "first") {
+                            var cmd = $('#entered_name').val();
+                            $.ajax({
+                                url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                                type: "POST",
+                                data: {numCmd: cmd, date: dateString, verif: 1 , okverif : okverif},
+                                dataType: "json",
+                                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                                complete: function (html) {
+                                    if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 402 ) {
+                                        var bl = html.responseText;
+                                        var obj = JSON.parse(bl);
+                                        var blT = JSON.parse(obj['bl']);
+                                        var objb = JSON.parse(bl);
+                                        var dateT = JSON.parse(objb['donne']);
+                                        var objc = JSON.parse(bl);
+                                        var AppAverif = JSON.parse(objc['verifAppli']);
+                                        var annule = JSON.parse(obj['annule']);
 
+                                         if (annule === 0 ) {
+                                             hideLoading();
 
-                                    hideLoading();
-
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varDate', dateT.date);
-                                    if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
-                                        if (html.responseJSON['zpl'] !== 'inconnu'){
-                                            temp = temp.replace('varEtat', '0v');
+                                             var temp = '{{ path('tmd_appli_production' ,{ 'appAverif': 'varappAverif','bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                             temp = temp.replace('varBl', cmd);
+                                             temp = temp.replace('varDate', dateT.date);
+                                             temp = temp.replace('varappAverif', AppAverif);
+                                             if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                                 if (html.responseJSON['zpl'] !== 'inconnu') {
+                                                     temp = temp.replace('varEtat', '0v');
+                                                     window.location.href = temp;
+                                                 }
+                                                 else {
+                                                     temp = temp.replace('varEtat', '2.0');
+                                                     window.location.href = temp
+                                                 }
+                                             }
+                                             else {
+                                                 temp = temp.replace('varEtat', '1');
+                                                 window.location.href = temp
+                                             }
+                                         }else{
+                                             var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                             temp = temp.replace('varBl', cmd);
+                                             temp = temp.replace('varEtat', '9');
+                                             temp = temp.replace('varDate', dateString);
                                             window.location.href = temp;
-                                        }
-                                        else{
-                                            temp = temp.replace('varEtat', '2.0');
-                                            window.location.href = temp
-                                        }
+                                         }
                                     }
-                                    else {
-                                        temp = temp.replace('varEtat', '1');
-                                        window.location.href = temp
-                                    }
-
-                                }
-                                else if (html.status === 400 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '4');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
-                                }
-                                else if (html.status === 401 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '3');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
-                                }
-                                else if (html.status === 405 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '5');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
-                                }
-
-                            },
-                            error: function (request, status, error) {
-
-
-                            }
-                        })
-                    }
-                    else if (message === "first" && $('#veriOrNot').text() !== "verif") {
-
-                        var cmd = $('#entered_name').val();
-                        $.ajax({
-                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
-                            type: "POST",
-                            data: {numCmd: cmd, date: dateString},
-                            dataType: "json",
-                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                            complete: function (html) {
-                                if (html.status !== 400 && html.status !== 401 && html.status !== 405) {
-                                    var bl = html.responseText;
-                                    var obj = JSON.parse(bl);
-                                    var blT = JSON.parse(obj['bl']);
-                                    var objb = JSON.parse(bl);
-                                    var dateT = JSON.parse(objb['donne']);
-
-                                    hideLoading();
-
-                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
-                                        temp = temp.replace('varBl', cmd);
-                                        temp = temp.replace('varDate', dateT.date);
-                                        if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
-                                            if (html.responseJSON['zpl'] !== 'inconnu'){
-                                                temp = temp.replace('varEtat', '0');
-                                                selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);
-                                            }
-                                            else{
-                                                temp = temp.replace('varEtat', '2');
-                                                window.location.href = temp
-                                            }
-                                        }
-                                        else {
-                                            temp = temp.replace('varEtat', '1');
-                                            window.location.href = temp
-                                        }
-
-
-                                }
-                                else if (html.status === 400 ) {
-                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                    else if (html.status === 400) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
                                         temp = temp.replace('varBl', cmd);
                                         temp = temp.replace('varEtat', '4');
                                         temp = temp.replace('varDate', dateString);
                                         window.location.href = temp;
+                                    }
+                                    else if (html.status === 408) {
+                                        var bl = html.responseText;
+                                        var obj = JSON.parse(bl);
+                                        var blT = JSON.parse(obj['bl']);
+                                        if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varEtat', '2.0');
+                                            temp = temp.replace('varDate', dateString);
+                                            window.location.href = temp;
+                                        } else {
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varEtat', '2');
+                                            temp = temp.replace('varDate', dateString);
+                                            window.location.href = temp;
+                                        }
+                                    }
+                                    else if (html.status === 401) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '3');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+                                    else if (html.status === 405) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '5');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+                                    else if (html.status === 402) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '9');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+
+
+                                },
+                                error: function (request, status, error) {
+
+
                                 }
-                                else if (html.status === 401 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '3');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
+                            })
+                        }
+                        else if (message === "first" && $('#veriOrNot').text() !== "verif") {
+
+                            var cmd = $('#entered_name').val();
+                            $.ajax({
+                                url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                                type: "POST",
+                                data: {numCmd: cmd, date: dateString , verif: 0 , okverif : okverif},
+                                dataType: "json",
+                                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                                complete: function (html) {
+                                    if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 407 && html.status !== 402 ) {
+                                        var bl = html.responseText;
+
+                                        var obj = JSON.parse(bl);
+                                        var blT = JSON.parse(obj['bl']);
+
+                                        var objb = JSON.parse(bl);
+                                        var dateT = JSON.parse(objb['donne']);
+
+                                        var objc = JSON.parse(bl);
+                                        var AppAverif = JSON.parse(objc['verifAppli']);
+
+                                        var objd = JSON.parse(bl);
+                                        var verifAppliOK = JSON.parse(objd['verifAppliOK']);
+
+                                        var annule = JSON.parse(obj['annule']);
+
+                                        if (annule === 0 ) {
+                                            hideLoading();
+
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'appAverif': 'varappAverif', 'bl': 'varBl' , 'dateDepot': 'varDate' , 'etat': 'varEtat', 'verif': 'varVerif' })|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varDate', dateT.date);
+                                            temp = temp.replace('varappAverif', AppAverif);
+                                            temp = temp.replace('varVerif', 'false');
+                                            if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                                if (html.responseJSON['zpl'] !== 'inconnu') {
+
+                                                    if (html.responseJSON['zpl'] !== 'colissimo' && html.responseJSON['zpl'] !== 'spool') {
+                                                        if (!AppAverif || verifAppliOK == 1) {
+                                                            temp = temp.replace('varEtat', '0');
+                                                            selected_printer.send(html.responseJSON['zpl'], window.location.href = temp, printerError);
+                                                        } else {
+                                                            temp = temp.replace('varEtat', '0code');
+                                                            window.location.href = temp
+                                                        }
+
+                                                    }
+                                                    else {
+                                                        if (!AppAverif || verifAppliOK == 1) {
+                                                            temp = temp.replace('varEtat', '0');
+                                                            window.location.href = temp;
+                                                        } else {
+                                                            temp = temp.replace('varEtat', '0code');
+                                                            window.location.href = temp
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    temp = temp.replace('varEtat', '2');
+                                                    window.location.href = temp
+                                                }
+                                            }
+                                            else {
+                                                temp = temp.replace('varEtat', '1');
+                                                window.location.href = temp
+                                            }
+                                        }else{
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varEtat', '9');
+                                            temp = temp.replace('varDate', dateString);
+                                            window.location.href = temp;
+                                        }
+
+                                    }
+                                    else if (html.status === 408) {
+                                        var bl = html.responseText;
+                                        var obj = JSON.parse(bl);
+                                        var blT = JSON.parse(obj['bl']);
+                                        if ((blT.date_production).substr(0, 11) === '-0001-11-30') {
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varEtat', '2.0');
+                                            temp = temp.replace('varDate', dateString);
+                                            window.location.href = temp;
+                                        } else {
+                                            var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                            temp = temp.replace('varBl', cmd);
+                                            temp = temp.replace('varEtat', '2');
+                                            temp = temp.replace('varDate', dateString);
+                                            window.location.href = temp;
+                                        }
+                                    }
+                                    else if (html.status === 400) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': true})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '4');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+                                    else if (html.status === 401) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '3');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+                                    else if (html.status === 405) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '5');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+                                    else if (html.status === 402) {
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '9');
+                                        temp = temp.replace('varDate', dateString);
+                                        window.location.href = temp;
+                                    }
+
+                                    else if (html.status === 407) {
+                                        var bl = html.responseText;
+                                        var obj = JSON.parse(bl);
+                                        var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate', 'verif': '0', 'error': 'varError' })|escape('js') }}';
+                                        temp = temp.replace('varBl', cmd);
+                                        temp = temp.replace('varEtat', '7');
+                                        temp = temp.replace('varDate', dateString);
+                                        temp = temp.replace('varError', obj['erreur']);
+                                        window.location.href = temp;
+                                    }
+
+                                },
+                                error: function (request, status, error) {
+
                                 }
-                                else if (html.status === 405 ) {
-                                    var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'dateDepot': 'varDate'})|escape('js') }}';
-                                    temp = temp.replace('varBl', cmd);
-                                    temp = temp.replace('varEtat', '5');
-                                    temp = temp.replace('varDate', dateString);
-                                    window.location.href = temp;
+                            })
+                        }
+                        else {
+                            $.ajax({
+                                url: "{{ path('tmd_zpl_imprimEtiq') }}",
+                                type: "POST",
+                                data: {numCmd: message, verif: 1, okverif : okverif},
+                                dataType: "json",
+                                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                complete: function (html) {
+                                    hideLoading();
+                                    if (html.responseJSON['zpl'] !== 'colissimo'){
+                                        selected_printer.send(html.responseJSON['zpl'], printComplete, printerError);
+                                    }
                                 }
-
-                            },
-                            error: function (request, status, error) {
-//                                alert(request.responseText);
-//                                $('.modalErrorZpl').modal('show');
-
-                                {#window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';#}
-
-                                {#setTimeout((function() {  window.location.href = '{{ path('tmd_appli_production')|escape('js') }}';}), 2500);#}
-
-                            }
-                        })
+                            })
+                        }
                     }
-
                     else {
-                        $.ajax({
-                            url: "{{ path('tmd_zpl_imprimEtiq') }}",
-                            type: "POST",
-                            data: {numCmd: message , verif: 1},
-                            dataType: "json",
-                            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                            complete: function (html) {
-                                hideLoading();
-
-
-                                selected_printer.send(html.responseJSON['zpl'], printComplete, printerError);
-
-
-                            }
-                        })
+//                    $('.modalErrorZpl').modal('show');
+                        printerError(text);
                     }
+                });
+            }
+
+            function checkPrinterStatus(finishedFunction) {
+
+                selected_printer.sendThenRead("~HQES",
+                    function (text) {
+                        var that = this;
+                        var statuses = new Array();
+                        var ok = false;
+                        var is_error = text.charAt(70);
+                        var media = text.charAt(88);
+                        var head = text.charAt(87);
+                        var pause = text.charAt(84);
+                        // check each flag that prevents printing
+                        if (is_error == '0') {
+                            ok = true;
+                            statuses.push("Ready to Print");
+                        }
+                        if (media == '1')
+                            statuses.push("Paper out");
+                        if (media == '2')
+                            statuses.push("Ribbon Out");
+                        if (media == '4')
+                            statuses.push("Media Door Open");
+                        if (media == '8')
+                            statuses.push("Cutter Fault");
+                        if (head == '1')
+                            statuses.push("Printhead Overheating");
+                        if (head == '2')
+                            statuses.push("Motor Overheating");
+                        if (head == '4')
+                            statuses.push("Printhead Fault");
+                        if (head == '8')
+                            statuses.push("Incorrect Printhead");
+                        if (pause == '1')
+                            statuses.push("Printer Paused");
+                        if ((!ok) && (statuses.Count == 0))
+                            statuses.push("Error: Unknown Error");
+                        finishedFunction(statuses.join());
+                    }, printerError);
+            };
+            function hidePrintForm() {
+                $('#print_form').hide();
+            };
+            function showPrintForm() {
+                $('#print_form').show();
+            };
+            function showLoading(text) {
+                $('#loading_message').text(text);
+                $('#printer_data_loading').show();
+                hidePrintForm();
+                $('#printer_details').hide();
+                $('#printer_select').hide();
+            };
+            function printComplete() {
+                hideLoading();
+            }
+            function hideLoading() {
+                $('#printer_data_loading').hide();
+                if (default_mode == true) {
+                    showPrintForm();
+                    $('#printer_details').show();
                 }
                 else {
-//                    $('.modalErrorZpl').modal('show');
-                    printerError(text);
+                    $('#printer_select').show();
+                    showPrintForm();
                 }
-            });
-        }
-        function checkPrinterStatus(finishedFunction)
-        {
-
-            selected_printer.sendThenRead("~HQES",
-                function(text){
-                    var that = this;
-                    var statuses = new Array();
-                    var ok = false;
-                    var is_error = text.charAt(70);
-                    var media = text.charAt(88);
-                    var head = text.charAt(87);
-                    var pause = text.charAt(84);
-                    // check each flag that prevents printing
-                    if (is_error == '0')
-                    {
-                        ok = true;
-                        statuses.push("Ready to Print");
-                    }
-                    if (media == '1')
-                        statuses.push("Paper out");
-                    if (media == '2')
-                        statuses.push("Ribbon Out");
-                    if (media == '4')
-                        statuses.push("Media Door Open");
-                    if (media == '8')
-                        statuses.push("Cutter Fault");
-                    if (head == '1')
-                        statuses.push("Printhead Overheating");
-                    if (head == '2')
-                        statuses.push("Motor Overheating");
-                    if (head == '4')
-                        statuses.push("Printhead Fault");
-                    if (head == '8')
-                        statuses.push("Incorrect Printhead");
-                    if (pause == '1')
-                        statuses.push("Printer Paused");
-                    if ((!ok) && (statuses.Count == 0))
-                        statuses.push("Error: Unknown Error");
-                    finishedFunction(statuses.join());
-                }, printerError);
-        };
-        function hidePrintForm()
-        {
-            $('#print_form').hide();
-        };
-        function showPrintForm()
-        {
-            $('#print_form').show();
-        };
-        function showLoading(text)
-        {
-            $('#loading_message').text(text);
-            $('#printer_data_loading').show();
-            hidePrintForm();
-            $('#printer_details').hide();
-            $('#printer_select').hide();
-        };
-        function printComplete()
-        {
-            hideLoading();
-//            alert ("Printing complete");
-        }
-        function hideLoading()
-        {
-            $('#printer_data_loading').hide();
-            if(default_mode == true)
-            {
-                showPrintForm();
-                $('#printer_details').show();
+            };
+            function changePrinter() {
+                default_mode = false;
+                selected_printer = null;
+                $('#printer_details').hide();
+                if (available_printers == null) {
+                    showLoading("Finding Printers...");
+                    $('#print_form').hide();
+                    setTimeout(changePrinter, 200);
+                    return;
+                }
+                onPrinterSelected();
             }
-            else
-            {
-                $('#printer_select').show();
-                showPrintForm();
+            function onPrinterSelected() {
+                selected_printer = available_printers[$('#printers')[0].selectedIndex];
             }
-        };
-        function changePrinter()
-        {
-            default_mode = false;
-            selected_printer = null;
-            $('#printer_details').hide();
-            if(available_printers == null)
-            {
-                showLoading("Finding Printers...");
-                $('#print_form').hide();
-                setTimeout(changePrinter, 200);
-                return;
+            function showErrorMessage(text) {
+                $('#main').hide();
+                // $('#error_div').show();
+                $('#error_message').html(text);
+                $('.modalErrorZpl').modal('show');
+
             }
-            // $('#printer_select').show();
-            onPrinterSelected();
+            function printerError(text) {
+                showErrorMessage("An error occurred while printing. Please try again." + text);
+            }
+            function trySetupAgain() {
+                $('#main').show();
+                $('#error_div').hide();
+                setup_web_print();
+                //hideLoading();
+            }
 
         }
-        function onPrinterSelected()
-        {
-            selected_printer = available_printers[$('#printers')[0].selectedIndex];
-        }
-        function showErrorMessage(text)
-        {
-            $('#main').hide();
-            // $('#error_div').show();
-            $('#error_message').html(text);
-            $('.modalErrorZpl').modal('show');
-
-        }
-        function printerError(text)
-        {
-//            alert(text)
-            showErrorMessage("An error occurred while printing. Please try again." + text);
-        }
-        function trySetupAgain()
-        {
-            $('#main').show();
-            $('#error_div').hide();
-            setup_web_print();
-            //hideLoading();
-        }
-
-
 
     </script>
+
+    {#Article a Verif#}
+    <script>
+        function verifCAB(cmd) {
+            var cab = $('#cabAverif'.concat(cmd)).val();
+            $.ajax({
+                url: "{{ path('tmd_appli_verifArticle') }}",
+                type: "POST",
+                data: {cmdp: cmd, cab: cab},
+                dataType: "json",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (html) {
+                    var bl = html.responseText;
+                    var obj = JSON.parse(bl);
+                    if (obj[0] === 'OK VERIF'){
+                        document.getElementById('imageAverif'.concat(cmd)).style.display = 'none';
+                        document.getElementById('imageverifok'.concat(cmd)).style.display = '';
+                        document.getElementById('cabAverif'.concat(cmd)).value = '';
+                        $('#cabAverif'.concat(cmd)).value = '';
+                    }else{
+                        document.getElementById('cabAverif'.concat(cmd)).value = '';
+                        $('.modalErrorCAB').modal('show');
+                    }
+
+                }
+            })
+        }
+    </script>
+
+
 {% endblock %}
 
 

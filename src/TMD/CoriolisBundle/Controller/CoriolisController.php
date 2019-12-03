@@ -53,11 +53,17 @@ class CoriolisController extends Controller
                 $allCarteByCmd[0]['tagProdTrue'] = 0;
                 $allCarteByCmd[0]['tagCmdComplete'] = 0;
             }
+            $reexpedition = 0 ;
             foreach ( $allCarteByCmd as $k => $v ){
+
                 $allCarteByCmd[$k]['detail'] = utf8_encode ((stream_get_contents($v['record'])));
                 $allCarteByCmd[$k]['record'] = null;
-                if ( $allCarteByCmd[$k]['numRef'] == $numRef and  $allCarteByCmd[$k]['flagProd'] == true){
+                if ( $allCarteByCmd[$k]['numRef'] == $numRef and  $allCarteByCmd[$k]['flagProd'] == true and $reexpedition == 0){
                     $allCarteByCmd[0]['tagProdTrue'] = 1;
+                }
+
+                if ( $allCarteByCmd[$k]['numRef'] == $numRef and $reexpedition == 0){
+                    $reexpedition = 1;
                 }
                 if ($CmdAlreadyLivre) {
                     if ($allCarteByCmd[$k]['flagProd'] == false) {
@@ -70,7 +76,6 @@ class CoriolisController extends Controller
                     $allCarteByCmd[0]['tagCmdComplete'] = 1;
                 }
             }
-
             return new JsonResponse($allCarteByCmd);
         };
 

@@ -111,7 +111,7 @@ class EcommBl
     /**
      * @var \TMD\ProdBundle\Entity\EcommLignes
      *
-     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommLignes")
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommLignes", inversedBy="bls")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="BL", referencedColumnName="numBL")
      * })

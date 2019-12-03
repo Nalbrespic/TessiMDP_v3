@@ -40,9 +40,36 @@ class EcommBLRepository extends EntityRepository
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
             ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idStatut','stat')
             ->innerJoin('bl.siteProduction', 'site')
             ->innerJoin('tr.idfile', 'file')
             ->where('bl.dateProduction LIKE :date')
+            ->setParameter('date',$date.'%')
+            ->andWhere('stat.idStatut != (:st1)')
+            ->setParameter('st1', 9)
+            ->andWhere('stat.idStatut != (:st2)')
+            ->setParameter('st2', 10)
+            ->andWhere('file.idappli IN (:ope)')
+            ->setParameter('ope',$ope)
+//            ->addSelect('bl.bl')
+//            ->addSelect('count(bl.numligne)')
+//            ->addSelect('site.abregesiteprod')
+//            ->groupBy('tr.idfile')
+            ->getQuery()
+            ->getResult()
+
+            ;
+    }
+
+    public function findBlByOpeByDateDepot( $date, $ope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('bl.siteProduction', 'site')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('tr.dateDepot LIKE :date')
             ->setParameter('date',$date.'%')
             ->andWhere('file.idappli IN (:ope)')
             ->setParameter('ope',$ope)
@@ -78,10 +105,14 @@ class EcommBLRepository extends EntityRepository
     {
         return $this
             ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
             ->where('bl.idfile IN (:id)')
             ->setParameter('id', $files)
             ->andwhere('bl.dateProduction != :dat')
             ->setParameter('dat', '0000-00-00 00:00:00')
+            ->andWhere('tr.idStatut != :st')
+            ->setParameter('st', 9)
             ->select('bl.idfile')
             ->addSelect('count(bl.idbl)')
             ->addSelect('min(bl.dateProduction as minDate')
@@ -94,53 +125,6 @@ class EcommBLRepository extends EntityRepository
 
 
 
-    public function findAllBlNonProdByFile($idfile)
-    {
-        return $this
-            ->createQueryBuilder('bl')
-            ->leftJoin('bl.bl', 'ligne')
-            ->leftJoin('ligne.ecommCmdeps', 'cmd')
-            ->innerJoin('ligne.numligne', 'tr')
-            ->innerJoin('tr.idfile', 'file')
-//            ->innerJoin('file.idappli', 'app')
-            ->where('bl.idfile IN (:id)')
-            ->setParameter('id', $idfile)
-            ->andwhere('bl.dateProduction = :dat')
-            ->setParameter('dat', '0000-00-00 00:00:00')
-//            ->addSelect('app.appliname')
-            ->addSelect('tr.destinataire')
-            ->addSelect('tr.destCp')
-            ->addSelect('tr.typeTransport')
-            ->addSelect('ligne.numbl')
-            ->addSelect('tr.destRue')
-            ->addSelect('tr.destAd2')
-            ->addSelect('tr.destAd3')
-            ->addSelect('tr.destAd4')
-            ->addSelect('tr.destAd5')
-            ->addSelect('tr.destAd6')
-            ->addSelect('tr.expRef')
-            ->addSelect('tr.refclient')
-            ->addSelect('tr.destVille')
-            ->addSelect('file.dateFile')
-            ->addSelect('tr.dateCmde')
-            ->addSelect('bl.dateProduction')
-            ->addSelect('tr.instrLivrais1')
-            ->addSelect('tr.instrLivrais2')
-            ->addSelect('tr.dateDepot')
-            ->addSelect('tr.type')
-            ->addSelect('tr.destPays')
-            ->addSelect('file.nbpages')
-            ->addSelect('file.filename')
-            ->addSelect('ligne.poids as poidsReel')
-            ->addSelect('sum(cmd.quantite) as quantite')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
-            ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('ligne.numbl')
-            ->getQuery()
-            ->getArrayResult()
-            ;
-    }
 
 
 
@@ -209,7 +193,27 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findAllBlByFile($idfile)
+    public function findNbBlDepotByDate($idappli)
+    {
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'fi')
+            ->innerJoin('fi.idappli', 'appl')
+            ->where('appl.idappli = :id')
+            ->setParameter('id',$idappli)
+            ->select('SUBSTRING(tr.dateDepot, 1, 10) as start')
+            ->addSelect('count(bl.idbl) as title')
+            ->addSelect('SUBSTRING(tr.dateDepot, 1, 10) as infoDate')
+            ->addSelect('appl.idappli as infoIdAppli')
+            ->groupBy('start')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+    public function findAllBlByBLS($idBLs)
     {
         return $this
             ->createQueryBuilder('bl')
@@ -218,8 +222,8 @@ class EcommBLRepository extends EntityRepository
             ->innerJoin('ligne.numligne', 'tr')
             ->innerJoin('tr.idfile', 'file')
             ->innerJoin('file.idappli', 'app')
-            ->where('tr.idfile IN (:id)')
-            ->setParameter('id', $idfile)
+            ->where('ligne.numbl IN (:id)')
+            ->setParameter('id', $idBLs)
             ->addSelect('app.appliname')
             ->addSelect('tr.destinataire')
             ->addSelect('tr.destCp')
@@ -234,14 +238,18 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.expRef')
             ->addSelect('tr.refclient')
             ->addSelect('tr.destVille')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.destMail')
             ->addSelect('file.dateFile')
             ->addSelect('tr.dateCmde')
+            ->addSelect('tr.numCmdeClient')
             ->addSelect('bl.dateProduction')
             ->addSelect('tr.instrLivrais1')
             ->addSelect('tr.instrLivrais2')
             ->addSelect('tr.dateDepot')
             ->addSelect('tr.type')
             ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
             ->addSelect('file.nbpages')
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
@@ -256,51 +264,128 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-//    public function findAllFileBetweenDate($idOpe,$dateDebut,$dateFin)
-//    {
-//        return $this
-//            ->createQueryBuilder('bl')
-//            ->innerJoin('bl.bl', 'ligne')
-//            ->leftJoin('ligne.ecommCmdeps', 'cmd')
-//            ->innerJoin('ligne.numligne', 'tr')
-//            ->innerJoin('tr.idfile', 'file')
-//            ->innerJoin('file.idappli', 'app')
-//            ->where('app.idappli IN (:id)')
-//            ->setParameter('id', $idOpe)
-//            ->andWhere('bl.dateProduction >= (:start)')
-//            ->setParameter('start', $dateDebut)
-//            ->andWhere('bl.dateProduction <= (:fin)')
-//            ->setParameter('fin', $dateFin)
-//            ->addSelect('tr.destinataire')
-//            ->addSelect('tr.destCp')
-//            ->addSelect('tr.typeTransport')
-//            ->addSelect('ligne.numbl')
-//            ->addSelect('tr.destRue')
-//            ->addSelect('tr.destAd2')
-//            ->addSelect('tr.destAd3')
-//            ->addSelect('tr.destAd4')
-//            ->addSelect('tr.destAd5')
-//            ->addSelect('tr.destAd6')
-//            ->addSelect('tr.expRef')
-//            ->addSelect('tr.refclient')
-//            ->addSelect('tr.destVille')
-//            ->addSelect('file.dateFile')
-//            ->addSelect('tr.dateCmde')
-//            ->addSelect('tr.instrLivrais1')
-//            ->addSelect('tr.instrLivrais2')
-//            ->addSelect('tr.destPays')
-//            ->addSelect('file.nbpages')
-//            ->addSelect('file.filename')
-//            ->addSelect('ligne.poids as poidsReel')
-//            ->addSelect('sum(cmd.quantite) as quantite')
+
+    public function findAllBlByFile($idfile)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'app')
+            ->innerJoin('tr.idStatut', 'stat')
+            ->where('tr.idfile IN (:id)')
+            ->setParameter('id', $idfile)
+            ->andwhere('bl.dateProduction != :dat')
+            ->setParameter('dat', '0000-00-00 00:00:00')
+            ->select('app.appliname')
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.destRue')
+            ->addSelect('tr.destAd2')
+            ->addSelect('tr.destAd3')
+            ->addSelect('tr.destAd4')
+            ->addSelect('tr.destAd5')
+            ->addSelect('tr.destAd6')
+            ->addSelect('tr.expRef')
+            ->addSelect('tr.refclient')
+            ->addSelect('tr.destVille')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.destMail')
+            ->addSelect('file.dateFile')
+            ->addSelect('tr.dateCmde')
+            ->addSelect('tr.numCmdeClient')
+            ->addSelect('bl.dateProduction')
+            ->addSelect('tr.instrLivrais1')
+            ->addSelect('tr.instrLivrais2')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('tr.type')
+            ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
+            ->addSelect('file.nbpages')
+            ->addSelect('file.filename')
+            ->addSelect('ligne.poids as poidsReel')
+            ->addSelect('sum(cmd.quantite) as quantite')
+            ->addSelect('count(cmd.numbl) as nbCmd')
+            ->addSelect('stat.idStatut')
+            ->addSelect('tr.json')
+            ->addSelect('bl.modexp')
+            ->addSelect('bl.dateProduction')
+            ->addSelect('bl.nColis')
 //            ->andWhere('cmd.flagart = (:qt)')
 //            ->setParameter('qt', 0)
-//            ->orderBy('tr.dateInsert', 'DESC')
-//            ->groupBy('ligne.numbl')
-//            ->getQuery()
-//            ->getArrayResult()
-//            ;
-//    }
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('ligne.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByFileArticle($idfile)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'app')
+            ->where('tr.idfile IN (:id)')
+            ->setParameter('id', $idfile)
+            ->andwhere('bl.dateProduction != :dat')
+            ->setParameter('dat', '0000-00-00 00:00:00')
+            ->select('app.appliname')
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.destRue')
+            ->addSelect('tr.destAd2')
+            ->addSelect('tr.destAd3')
+            ->addSelect('tr.destAd4')
+            ->addSelect('tr.destAd5')
+            ->addSelect('tr.destAd6')
+            ->addSelect('tr.expRef')
+            ->addSelect('tr.refclient')
+            ->addSelect('tr.destVille')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.destMail')
+            ->addSelect('file.dateFile')
+            ->addSelect('tr.dateCmde')
+            ->addSelect('tr.numCmdeClient')
+            ->addSelect('tr.instrLivrais1')
+            ->addSelect('tr.instrLivrais2')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('tr.type')
+            ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
+            ->addSelect('file.nbpages')
+            ->addSelect('file.filename')
+            ->addSelect('ligne.poids as poidsReel')
+//            ->addSelect('sum(cmd.quantite) as quantite')
+//            ->addSelect('count(cmd.numbl) as nbCmd')
+            ->addSelect('IDENTITY(tr.idStatut) as trStatut')
+            ->addSelect('tr.json')
+            ->addSelect('bl.modexp')
+            ->addSelect('bl.dateProduction')
+            ->addSelect('bl.nColis')
+            ->addSelect('cmd.codearticle')
+            ->addSelect('cmd.libelle')
+            ->addSelect('cmd.quantite')
+            ->addSelect('IDENTITY(cmd.idStatut) as cmdStatut')
+            ->orderBy('tr.expRef', 'DESC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+
+
+
+
 
     public function findAllBlByDateProdByAppli($idAppli, $DateProd)
     {
@@ -319,12 +404,15 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.destCp')
             ->addSelect('tr.typeTransport')
             ->addSelect('ligne.numbl')
+            ->addSelect('tr.numCmdeClient')
             ->addSelect('tr.destRue')
             ->addSelect('tr.destAd2')
             ->addSelect('tr.destAd3')
             ->addSelect('tr.destAd4')
             ->addSelect('tr.destAd5')
             ->addSelect('tr.destAd6')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.dateDepot')
             ->addSelect('tr.expRef')
             ->addSelect('tr.refclient')
             ->addSelect('tr.destVille')
@@ -333,6 +421,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.instrLivrais1')
             ->addSelect('tr.instrLivrais2')
             ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
             ->addSelect('file.nbpages')
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
@@ -341,6 +430,76 @@ class EcommBLRepository extends EntityRepository
 //            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+    public function findAllBlByDateDepotByAppli($idAppli, $DateProd)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.numCmdeClient')
+            ->addSelect('tr.destRue')
+            ->addSelect('tr.destAd2')
+            ->addSelect('tr.destAd3')
+            ->addSelect('tr.destAd4')
+            ->addSelect('tr.destAd5')
+            ->addSelect('tr.destAd6')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('tr.expRef')
+            ->addSelect('tr.refclient')
+            ->addSelect('tr.destVille')
+            ->addSelect('file.dateFile')
+            ->addSelect('tr.dateCmde')
+            ->addSelect('tr.instrLivrais1')
+            ->addSelect('tr.instrLivrais2')
+            ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
+            ->addSelect('file.nbpages')
+            ->addSelect('file.filename')
+            ->addSelect('ligne.poids as poidsReel')
+            ->addSelect('sum(cmd.quantite) as quantite')
+//            ->andWhere('cmd.flagart = (:qt)')
+//            ->setParameter('qt', 0)
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('ligne.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function nbPresseByDateDepotByAppli($idAppli, $DateProd)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('tr.typeTransport = (:trans)')
+            ->setParameter('trans', 'PRESS')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+//            ->andWhere('bl.modexp = :exp')
+//            ->setParameter('exp', 'PRESS')
+            ->Select('count(bl.idbl)')
+
             ->getQuery()
             ->getArrayResult()
             ;
@@ -422,7 +581,7 @@ class EcommBLRepository extends EntityRepository
 
     }
 
-    public function findOperationsCourantes()
+    public function findOperationsCourantes($result)
     {
         $dateJ7 = date("Y-m-d", strtotime('-14 day'));
         return $this
@@ -440,7 +599,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('app.idappli')
             ->groupBy('file.idappli')
             ->orderBy('date', 'DESC')
-            ->setMaxResults( 6 )
+            ->setMaxResults( $result )
             ->getQuery()
             ->getResult()
 
@@ -527,47 +686,34 @@ class EcommBLRepository extends EntityRepository
 
     }
 
-    public function findArticlesByOpeByDateNonProd($files)
-    {
-        return $this
-            ->createQueryBuilder('bl')
-            ->innerJoin('bl.bl', 'ligne')
-            ->innerJoin('ligne.ecommCmdeps ', 'cmd')
-            ->where('ligne.idfile IN (:id)')
-            ->setParameter('id', $files)
-            ->andwhere('bl.dateProduction = :dat')
-            ->setParameter('dat', '0000-00-00 00:00:00')
-            ->select('count(cmd.quantite) as quantite')
-            ->addSelect('cmd.libelle')
-            ->addSelect('cmd.flagart')
-            ->groupBy('cmd.libelle')
-            ->getQuery()
-            ->getArrayResult()
 
-            ;
-    }
+
+
 
     public function findAllBlByCmd($cmd,$idClient, $idope)
     {
         return $this
             ->createQueryBuilder('bl')
-            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('bl.bl', 'ligne')
             ->innerJoin('ligne.numligne', 'tr')
-            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.ecommCmdeps', 'cmd')
             ->innerJoin('tr.idfile', 'file')
             ->where('cmd.numcmde LIKE :cmd')
             ->orWhere('ligne.numbl LIKE :cmd3')
+            ->orWhere('tr.refclient LIKE :cmd2')
             ->orWhere('UPPER(tr.destinataire) LIKE UPPER(:cmd5)')
             ->setParameter('cmd', '%'.$cmd.'%')
             ->setParameter('cmd3', '%'.$cmd.'%')
+            ->setParameter('cmd2', '%'.$cmd.'%')
             ->setParameter('cmd5', '%'.$cmd.'%' )
             ->andWhere('ligne.idclient = :client')
             ->setParameter('client', $idClient)
             ->andWhere('file.idappli = :ope')
             ->setParameter('ope', $idope)
-            ->addSelect('tr.destinataire')
+            ->select('tr.destinataire')
             ->addSelect('tr.destCp')
             ->addSelect('tr.typeTransport')
+            ->addSelect('tr.numCmdeClient')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.destRue')
             ->addSelect('tr.destAd2')
@@ -575,7 +721,63 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.destAd4')
             ->addSelect('tr.destAd5')
             ->addSelect('tr.destAd6')
+            ->addSelect('tr.destTel')
             ->addSelect('tr.expRef')
+            ->addSelect('tr.refclient')
+            ->addSelect('tr.destVille')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('file.dateFile')
+            ->addSelect('tr.dateCmde')
+            ->addSelect('tr.instrLivrais1')
+            ->addSelect('tr.instrLivrais2')
+            ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
+            ->addSelect('file.nbpages')
+            ->addSelect('file.filename')
+            ->addSelect('ligne.poids as poidsReel')
+            ->addSelect('sum(cmd.quantite) as quantite')
+            ->addSelect('cmd.numTrack')
+            ->addSelect('bl.nColis')
+            ->addSelect('bl.modexp')
+            ->addSelect('bl.dateProduction')
+
+//            ->andWhere('cmd.flagart = (:qt)')
+//            ->setParameter('qt', 0)
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('ligne.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByCmdandCodeArticle($code,$idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('cmd.codearticle = :cmd')
+            ->setParameter('cmd', $code)
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
+            ->addSelect('tr.numCmdeClient')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.destRue')
+            ->addSelect('tr.destAd2')
+            ->addSelect('tr.destAd3')
+            ->addSelect('tr.destAd4')
+            ->addSelect('tr.destAd5')
+            ->addSelect('tr.destAd6')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.expRef')
+            ->addSelect('tr.dateDepot')
             ->addSelect('tr.refclient')
             ->addSelect('tr.destVille')
             ->addSelect('file.dateFile')
@@ -583,6 +785,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.instrLivrais1')
             ->addSelect('tr.instrLivrais2')
             ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
             ->addSelect('file.nbpages')
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
@@ -598,6 +801,161 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+    public function findAllBlByCmdModifb($cmd,$idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('ligne.numbl LIKE :cmd3')
+            ->setParameter('cmd3', '%'.$cmd.'%')
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('file.filename')
+            ->addSelect('bl.nColis')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('bl.dateProduction')
+//            ->addSelect('tr.destRue')
+//            ->addSelect('tr.destAd2')
+//            ->addSelect('tr.destAd3')
+//            ->addSelect('tr.destAd4')
+//            ->addSelect('tr.destAd5')
+//            ->addSelect('tr.destAd6')
+//            ->addSelect('tr.destTel')
+//            ->addSelect('tr.expRef')
+//            ->addSelect('tr.refclient')
+//            ->addSelect('tr.destVille')
+//            ->addSelect('file.dateFile')
+//            ->addSelect('tr.dateCmde')
+//            ->addSelect('tr.instrLivrais1')
+//            ->addSelect('tr.instrLivrais2')
+//            ->addSelect('tr.destPays')
+//            ->addSelect('file.nbpages')
+//            ->addSelect('file.filename')
+//            ->addSelect('ligne.poids as poidsReel')
+//            ->addSelect('sum(cmd.quantite) as quantite')
+//            ->addSelect('cmd.numTrack')
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('ligne.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByCmdModiff($cmd,$idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('UPPER(file.filename) LIKE UPPER(:cmd5)')
+            ->setParameter('cmd5', '%'.$cmd.'%' )
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('file.filename')
+            ->addSelect('bl.nColis')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.dateDepot')
+//            ->addSelect('tr.destRue')
+//            ->addSelect('tr.destAd2')
+//            ->addSelect('tr.destAd3')
+//            ->addSelect('tr.destAd4')
+//            ->addSelect('tr.destAd5')
+//            ->addSelect('tr.destAd6')
+//            ->addSelect('tr.destTel')
+//            ->addSelect('tr.expRef')
+//            ->addSelect('tr.refclient')
+//            ->addSelect('tr.destVille')
+//            ->addSelect('file.dateFile')
+//            ->addSelect('tr.dateCmde')
+//            ->addSelect('tr.instrLivrais1')
+//            ->addSelect('tr.instrLivrais2')
+//            ->addSelect('tr.destPays')
+//            ->addSelect('file.nbpages')
+//            ->addSelect('file.filename')
+//            ->addSelect('ligne.poids as poidsReel')
+//            ->addSelect('sum(cmd.quantite) as quantite')
+//            ->addSelect('cmd.numTrack')
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('file.filename')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByCmdModiffaUpdateFab($cmd,$idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('UPPER(file.filename) LIKE UPPER(:cmd5)')
+            ->setParameter('cmd5', '%'.$cmd.'%' )
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->andwhere('bl.dateProduction = :dat')
+            ->setParameter('dat', '0000-00-00 00:00:00')
+
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('file.filename')
+            ->addSelect('bl.nColis')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.dateDepot')
+//
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('file.filename')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByCmdModiffaUpdateDepot($cmd,$idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('UPPER(file.filename) LIKE UPPER(:cmd5)')
+            ->setParameter('cmd5', '%'.$cmd.'%' )
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->andwhere('tr.dateDepot = :dat')
+            ->setParameter('dat', '0000-00-00')
+            ->addSelect('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('file.filename')
+            ->addSelect('bl.nColis')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.dateDepot')
+//
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('file.filename')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
 
     public function donneCmdCoriolisWithNumRef($numRef, $idApp)
     {
@@ -647,6 +1005,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('cmd.type')
             ->addSelect('tr.destinataire')
             ->addSelect('cmd.record')
+            ->orderBy('cmd.numero', 'DESC')
             ->getQuery()
             ->getArrayResult()
 
@@ -696,71 +1055,11 @@ class EcommBLRepository extends EntityRepository
             ;
 
     }
-    public function findArticlesPersoByFileArrayNonProd($files)
-    {
-        return $this
-            ->createQueryBuilder('bl')
-            ->leftJoin('bl.bl', 'ligne')
-            ->innerJoin('ligne.ecommCmdeps', 'cmd')
-            ->where('ligne.idfile IN (:id)')
-            ->setParameter('id', $files)
-            ->andWhere('cmd.flagart = 0')
-            ->andwhere('bl.dateProduction = :dat')
-            ->setParameter('dat', '0000-00-00 00:00:00')
-            ->select('ligne.idfile')
-            ->select('ligne.idfile')
-            ->addSelect('cmd.libelle')
-            ->addSelect('ligne.numbl')
-            ->addSelect('count(cmd.perso1)')
-            ->addSelect('cmd.flagart')
-            ->addSelect('cmd.perso1')
-            ->addSelect('cmd.perso2')
-            ->orderBy('cmd.perso1', 'ASC')
-            ->groupBy('cmd.perso1')
-            ->getQuery()
-            ->getArrayResult()
-            ;
-    }
 
-    public function findArticlesByFileArrayNonProd($files)
-    {
-        return $this
-            ->createQueryBuilder('bl')
-            ->innerJoin('bl.bl', 'ligne')
-            ->innerJoin('ligne.ecommCmdeps', 'cmd')
-            ->where('ligne.idfile IN (:id)')
-            ->andwhere('bl.dateProduction = :dat')
-            ->setParameter('dat', '0000-00-00 00:00:00')
-            ->setParameter('id', $files)
-            ->select('ligne.idfile')
-            ->addSelect('sum(cmd.quantite) as quantite')
-            ->addSelect('cmd.libelle')
-            ->addSelect('cmd.flagart')
-            ->groupBy('ligne.idfile, cmd.libelle')
-            ->getQuery()
-            ->getArrayResult()
-            ;
-    }
 
-//    public function donneDateProductionByBl($numBL)
-//    {
-//
-//        return $this
-//            ->createQueryBuilder('bl')
-//            ->innerJoin('bl.bl', 'ligne')
-//            ->innerJoin('ligne.numligne', 'tr')
-//            ->where('bl.bl = (:bld)')
-//            ->setParameter('bld', $numBL)
-//            ->select('ligne.numbl')
-//            ->addSelect('bl.poids')
-//            ->addSelect('bl.dateProduction')
-//            ->addSelect('tr.dateDepot')
-//            ->getQuery()
-//            ->getResult()
-//
-//            ;
-//
-//    }
+
+
+
 
     public function syntheseMoisArtCokeFlagZero($date)
     {
@@ -788,6 +1087,98 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('cmd.libelle')
             ->groupBy('ligne.numbl, cmd.libelle')
             ->orderBy('cmd.numbl')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function syntheseMoisCoriolis1($date)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('bl.dateProduction  LIKE :date')
+            ->setParameter('date', '%'.$date.'%')
+            ->andWhere('file.idappli = (:idA)')
+            ->setParameter('idA', 554)
+            ->andWhere('cmd.type LIKE :typ')
+            ->setParameter('typ', '%E%')
+            ->select('count(cmd.numbl) as cn')
+//            ->addSelect('cmd.type')
+            ->groupBy('ligne.numbl')
+            ->having('cn > 0 and cn < 5')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function syntheseMoisCoriolis2($date)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('bl.dateProduction  LIKE :date')
+            ->setParameter('date', '%'.$date.'%')
+            ->andWhere('file.idappli = (:idA)')
+            ->setParameter('idA', 554)
+            ->andWhere('cmd.type LIKE :typ')
+            ->setParameter('typ', '%E%')
+            ->select('count(cmd.numbl) as cn')
+//            ->addSelect('cmd.type')
+            ->groupBy('ligne.numbl')
+            ->having('cn > 4 and cn < 11')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function syntheseMoisCoriolis3($date)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('bl.dateProduction  LIKE :date')
+            ->setParameter('date', '%'.$date.'%')
+            ->andWhere('file.idappli = (:idA)')
+            ->setParameter('idA', 554)
+            ->andWhere('cmd.type LIKE :typ')
+            ->setParameter('typ', '%E%')
+            ->select('count(cmd.numbl) as cn')
+//            ->addSelect('cmd.type')
+            ->groupBy('ligne.numbl')
+            ->having('cn > 10 and cn < 31')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function syntheseMoisCoriolis4($date)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('bl.dateProduction  LIKE :date')
+            ->setParameter('date', '%'.$date.'%')
+            ->andWhere('file.idappli = (:idA)')
+            ->setParameter('idA', 554)
+            ->andWhere('cmd.type LIKE :typ')
+            ->setParameter('typ', '%E%')
+            ->select('count(cmd.numbl) as cn')
+//            ->addSelect('cmd.type')
+            ->groupBy('ligne.numbl')
+            ->having('cn > 30')
             ->getQuery()
             ->getArrayResult()
             ;
@@ -838,61 +1229,167 @@ class EcommBLRepository extends EntityRepository
 
 
 
-    public function donneNbAllBlnonProd()
+
+
+
+
+
+    public function findAllBlForBordereau()
     {
-        $dateM6 = date("Y-m-d", strtotime('-70 day'));
+        $date = date("Y-m-d");
+        $tabCN23 = array('COM', 'CDS', 'ECO', 'COLI' );
         return $this
             ->createQueryBuilder('bl')
             ->innerJoin('bl.bl', 'ligne')
-            ->leftJoin('ligne.numligne', 'tr')
-            ->innerJoin('tr.idfile', 'file')
-            ->innerJoin('file.idappli', 'app')
-            ->innerJoin('app.idclient', 'cl')
-            ->where('file.dateFile > (:dat)')
-            ->setParameter('dat', $dateM6)
-//            ->where('bl.idbl > :idB')
-//            ->setParameter('idB', $idBL)
-            ->andWhere('bl.dateProduction LIKE :date')
-            ->setParameter('date', '%0000%')
-            ->select('cl.nomclient')
-            ->addSelect('app.appliname')
-            ->addSelect('cl.idclient')
-            ->addSelect('count(ligne.numbl)')
-            ->addSelect('app.idappli')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
-//            ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('app.appliname')
-            ->orderBy('tr.dateInsert', 'DESC')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->where('tr.typeTransport IN (:trans)')
+            ->setParameter('trans', $tabCN23)
+            ->andWhere('tr.dateDepot = :date')
+            ->setParameter('date', $date)
+            ->andWhere('tr.expCompte = :cpt')
+            ->setParameter('cpt', '923108')
+            ->select('tr.expRef')
+            ->addSelect('bl.nColis')
             ->getQuery()
             ->getArrayResult()
+
+            ;
+
+    }
+
+    public function findAllBlForBordereauTrack()
+    {
+        $date = date("Y-m-d");
+        $tabCN23 = array('COM', 'CDS', 'ECO', 'COLI' );
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->where('tr.typeTransport IN (:trans)')
+            ->setParameter('trans', $tabCN23)
+            ->andWhere('tr.dateDepot = :date')
+            ->setParameter('date', $date)
+            ->andWhere('tr.expCompte = :cpt')
+            ->setParameter('cpt', '923108')
+            ->select('bl.nColis')
+            ->getQuery()
+            ->getResult()
+
+            ;
+
+    }
+
+
+    public function findAllBlsByFile($idclient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('file.idclient IN (:idC)')
+            ->setParameter('idC', $idclient)
+            ->andWhere('file.idappli IN (:idO)')
+            ->setParameter('idO', $idope)
+            ->getQuery()
+            ->getResult()
             ;
     }
 
-    public function donneNbAllArticlenonProd()
+    public function findnbKubTotal($idStatut)
     {
-        $dateM6 = date("Y-m-d", strtotime('-70 day'));
-        return $this
-            ->createQueryBuilder('bl')
-            ->innerJoin('bl.bl', 'ligne')
-            ->leftJoin('ligne.numligne', 'tr')
-            ->innerJoin('tr.idfile', 'file')
-            ->innerJoin('file.idappli', 'app')
-            ->innerJoin('app.idclient', 'cl')
-            ->leftJoin('ligne.ecommCmdeps', 'cmd')
-            ->where('file.dateFile > (:dat)')
-            ->setParameter('dat', $dateM6)
-            ->andWhere('bl.dateProduction LIKE :date')
-            ->setParameter('date', '%0000-00-00%')
-            ->select('app.idappli')
-            ->addSelect('count(ligne.numbl)')
-            ->andWhere('cmd.flagart = (:qt)')
-            ->setParameter('qt', 0)
-//            ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('app.appliname')
-            ->getQuery()
-            ->getArrayResult()
-            ;
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') 
+                                                              GROUP BY cmd.numbl');
+        $results = $query->getArrayResult();
+        return $results;
+    }
+     public function findnbKubTotalJ($idStatut, $jour)
+    {
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') and hs.datestatut <= '."'".$jour." 23:00:00'".'
+                                                              GROUP BY cmd.numbl');
+        $results = $query->getArrayResult();
+        return $results;
+    }
+
+    public function findnbKubbyHour($idStatut, $dateJour, $dateInterro)
+    {
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                                and hs.id > 1000000 
+                                                                and hs.idstatut = '.$idStatut.'
+                                                                and hs.datestatut > '."'".$dateJour."'".'
+                                                                and hs.datestatut < '."'".$dateInterro."'".'
+                                                              GROUP BY cmd.numbl');
+        $results = $query->getArrayResult();
+        return $results;
+    }
+
+    public function findnbElecteurTotal($idStatut)
+    {
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.')
+                                                              ');
+        $results = $query->getArrayResult();
+        return $results;
+    }
+
+    public function findnbElecteurTotalJ($idStatut, $jour)
+    {
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                              and hs.id > 1000000 
+                                                              and hs.idstatut = ('.$idStatut.')
+                                                              and hs.datestatut <= '."'".$jour." 23:00:00'".'
+                                                              ');
+        $results = $query->getArrayResult();
+        return $results;
+    }
+
+
+
+    public function findnbElecteurbyHour($idStatut, $dateJour, $dateInterro)
+    {
+        $idFichier = 5580;
+        $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                                and hs.id > 1000000 
+                                                                and hs.idstatut = '.$idStatut.'
+                                                                and hs.datestatut > '."'".$dateJour."'".'
+                                                                and hs.datestatut < '."'".$dateInterro."'".'
+                                                              ');
+        $results = $query->getArrayResult();
+        return $results;
     }
 
 }

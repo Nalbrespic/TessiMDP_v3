@@ -2,13 +2,16 @@
 
 namespace TMD\ProdBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Proxies\__CG__\TMD\AppliBundle\Entity\EcommCompteTransport;
+//use TMD\AppliBundle\Entity\EcommAppliConfig;
 
 /**
  * EcommAppli
  *
- * @ORM\Table(name="ecomm_appli", uniqueConstraints={@ORM\UniqueConstraint(name="FileName", columns={"AppliName"})}, indexes={@ORM\Index(name="idClient", columns={"idClient"}), @ORM\Index(name="codeAppli", columns={"codeAppli"}), @ORM\Index(name="idTypeProd", columns={"idTypeProd"})})
- * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\EcommAppliRepository", readOnly=true)
+ * @ORM\Table(name="ecomm_appli", uniqueConstraints={@ORM\UniqueConstraint(name="FileName", columns={"AppliName"})},indexes={@ORM\Index(name="idClient", columns={"idClient"}), @ORM\Index(name="codeAppli", columns={"codeAppli"}), @ORM\Index(name="idTypeProd", columns={"idTypeProd"}) })
+ * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\EcommAppliRepository", readOnly=false)
  */
 class EcommAppli
 {
@@ -57,7 +60,7 @@ class EcommAppli
     /**
      * @var boolean
      *
-     * @ORM\Column(name="gpmnttrans", type="boolean", nullable=true)
+     * @ORM\Column(name="gpmnttrans", type="boolean", nullable=true, options={"default" = 0})
      */
     private $gpmnttrans;
 
@@ -71,7 +74,7 @@ class EcommAppli
     /**
      * @var string
      *
-     * @ORM\Column(name="codeAppli", type="string", length=10, nullable=true)
+     * @ORM\Column(name="codeAppli", type="string", length=20, nullable=true)
      */
     private $codeappli;
 
@@ -90,6 +93,16 @@ class EcommAppli
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $idappli;
+
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="flag_mailing", type="boolean", nullable=false, options={"default" = 0})
+     */
+    private $mailing;
+
+
 
     /**
      * @var \TMD\ProdBundle\Entity\Client
@@ -111,6 +124,28 @@ class EcommAppli
      */
     private $idtypeprod = 1 ;
 
+//    /**
+//     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommCompteTransport", cascade={"persist"})
+//     *  @ORM\JoinTable(name="ecomm_Appli_Transport",
+//     *      joinColumns={@ORM\JoinColumn(name="idApp", referencedColumnName="idAppli")},
+//     *      inverseJoinColumns={@ORM\JoinColumn(name="idTrans", referencedColumnName="idcomptetransport")}
+//     *      )
+//     */
+//    private $transports;
+
+//    /**
+//     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommAppliConfig", cascade={"persist"})
+//     *  @ORM\JoinTable(name="ecomm_Appli_AppliConfig" ,
+//     *                     joinColumns={@ORM\JoinColumn(name="idApp", referencedColumnName="idAppli",  nullable=true )}
+//     *
+//     * )
+//     *
+//     */
+//    private $configs;
+
+
+
+
     /**
      * EcommAppli constructor.
      * @param \DateTime $dateappli
@@ -118,6 +153,7 @@ class EcommAppli
     public function __construct()
     {
         $this->dateappli = new \DateTime('now');
+//        $this->configs = new ArrayCollection();
     }
 
 
@@ -284,17 +320,17 @@ class EcommAppli
     /**
      * @return int
      */
-    public function getIdappli()
+    public function getIdAppli()
     {
         return $this->idappli;
     }
 
     /**
-     * @param int $idappli
+     * @param int $idAppli
      */
-    public function setIdappli($idappli)
+    public function setIdAppli($idAppli)
     {
-        $this->idappli = $idappli;
+        $this->idappli = $idAppli;
     }
 
     /**
@@ -328,6 +364,42 @@ class EcommAppli
     {
         $this->idtypeprod = $idtypeprod;
     }
+
+    /**
+     * @return bool
+     */
+    public function isMailing()
+    {
+        return $this->mailing;
+    }
+
+    /**
+     * @param bool $mailing
+     */
+    public function setMailing($mailing)
+    {
+        $this->mailing = $mailing;
+    }
+
+
+
+
+//    public function addConfig(EcommAppliConfig $config)
+//    {
+//        $this->configs[] = $config;
+//    }
+//
+//    public function removeConfig(EcommAppliConfig $config)
+//    {
+//        $this->configs->removeElement($config);
+//    }
+//
+//    public function getConfigs()
+//    {
+//        return $this->configs;
+//    }
+
+
 
 
 

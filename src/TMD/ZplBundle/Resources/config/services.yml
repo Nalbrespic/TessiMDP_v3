@@ -1,4 +1,10 @@
 services:
-#    tmd_zpl.example:
-#        class: TMD\ZplBundle\Example
+    tmd_zpl.colissimo:
+        class: TMD\ZplBundle\WebService\Colissimo
+
+    tmd_zpl_colissimoBordereau:
+        class: TMD\ZplBundle\WebService\ColissimoBordereau
+
+    tmd_zpl_colissimoSuivi:
+        class: TMD\ZplBundle\WebService\ColissimoSuivi
 #        arguments: ["@service_id", "plain_value", "%parameter%"]

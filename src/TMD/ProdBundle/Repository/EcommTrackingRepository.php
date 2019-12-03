@@ -127,6 +127,51 @@ class EcommTrackingRepository extends EntityRepository
 
     }
 
+    public function findTrackingsPbWS()
+    {
+        $date = date("Y-m-d", strtotime('-60 day'));
+        return $this
+            ->createQueryBuilder('tr')
+            ->innerJoin('tr.idfile','file')
+            ->innerJoin('file.idappli', 'app')
+            ->innerJoin('tr.idclient', 'cli')
+            ->select('cli.nomclient')
+            ->addSelect('count(tr.idfile)')
+            ->addSelect('app.appliname')
+            ->addSelect('app.idappli')
+            ->where('tr.flagEtikt = (:flag)')
+            ->setParameter('flag', -1)
+            ->andWhere('file.dateFile > :nb')
+            ->setParameter('nb', $date)
+            ->groupBy('app.appliname')
+            ->getQuery()
+            ->getArrayResult()
+
+            ;
+    }
+
+    public function findSyntheseStatut($idOpe)
+    {
+        return $this
+            ->createQueryBuilder('tr')
+            ->innerJoin('tr.idStatut', 'stat')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('file.idappli IN (:id)')
+            ->setParameter('id', $idOpe)
+            ->select('file.idfile')
+            ->addSelect('stat.idStatut')
+            ->addselect('count(stat.idStatut)')
+            ->groupBy('tr.idfile, stat.idStatut')
+            ->getQuery()
+            ->getResult()
+
+            ;
+
+    }
+
+
+
+//
 
 
 

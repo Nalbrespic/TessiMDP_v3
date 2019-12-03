@@ -3,22 +3,16 @@
 namespace TMD\ProdBundle\Controller;
 
 use DateTime;
-use PHPExcel_Cell_DataType;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use function PHPSTORM_META\type;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use TMD\ProdBundle\Entity\EcommAppli;
-use TMD\ProdBundle\Entity\InputData;
 use TMD\ProdBundle\Form\EcommAppliType;
-use TMD\ProdBundle\Form\InputDataType;
+use XLSXWriter;
 
 class ProdController extends Controller
 {
@@ -117,6 +111,83 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function modifDateProductionDepotTrackingAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $bl = $request->get('bl');
+            $tracking = $request->get('tracking');
+            $dateDepot = $request->get('dateDepot');
+            $dateProd = $request->get('dateProd');
+            $em = $this->getDoctrine()->getManager();
+
+            $bl = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
+
+            $bl->setNColis($tracking);
+            if ($dateDepot != '0000-00-00'){
+                $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
+                $bl->getBl()->getNumligne()->setDateDepot($date);
+            }
+            if ($dateProd != '0000-00-00'){
+                $date = DateTime::createFromFormat('Y-m-d',$dateProd );
+                $bl->setDateProduction($date);
+            }
+
+            $em->flush();
+
+
+
+
+            return new JsonResponse(array("bl" => $bl, "tracking" => $tracking, "dateProd" => $dateProd, "dateDepot" => $dateDepot));
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function modifDateProductionDepotAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $file = $request->get('idfile');
+            $dateDepot = $request->get('dateDepot');
+            $dateProd = $request->get('dateProd');
+
+            $em = $this->getDoctrine()->getManager();
+            $allTrByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBy(array('idfile' => $file));
+
+
+            if ($dateDepot != '0000-00-00'){
+                $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
+                foreach ($allTrByFile as $tr){
+                    if ( date_format($tr->getBl()->getNumligne()->getDateDepot(), "Y-m-d") == '-0001-11-30'){
+                        $tr->getBl()->getNumligne()->setDateDepot($date);
+                    }
+
+                }
+
+            }
+            if ($dateProd != '0000-00-00'){
+                $date = DateTime::createFromFormat('Y-m-d',$dateProd );
+                foreach ($allTrByFile as $tr){
+                    if ( date_format($tr->getDateProduction(), "Y-m-d") == '-0001-11-30') {
+                        $tr->setDateProduction($date);
+                    }
+                }
+            }
+
+
+
+
+            $em->flush();
+
+            $name = $tr->getBl()->getNumligne()->getIdfile()->getFilename();
+
+
+            return new JsonResponse(array("name" => $name, "dateProd" => $dateProd, "dateDepot" => $dateDepot));
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
 
     public function rechercheByCmdAction(Request $request)
     {
@@ -132,6 +203,18 @@ class ProdController extends Controller
 
 
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmd($cmd,$idClient, $idope );
+dump($allBlByOpe);
+            $tabBls=[];
+            foreach ($allBlByOpe as $i){
+                array_push($tabBls,$i['numbl']);
+            }
+            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBLsArray($tabBls);
+            $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByBLsArray($tabBls);
+
+            $articleArray = array();
+            foreach ($articles as $key => $item) {
+                $articleArray[$key] = $item;
+            }
 
 
 
@@ -179,10 +262,196 @@ class ProdController extends Controller
             }
 
 
+            $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
 
+            return new JsonResponse($reponse);
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function rechercheByCodeArticleAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $code= $request->get('code');
+            $idClient = $request->get('idClient');
+            $idope = $request->get('idope');
+            $em = $this->getDoctrine()->getManager();
+            $emCP = $this->getDoctrine()->getManager('colisprive');
+            $emDpd = $this->getDoctrine()->getManager('dpd');
+
+
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdandCodeArticle($code,$idClient, $idope );
+
+            $tabBls=[];
+            foreach ($allBlByOpe as $i){
+                array_push($tabBls,$i['numbl']);
+            }
+            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBLsArray($tabBls);
+            $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByBLsArray($tabBls);
+
+            $articleArray = array();
+            foreach ($articles as $key => $item) {
+                $articleArray[$key] = $item;
+            }
+
+
+            $numBLs = array();
+            foreach ($allBlByOpe as $key=>$file)
+            {
+                if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                    $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+                }
+                if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                    $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+                }
+
+            }
+
+            $statuts = array();
+            if ( isset($numBLs['CPRV']['numBl'])) {
+                $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+                foreach ($trackingColisPrive as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+            if (isset($numBLs['DPD']['numBl']) ) {
+                $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+                foreach ($trackingDpd as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+
+            $tabBlComplet = array();
+            foreach ($allBlByOpe as $key=>$item){
+                if (isset($statuts[$item['numbl']])){
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                }
+                else{
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut']['libelle']="";
+                    $tabBlComplet[$key]['statut']['dateStatut']="";
+                }
+            }
+
+            $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
+
+            return new JsonResponse($reponse);
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function rechercheModifAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $cmd = $request->get('cmd');
+            $idClient = $request->get('idClient');
+            $idope = $request->get('idope');
+            $em = $this->getDoctrine()->getManager();
+
+
+
+            $allBlByOpeBL = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModifb($cmd,$idClient, $idope );
+            $allBlByOpeFILE = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiff($cmd,$idClient, $idope );
+            $allBlByOpeFILEAUpdateDepot = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateDepot($cmd,$idClient, $idope );
+            $allBlByOpeFILEAUpdateFab = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateFab($cmd,$idClient, $idope );
+
+
+            $tabBlComplet = array();
+            $tabBlComplet['file'] =array();
+            $tabBlComplet['fileNoCompletedepot'] =array();
+            $tabBlComplet['fileNoCompletefab'] =array();
+            $tabBlComplet['bl'] =array();
+            if (sizeof($allBlByOpeBL) > 0){
+                foreach ($allBlByOpeBL as $val){
+                    array_push($tabBlComplet['bl'],$val);
+                }
+            }
+
+            if (sizeof($allBlByOpeFILE) > 0){
+                foreach ($allBlByOpeFILE as $val){
+                    array_push($tabBlComplet['file'],$val);
+                }
+            }
+            if (sizeof($allBlByOpeFILEAUpdateDepot) > 0){
+                foreach ($allBlByOpeFILEAUpdateDepot as $val){
+                    $tabBlComplet['fileNoCompletedepot'][$val[0]['idfile']] = 1;
+                }
+            }
+            if (sizeof($allBlByOpeFILEAUpdateFab) > 0){
+                foreach ($allBlByOpeFILEAUpdateFab as $val){
+                    $tabBlComplet['fileNoCompletefab'][$val[0]['idfile']] = 1;
+                }
+            }
 
 
             return new JsonResponse($tabBlComplet);
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function suppNameOperationAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $idClient = $request->get('idClient');
+            $ipOpe = $request->get('ipOpe');
+
+            $em = $this->getDoctrine()->getManager();
+
+            $allBLs = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlsByFile($idClient,$ipOpe);
+
+            foreach ($allBLs as $v){
+                if ($v->getBl()->getNumligne()->getDestCiv() != ""){
+                    $v->getBl()->getNumligne()->setDestCiv("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestPrenom() != ""){
+                    $v->getBl()->getNumligne()->setDestPrenom("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestNom() != ""){
+                    $v->getBl()->getNumligne()->setDestNom("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestinataire() != ""){
+                    $v->getBl()->getNumligne()->setDestinataire("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestRue() != ""){
+                    $v->getBl()->getNumligne()->setDestRue("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestAd2() != ""){
+                    $v->getBl()->getNumligne()->setDestAd2("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestAd3() != ""){
+                    $v->getBl()->getNumligne()->setDestAd3("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestAd4() != ""){
+                    $v->getBl()->getNumligne()->setDestAd4("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestAd5() != ""){
+                    $v->getBl()->getNumligne()->setDestAd5("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestAd6() != ""){
+                    $v->getBl()->getNumligne()->setDestAd6("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestTel() != ""){
+                    $v->getBl()->getNumligne()->setDestTel("*******");
+                }
+                if ($v->getBl()->getNumligne()->getDestMail() != ""){
+                    $v->getBl()->getNumligne()->setDestMail("*******");
+                }
+
+            }
+            $em->flush();
+//            dump($allBLs);
+            return new JsonResponse(array("client" => $idClient, "ope" => $ipOpe));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
@@ -193,17 +462,17 @@ class ProdController extends Controller
         $artWoPSG = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisArtCokeFlagZero($date);
         $artPSG = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisArtCokePSG($date);
         $artCollector = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisArtCokeCollector($date);
-//        var_dump($artWoPSG);
-//        var_dump($artCollector);
 
         $cmdArt = array();
         foreach ($artWoPSG as $k=>$v){
-            if (!$v['flagart'] ) {
+            if (!$v['flagart'] and !preg_match('/Kit Noel/', $v['libelle'])) {
                 if ( !preg_match('/nyle Emy L TR Ninety O/', $v['libelle'])
                     and !preg_match('/offret Plan de Pari/', $v['libelle'])
                         and !preg_match('/offret Caroussel Pa/', $v['libelle'])
                             and !preg_match('/Récla/', $v['libelle'])
-                                and !preg_match('/Recla/', $v['libelle'])) {
+                                and !preg_match('/Tee Shirt Cuisse de Grenouille/', $v['libelle'])
+                                    and !preg_match('/Recla/', $v['libelle'])
+                                        and !preg_match('/Kit Noel/', $v['libelle'])){
 
 
                     if ( array_key_exists($v['numbl'], $cmdArt) ) {
@@ -213,6 +482,9 @@ class ProdController extends Controller
                         elseif (preg_match('/ffret 6 cans Collector C/', $v['libelle'])){
                             $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*6;
                         }
+//                        elseif (preg_match('/Kit Noel/', $v['libelle'])){
+//                            $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*2;
+//                        }
                         else{
                             $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1]);
                         }
@@ -222,6 +494,7 @@ class ProdController extends Controller
                         if (preg_match('/Basket Pack/', $v['libelle'])){
                             $cmdArt[$v['numbl']] = intval($v[1])*8;
                         }
+//
                         elseif (preg_match('/ffret 6 cans Collector C/', $v['libelle'])){
                             $cmdArt[$v['numbl']] = intval($v[1])*6;
                         }
@@ -232,142 +505,261 @@ class ProdController extends Controller
                     }
                 }
             }
+            elseif (!$v['flagart'] and preg_match('/Kit Noel/', $v['libelle'])) {
+                if ( array_key_exists($v['numbl'], $cmdArt) ) {
+                    if (preg_match('/Kit Noel/', $v['libelle'])){
+                        $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*2;
+                    }
 
-//            $tag = false;
-//            foreach ($artPSG as $ke=>$va){
-//                if ($v['numbl'] == $va['numbl']){
-//                    $cmdArt[$va['numbl']] =  (intval($v[1]) + intval($va[1])*8 );
-//                    $tag = true;
-//                }
-//            }
-//            foreach ($artCollector as $ke2=>$va2){
-//                if ($v['numbl'] == $va2['numbl']){
-//                    $cmdArt[$va2['numbl']] =  ( intval($va2[1])*6 );
-//                    $tag = true;
-//                }
-//            }
-//            if (!$tag){
-//                $cmdArt[$v['numbl']] = intval($v[1]);
-//            }
+                } else {
+                    if (preg_match('/Kit Noel/', $v['libelle'])){
+                        $cmdArt[$v['numbl']] = intval($v[1])*2;
+                    }
+
+                }
+            }
+
+
 
     }
-//        var_dump($cmdArt);
-//    var_dump(array_count_values($cmdArt));
 
 
 
-        $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()->setCreator('Rob Gravelle')
+            ->setLastModifiedBy('Rob Gravelle')
+            ->setTitle('A Simple Excel Spreadsheet')
+            ->setSubject('PhpSpreadsheet')
+            ->setDescription('A Simple Excel Spreadsheet generated using PhpSpreadsheet.')
+            ->setKeywords('Microsoft office 2013 php PhpSpreadsheet')
+            ->setCategory('Test file');
 
-        $phpExcelObject->getProperties()->setCreator("TMD")
-            ->setLastModifiedBy("TMDj")
-            ->setTitle("Office 2005 XLSX Test Document")
-            ->setSubject("Office 2005 XLSX Test Document")
-            ->setDescription("Test document for Office 2005 XLSX, generated using PHP classes.")
-            ->setKeywords("office 2005 openxml php")
-            ->setCategory("Test result file");
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="SyntheseNbBouteilles.xlsx.xlsx"');
 
 
 
-
-        $phpExcelObject->setActiveSheetIndex(0)
+        $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue( 'A1', 'Nbre de commande');
-        $phpExcelObject->setActiveSheetIndex(0)
+        $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue( 'B1', 'quantite de bouteilles');
 
         ;
 
         $indice = 2;
         foreach (array_count_values($cmdArt) as $h=>$b) {
-            $phpExcelObject->setActiveSheetIndex(0)
+            $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A' . $indice, $b)
                 ->setCellValue('B' . $indice, $h);
             $indice ++;
         }
 
 
-        $phpExcelObject->setActiveSheetIndex(0)
+        $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('A')->setWidth(15);
-        $phpExcelObject->setActiveSheetIndex(0)
+        $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('B')->setWidth(15);
 
 
-        $phpExcelObject->getActiveSheet()->setTitle('Simple');
-        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-        $phpExcelObject->setActiveSheetIndex(0);
-//        $phpExcelObject = $this->createContrevenantXSLObject($request);
-        $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-        $response = $this->get('phpexcel')->createStreamedResponse($writer);
-        $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename=SyntheseNbBouteilles.xlsx');
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Cache-Control', 'maxage=1');
+        $writer =  IOFactory::createWriter($spreadsheet, 'Xlsx');
 
-        return $response;
+        $writer->save('php://output');
+        exit;
+
+
     }
 
+    public function syntheseCoriolisAction(Request $request, $date)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $multiP1 = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisCoriolis1($date);
+        $compt1 =null;
+        foreach ($multiP1 as $v){
+            $compt1 = $compt1 + 1;
+        }
+        $multiP2 = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisCoriolis2($date);
+        $compt2 =null;
+        foreach ($multiP2 as $v){
+            $compt2 = $compt2 + 1;
+        }
+        $multiP3 = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisCoriolis3($date);
+        $compt3 =null;
+        foreach ($multiP3 as $v){
+            $compt3 = $compt3 + 1;
+        }
+        $multiP4 = $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisCoriolis4($date);
+        $compt4 =null;
+        foreach ($multiP4 as $v){
+            $compt4 = $compt4 + 1;
+        }
+
+
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()->setCreator('Rob Gravelle')
+            ->setLastModifiedBy('Rob Gravelle')
+            ->setTitle('A Simple Excel Spreadsheet')
+            ->setSubject('PhpSpreadsheet')
+            ->setDescription('A Simple Excel Spreadsheet generated using PhpSpreadsheet.')
+            ->setKeywords('Microsoft office 2013 php PhpSpreadsheet')
+            ->setCategory('Test file');
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="SyntheseCoriolis.xlsx"');
+
+        $ligne1 =1;
+        $ligne2 =2;
+
+        if (($compt1) >1 ) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A'.$ligne1, 'Tranche de 2 à 4 cartes');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('B'.$ligne2, 'Nb commandes: ');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('C'.$ligne2, $compt1);
+            $ligne1 = $ligne1 + 2;
+            $ligne2 = $ligne2 + 2;
+        }
+        if (($compt2) >1 ) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $ligne1, 'Tranche de 5 à 10 cartes');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('B' . $ligne2, 'Nb commandes: ');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('C' . $ligne2, $compt2);
+
+            $ligne1 = $ligne1 + 2;
+            $ligne2 = $ligne2 + 2;
+        }
+        if (($compt3) >1 ) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $ligne1, 'Tranche de 11 à 30 cartes');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('B' . $ligne2, 'Nb commandes: ');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('C' . $ligne2, $compt3);
+
+            $ligne1 = $ligne1 + 2;
+            $ligne2 = $ligne2 + 2;
+        }
+        if (($compt4) >1 ) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $ligne1, 'Tranche 31 à 1500 cartes');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('B' . $ligne2, 'Nb commandes: ');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('C' . $ligne2, $compt4);
+        }
+
+
+
+
+
+
+        if ( ($compt3) == null and ($compt3) == null and ($compt3) == null and ($compt4) == null){
+
+
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A1', 'Aucune ligne de commande en multi !');
+        }else{
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('B11', 'Total ');
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('C11', '= C2 + C4 + C6 + C8');
+        }
+
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->getColumnDimension('A')->setWidth(20);
+        $spreadsheet->setActiveSheetIndex(0)
+            ->getColumnDimension('B')->setWidth(15);
+
+
+
+        $writer =  IOFactory::createWriter($spreadsheet, 'Xlsx');
+
+        $writer->save('php://output');
+        exit;
+
+
+    }
 
     public function exportTrackingExcelAction(Request $request, $idFile, $prod)
     {
-//        $idFile="3698,3683,3636,3628,3597,3572,3563,3545,3528,3510,3500,3495,3467,3437,3426,3425,3415,3407,3387,3381,3354,3353,3352,3350,3346,3338,3331,3317,3307,3299,3292,3281,3266,3256,3251,3237,3228,3216,3202,3189,3169,3158,3156,3141,3131,3127,3125,3119,3110,3097,3096,3071,3069,3064,3062,3047,3006";
 
-//        $idFile="3698,3683,3636,3628";
         $idFiles = explode(",", $idFile);
-
         $em = $this->getDoctrine()->getManager();
         $emCP = $this->getDoctrine()->getManager('colisprive');
         $emDpd = $this->getDoctrine()->getManager('dpd');
 
-//        $indiceProdorNot = $request->get('prod');
 
         $allBlByOpekey=array();
 
-        if (sizeof($idFiles) >8) {
-
-            $size = sizeof($idFiles);
-            $index = 0;
-            while ($size > 0) {
-                $idFileb = array_splice($idFiles, 0, 8);
-
-                $index = $index + 8;
-                $size = $size - 8;
-
-
-                if ($prod == 0) {
-                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($idFileb);
-//                    var_dump($allBlByOpeb);
-                    array_push($allBlByOpekey, $allBlByOpeb);
-                } else {
-
-                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFile($idFileb);
-                    array_push($allBlByOpekey, $allBlByOpeb);
-//                    var_dump($allBlByOpeb);
-
-                }
+//        if (sizeof($idFiles) > 8) {
+//
+//            $size = sizeof($idFiles);
+//            $index = 0;
+//            while ($size > 0) {
+//                $idFileb = array_splice($idFiles, 0, 8);
+//
+//                $index = $index + 8;
+//                $size = $size - 8;
+//
+//
+//                //tous les fichiers
+//                if ($prod == '0') {
+//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($idFileb);
+//                    array_push($allBlByOpekey, $allBlByOpeb);
+//                }
+//                //en attente de production
+//                if ($prod == '1') {
+//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($idFileb);
+//                    array_push($allBlByOpekey, $allBlByOpeb);
+//                }
+//                //produit
+//                else if ($prod == '2') {
+//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFile($idFileb);
+//                    array_push($allBlByOpekey, $allBlByOpeb);
+//
+//                }
+//                //rupture
+//                else if ($prod == '3') {
+//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByFile($idFileb);
+//                    array_push($allBlByOpekey, $allBlByOpeb);
+//                }
+//                //supprime
+//                else {
+//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFileb);
+//                    array_push($allBlByOpekey, $allBlByOpeb);
+//
+//                }
+//            }
+//            $allBlByOpe = array();
+//            foreach ($allBlByOpekey as $k => $v) {
+//                foreach ($v as $k1 => $v1) {
+//                    array_push($allBlByOpe,  $v1);
+//                }
+//
+//
+//            }
+//            $idFiles = explode(",", $idFile);
+//        }
+//        else{
+            if ($prod == '0') {
+                $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($idFiles);
             }
-//var_dump($allBlByOpekey);
-            $allBlByOpe = array();
-            foreach ($allBlByOpekey as $k => $v) {
-                foreach ($v as $k1 => $v1) {
-                    array_push($allBlByOpe,  $v1);
-                }
-
-
-            }
-
-//            var_dump($allBlByOpe);
-        }
-        else{
-            if ($prod == 0){
-                $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($idFiles);
-            }
-            else{
+            else if ($prod == '1') {
+                $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlNonProdByFile($idFiles);
+            }else if ($prod == '2') {
                 $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFile($idFiles);
-//                var_dump($allBlByOpe);
+            }else if ($prod == '3') {
+                $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByFile($idFiles);
+            }else {
+                $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFiles);
+
             }
-        }
 
+//        }
 
-//var_dump($allBlByOpe);
 
 
         $numBLs = array();
@@ -381,7 +773,6 @@ class ProdController extends Controller
             }
 
         }
-//dump($allBlByOpe);
         $statuts = array();
         if ( isset($numBLs['CPRV']['numBl'])) {
             $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
@@ -413,290 +804,89 @@ class ProdController extends Controller
                 $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
             }
         }
-        $allBlByOpegggg = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($idFiles);
 
-//        $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-//
-//        $phpExcelObject->getProperties()->setCreator("TMD")
-//            ->setLastModifiedBy("TMDj")
-//            ->setTitle("Office 2005 XLSX Test Document")
-//            ->setSubject("Office 2005 XLSX Test Document")
-//            ->setDescription("Test document for Office 2005 XLSX, generated using PHP classes.")
-//            ->setKeywords("office 2005 openxml php")
-//            ->setCategory("Test result file");
-//
-//
-////        $tit = array(
-////            'A'   => 'Date fichier',
-////            'B' => 'n° BL'
-////        );
-////        $i='1';
-////        foreach ($tit as $k=>$v){
-////            $phpExcelObject->setActiveSheetIndex(0)->setCellValue($k.$i,$v);
-////            $i++;
-////        }
-//
-//
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'A1', 'Date fichier');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'B1', 'n° BL');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'C1', 'Ref Client');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'D1', 'exp_ref');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'E1', 'n° Cmde Client');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'F1', 'Date Cmd');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'G1', 'Destinataire');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'H1', 'Rue');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'I1', 'Adresse 2');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'J1', 'Adresse 3');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'K1', 'Adresse 4');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'L1', 'Adresse 5');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'M1', 'Adresse 6');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'N1', 'CP');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'O1', 'Ville');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'P1', 'Pays');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'Q1', 'Instr_Livraison 1');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'R1', 'Instr_Livraison 2');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'S1', 'Date Dépôt');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'T1', 'N° Tracking');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'U1', 'Date Production');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'V1', 'Mode Expedition');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'W1', 'Type');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'X1', 'Poids (gr)');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'Y1', 'Qté');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'Z1', 'Date statut');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'AA1', 'Statut livraison');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'AB1', 'Nb pages');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'AC1', 'NbLignesCmde');
-//        $phpExcelObject->setActiveSheetIndex(0)
-//            ->setCellValue( 'AD1', 'Nom fichier');
-//        ;
-//
-//        $dateZero = (new DateTime('-0001-11-30 00:00:00'));
-//        $indice = 2;
-//        foreach ($tabBlComplet as $ligne) {
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->setCellValue('A' . $indice, date_format($ligne['dateFile'], "d-m-Y h:m"))
-//                ->setCellValue('B' . $indice, $ligne['numbl'])
-//                ->setCellValue('C' . $indice, $ligne['refclient'])
-//                ->setCellValue('D' . $indice, $ligne['expRef'])
-//                ->setCellValue('E' . $indice, $ligne[0]['numCmdeClient'])
-//                ->setCellValue('F' . $indice, date_format($ligne['dateCmde'], "d-m-Y"))
-//                ->setCellValue('G' . $indice, $ligne['destinataire'])
-//                ->setCellValue('H' . $indice, $ligne['destRue'])
-//                ->setCellValue('I' . $indice, $ligne['destAd2'])
-//                ->setCellValue('J' . $indice, $ligne['destAd3'])
-//                ->setCellValue('K' . $indice, $ligne['destAd4'])
-//                ->setCellValue('L' . $indice, $ligne['destAd5'])
-//                ->setCellValue('M' . $indice, $ligne['destAd6'])
-//                ->setCellValue('N' . $indice, $ligne['destCp'])
-//                ->setCellValue('O' . $indice, $ligne['destVille'])
-//                ->setCellValue('P' . $indice, $ligne['destPays'])
-//                ->setCellValue('Q' . $indice, $ligne['instrLivrais1'])
-//                ->setCellValue('R' . $indice, $ligne['instrLivrais2']);
-//            if ($ligne['dateDepot'] == $dateZero) {
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('S' . $indice, "Non renseigné");
-//            } else {
-//                $date = date_format($ligne['dateDepot'], "d-m-Y h:m");
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('S' . $indice, $date);
-//            }
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->setCellValue('T' . $indice, $ligne[0]['nColis']);
-//            if ($ligne[0]['dateProduction'] == $dateZero) {
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('U' . $indice, "Non renseigné");
-//            } else {
-//                $date = date_format($ligne['dateProduction'], "d-m-Y h:m");
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('U' . $indice, $date);
-//            }
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->setCellValue('V' . $indice, $ligne[0]['modexp'])
-//                ->setCellValue('W' . $indice, $ligne['type'])
-//                ->setCellValue('X' . $indice, ltrim($ligne['poidsReel'], "0"))
-//                ->setCellValue('Y' . $indice, $ligne['quantite']);
-//            if ($ligne['statut']['dateStatut'] == null) {
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('Z' . $indice, "");
-//            } elseif ($ligne['statut']['dateStatut'] == $dateZero) {
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('Z' . $indice, "");
-//            } else {
-//                $date = date_format($ligne['statut']['dateStatut'], "d-m-Y ");
-//                $phpExcelObject->setActiveSheetIndex(0)
-//                    ->setCellValue('Z' . $indice, $date);
-//            }
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->setCellValue('AA' . $indice, $ligne['statut']['libelle'])
-//                ->setCellValue('AB' . $indice, $ligne['nbpages'])
-//                ->setCellValue('AC' . $indice, $ligne['nbCmd'])
-//                ->setCellValue('AD' . $indice, $ligne['filename']);
-//            $indice++;
-//        }
-//
-//        $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('A')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('B')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('C')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('D')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('E')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('F')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('G')->setWidth(25);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('H')->setWidth(40);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('I')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('J')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('K')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('L')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('M')->setWidth(12);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('N')->setWidth(6);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('O')->setWidth(20);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('P')->setWidth(5);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('Q')->setWidth(20);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('R')->setWidth(23);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('S')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('T')->setWidth(23);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('U')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('V')->setWidth(17);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('W')->setWidth(17);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('X')->setWidth(10);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('Y')->setWidth(8);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('Z')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('AA')->setWidth(20);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('AB')->setWidth(9);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('AC')->setWidth(15);
-//            $phpExcelObject->setActiveSheetIndex(0)
-//                ->getColumnDimension('AD')->setWidth(40);
-//
-//        if ( sizeof($idFiles) > 1) {
-//            $nomExport = str_replace(' ','',$tabBlComplet[0]['appliname']);
-//
-//        }else{
-//            $nomExport = preg_replace ('/\s+/',"_",($tabBlComplet[0]['filename']));
-//        }
-//        $phpExcelObject->getActiveSheet()->setTitle('Simple');
-//        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-//        $phpExcelObject->setActiveSheetIndex(0);
-////        $phpExcelObject = $this->createContrevenantXSLObject($request);
-//        $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-//        $response = $this->get('phpexcel')->createStreamedResponse($writer);
-//        $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-//        $response->headers->set('Content-Disposition', 'attachment;filename='.$nomExport.'.xlsx');
-//        $response->headers->set('Pragma', 'public');
-//        $response->headers->set('Cache-Control', 'maxage=1');
 //var_dump($tabBlComplet);
+        $header = array('Date fichier' => 'string',
+                                'n° BL'=> 'string',
+                                'Ref Client'=> 'string',
+                                'exp_ref'=> 'string',
+                                'n° Cmde Client'=> 'string',
+                                'Date Cmd'=> 'string',
+                                'Destinataire'=> 'string',
+                                'Rue'=> 'string',
+                                'Adresse 2'=> 'string',
+                                'Adresse 3'=> 'string',
+                                'Adresse 4'=> 'string',
+                                'Adresse 5'=> 'string',
+                                'Adresse 6'=> 'string',
+                                'CP'=> 'string',
+                                'Ville'=> 'string',
+                                'Pays'=> 'string',
+                                'Telephone'=> 'string',
+                                'Mail'=> 'string',
+                                'Instr_Livraison 1'=> 'string',
+                                'Instr_Livraison 2'=> 'string',
+                                'Date Dépôt'=> 'string',
+                                'N° Tracking'=> 'string',
+                                'Date Production'=> 'string',
+                                'Mode Expedition'=> 'string',
+                                'Type'=> 'string',
+                                'Poids (gr)'=> 'string',
+                                'Qté total articles'=> 'string',
+                                'Nb lignes Cmde '=> 'string',
+                                'Date statut'=> 'string',
+                                'Statut livraison'=> 'string',
+                                'Nb pages'=> 'string',
+                                'Statut cmd'=> 'string',
+                                'Nom fichier'=> 'string',
+                                'Type_cmd'  => 'string'
+                            );
 
-        $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()->setCreator('Rob Gravelle')
-            ->setLastModifiedBy('Rob Gravelle')
-            ->setTitle('A Simple Excel Spreadsheet')
-            ->setSubject('PhpSpreadsheet')
-            ->setDescription('A Simple Excel Spreadsheet generated using PhpSpreadsheet.')
-            ->setKeywords('Microsoft office 2013 php PhpSpreadsheet')
-            ->setCategory('Test file');
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="simple.xlsx"');
-//        header('Content-Transfer-Encoding: binary');
-//        header('Cache-Control: must-revalidate');
-//        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: no-cache');
-
-        $tabBlComplet2 = array(['Date fichier',
-                                'n° BL',
-                                'Ref Client',
-                                'exp_ref',
-                                'n° Cmde Client',
-                                'Date Cmd',
-                                'Destinataire',
-                                'Rue',
-                                'Adresse 2',
-                                'Adresse 3',
-                                'Adresse 4',
-                                'Adresse 5',
-                                'Adresse 6',
-                                'CP',
-                                'Ville',
-                                'Pays',
-                                'Instr_Livraison 1',
-                                'Instr_Livraison 2',
-                                'Date Dépôt',
-                                'N° Tracking',
-                                'Date Production',
-                                'Mode Expedition',
-                                'Type',
-                                'Poids (gr)',
-                                'Qté',
-                                'Date statut',
-                                'Statut livraison',
-                                'Nb pages',
-                                'NbLignesCmde',
-                                'Nom fichier'
-                            ]);
-        
+        $tabBlComplet2 = array();
         foreach ($tabBlComplet as $k=>$v){
-            array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y h:m"),
+            if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
+                $v['statut']['dateStatut'] = '';
+            }else{
+                $v['statut']['dateStatut'] = date_format($v['statut']['dateStatut'], "d-m-Y ");
+            }
+            if (isset($v['nColis'])){
+                if ($v['nColis'] == '0') {
+                    $v['nColis'] = '';
+                }
+            }else{
+                $v[0]['nColis'] = '';
+            }
+            $v['dateDepot'] = date_format($v['dateDepot'], "d-m-Y");
+            if($v['dateDepot'] == "30-11--0001") $v['dateDepot'] ="";
+            if (isset($v['dateProduction'])){
+                $v['dateProduction'] = date_format($v['dateProduction'], "d-m-Y h:m");
+                if($v['dateProduction'] == "30-11--0001 12:11") $v['dateProduction'] ="";
+            }else{
+                $v['dateProduction'] ="";
+            }
+            if (!isset($v['modexp'])) {
+                $v['modexp'] = '';
+            }
+
+            if($v['idStatut'] == "10"){
+                $v['idStatut'] ="En rupture";
+            }elseif ($v['idStatut'] == "9"){
+                $v['idStatut'] ="Annulé";
+            }else{
+                $v['idStatut'] ="";
+            }
+            $tabJson = json_decode($v['json'], true);
+            if (isset($tabJson['TYPE'])){
+                $type = $tabJson['TYPE'];
+            }else{
+                $type = "";
+            }
+//            var_dump($tabJson);
+            array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y"),
                                         $v['numbl'],
                                         $v['refclient'],
                                         $v['expRef'],
-                                        $v[0]['numCmdeClient'],
+                                        $v['numCmdeClient'],
                                         date_format($v['dateCmde'], "d-m-Y"),
                                         $v['destinataire'],
                                         $v['destRue'],
@@ -708,109 +898,961 @@ class ProdController extends Controller
                                         $v['destCp'],
                                         $v['destVille'],
                                         $v['destPays'],
+                                        $v['destTel'],
+                                        $v['destMail'],
                                         $v['instrLivrais1'],
                                         $v['instrLivrais2'],
-
-                                        date_format($v['dateDepot'], "d-m-Y h:m"),
-                                        $v[0]['nColis'],
-
-                                        date_format($v['dateProduction'], "d-m-Y h:m"),
-                                        $v[0]['modexp'],
+                                        $v['dateDepot'],
+                                        (string)($v['nColis']),
+                                        $v['dateProduction'],
+                                        $v['modexp'],
                                         $v['type'],
                                         ltrim($v['poidsReel'], "0"),
                                         $v['quantite'],
-
-                                        date_format($v['statut']['dateStatut'], "d-m-Y "),
+                                        $v['nbCmd'],
+                                        $v['statut']['dateStatut'],
                                         $v['statut']['libelle'],
                                         $v['nbpages'],
-                                        $v['nbCmd'],
-                                        $v['filename']
+                                        $v['idStatut'],
+                                        $v['filename'],
+                                        $type
+
                                     ]);
         }
-//        $spreadsheet->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('K')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('L')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('M')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('N')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('O')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('P')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('Q')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('R')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('S')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('T')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('U')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('V')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('W')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('X')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('Y')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('Z')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('AA')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('AB')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('AC')->setAutoSize(true);
-//        $spreadsheet->getActiveSheet()->getColumnDimension('AD')->setAutoSize(true);
+
+        $titre= '';
+        if ($prod == '1') {
+            $titre= '_attenteProd';
+        }else if ($prod == '0') {
+            $titre= '_all';
+        }else if ($prod == '2') {
+            $titre= '_produits';
+        }
+        else if ($prod == '3') {
+            $titre= '_enRupture';
+        }else {
+            $titre= '_annule';
+
+        }
+
+        if (!isset($tabBlComplet[0])){
+            $tabBlComplet[0]['appliname'] = 'pas de fichiers';
+            $tabBlComplet[0]['filename']= 'pas de fichiers';
+        }
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+        if ( sizeof($idFiles) > 1) {
+            $nomExport = str_replace(' ','',$tabBlComplet[0]['appliname'].$titre);
+
+        }else{
+            $nomExport = preg_replace ('/\s+/',"_",($tabBlComplet[0]['filename'].$titre));
+        }
 
 
-        $spreadsheet->getActiveSheet()->getColumnDimension('A')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('B')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('C')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('D')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('E')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('F')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('G')->setAutoSize(25);
-        $spreadsheet->getActiveSheet()->getColumnDimension('H')->setAutoSize(40);
-        $spreadsheet->getActiveSheet()->getColumnDimension('I')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('J')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('K')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('L')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('M')->setAutoSize(12);
-        $spreadsheet->getActiveSheet()->getColumnDimension('N')->setAutoSize(6);
-        $spreadsheet->getActiveSheet()->getColumnDimension('O')->setAutoSize(20);
-        $spreadsheet->getActiveSheet()->getColumnDimension('P')->setAutoSize(5);
-        $spreadsheet->getActiveSheet()->getColumnDimension('Q')->setAutoSize(20);
-        $spreadsheet->getActiveSheet()->getColumnDimension('R')->setAutoSize(23);
-        $spreadsheet->getActiveSheet()->getColumnDimension('S')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('T')->setAutoSize(23);
-        $spreadsheet->getActiveSheet()->getColumnDimension('U')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('V')->setAutoSize(17);
-        $spreadsheet->getActiveSheet()->getColumnDimension('W')->setAutoSize(17);
-        $spreadsheet->getActiveSheet()->getColumnDimension('X')->setAutoSize(10);
-        $spreadsheet->getActiveSheet()->getColumnDimension('Y')->setAutoSize(8);
-        $spreadsheet->getActiveSheet()->getColumnDimension('Z')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('AA')->setAutoSize(20);
-        $spreadsheet->getActiveSheet()->getColumnDimension('AB')->setAutoSize(9);
-        $spreadsheet->getActiveSheet()->getColumnDimension('AC')->setAutoSize(15);
-        $spreadsheet->getActiveSheet()->getColumnDimension('AD')->setAutoSize(40);
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
 
 
-//        $sheet = $spreadsheet->getActiveSheet();
-//        $sheet->setCellValue('A1', 'Hello World !');
-        $spreadsheet->getActiveSheet()
-            ->fromArray(
-                $tabBlComplet2,  // The data to set
-                ['30-11-1999',NULL],        // Array values with this value will not be set
-                'A1'         // Top left coordinate of the worksheet range where
-//                we want to set these values (default is A1)
-            );
-//        $spreadsheet->setActiveSheetIndex(0);
-//        $spreadsheet->getActiveSheet()
-//            ->getCell('B8')
-//            ->setValue('Some value');
+    }
 
-//        $spreadsheet->getActiveSheet()->setCellValue('A3', new DateTime());
+    public function exportTrackingArticleExcelAction(Request $request, $idFile, $prod)
+    {
 
-        $writer =  IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $idFiles = explode(",", $idFile);
+        $em = $this->getDoctrine()->getManager();
+        $emCP = $this->getDoctrine()->getManager('colisprive');
+        $emDpd = $this->getDoctrine()->getManager('dpd');
 
-        $writer->save('php://output');
-        exit;
+
+
+        if ($prod == '0') {
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFileArticle($idFiles);
+        }
+        else if ($prod == '1') {
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlNonProdByFileArticle($idFiles);
+        }else if ($prod == '2') {
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFileArticle($idFiles);
+        }else if ($prod == '3') {
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByFileArticle($idFiles);
+        }else {
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFiles);
+
+        }
+
+//        }
+
+
+
+        $numBLs = array();
+        foreach ($allBlByOpe as $key=>$file)
+        {
+            if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+            }
+            if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+            }
+
+        }
+        $statuts = array();
+        if ( isset($numBLs['CPRV']['numBl'])) {
+            $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+            foreach ($trackingColisPrive as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+        if (isset($numBLs['DPD']['numBl']) ) {
+            $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+            foreach ($trackingDpd as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+
+        $tabBlComplet = array();
+        foreach ($allBlByOpe as $key=>$item){
+            if (isset($statuts[$item['numbl']])){
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+
+            }
+            else{
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut']['libelle']="";
+                $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
+            }
+        }
+
+//var_dump($tabBlComplet);
+        $header = array('Date fichier' => 'string',
+            'n° BL'=> 'string',
+            'Ref Client'=> 'string',
+            'exp_ref'=> 'string',
+            'n° Cmde Client'=> 'string',
+            'Date Cmd'=> 'string',
+            'Destinataire'=> 'string',
+            'Rue'=> 'string',
+            'Adresse 2'=> 'string',
+            'Adresse 3'=> 'string',
+            'Adresse 4'=> 'string',
+            'Adresse 5'=> 'string',
+            'Adresse 6'=> 'string',
+            'CP'=> 'string',
+            'Ville'=> 'string',
+            'Pays'=> 'string',
+            'Telephone'=> 'string',
+            'Mail'=> 'string',
+            'Instr_Livraison 1'=> 'string',
+            'Instr_Livraison 2'=> 'string',
+            'Date Dépôt'=> 'string',
+            'N° Tracking'=> 'string',
+            'Date Production'=> 'string',
+            'Mode Expedition'=> 'string',
+            'Type'=> 'string',
+            'Poids (gr)'=> 'string',
+            'Date statut'=> 'string',
+            'Statut livraison'=> 'string',
+            'Nb pages'=> 'string',
+            'Statut commande'=> 'string',
+            'Nom fichier'=> 'string',
+            'Type_cmd'  => 'string',
+            'codearticle' => 'string',
+            'libelle'    =>'string',
+            'quantite'  =>'string',
+            'Statut article'  =>'string'
+        );
+//var_dump($tabBlComplet);
+        $tabBlComplet2 = array();
+        foreach ($tabBlComplet as $k=>$v){
+            if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
+                $v['statut']['dateStatut'] = '';
+            }else{
+                $v['statut']['dateStatut'] = date_format($v['statut']['dateStatut'], "d-m-Y ");
+            }
+            if (isset($v['nColis'])){
+                if ($v['nColis'] == '0') {
+                    $v['nColis'] = '';
+                }
+            }else{
+                $v[0]['nColis'] = '';
+            }
+            $v['dateDepot'] = date_format($v['dateDepot'], "d-m-Y");
+            if($v['dateDepot'] == "30-11--0001") $v['dateDepot'] ="";
+            if (isset($v['dateProduction'])){
+                $v['dateProduction'] = date_format($v['dateProduction'], "d-m-Y h:m");
+                if($v['dateProduction'] == "30-11--0001 12:11") $v['dateProduction'] ="";
+            }else{
+                $v['dateProduction'] ="";
+            }
+            if (!isset($v['modexp'])) {
+                $v['modexp'] = '';
+            }
+
+            if($v['trStatut'] == "10"){
+                $v['trStatut'] ="En rupture";
+            }elseif ($v['trStatut'] == "9"){
+                $v['trStatut'] ="Annulé";
+            }elseif ($v['trStatut'] == "11"){
+                $v['trStatut'] ="Sortie-Rupture";
+            }else{
+                $v['trStatut'] ="";
+            }
+
+            if($v['cmdStatut'] == "10"){
+                $v['cmdStatut'] ="En rupture";
+            }elseif ($v['cmdStatut'] == "9"){
+                $v['cmdStatut'] ="Annulé";
+            }elseif ($v['cmdStatut'] == "11"){
+                $v['cmdStatut'] ="Sortie-Rupture";
+            }else{
+                $v['cmdStatut'] ="";
+            }
+
+            $tabJson = json_decode($v['json'], true);
+            if (isset($tabJson['TYPE'])) $type = $tabJson['TYPE'];
+//            var_dump($tabJson);
+            array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y"),
+                $v['numbl'],
+                $v['refclient'],
+                $v['expRef'],
+                $v['numCmdeClient'],
+                date_format($v['dateCmde'], "d-m-Y"),
+                $v['destinataire'],
+                $v['destRue'],
+                $v['destAd2'],
+                $v['destAd3'],
+                $v['destAd4'],
+                $v['destAd5'],
+                $v['destAd6'],
+                $v['destCp'],
+                $v['destVille'],
+                $v['destPays'],
+                $v['destTel'],
+                $v['destMail'],
+                $v['instrLivrais1'],
+                $v['instrLivrais2'],
+                $v['dateDepot'],
+                (string)($v['nColis']),
+                $v['dateProduction'],
+                $v['modexp'],
+                $v['type'],
+                ltrim($v['poidsReel'], "0"),
+                $v['statut']['dateStatut'],
+                $v['statut']['libelle'],
+                $v['nbpages'],
+                $v['trStatut'],
+                $v['filename'],
+                $type,
+                $v['codearticle'],
+                $v['libelle'],
+                $v['quantite'],
+                $v['cmdStatut'],
+
+            ]);
+        }
+
+        $titre= '';
+        if ($prod == '1') {
+            $titre= '_attenteProd';
+        }else if ($prod == '0') {
+            $titre= '_all';
+        }else if ($prod == '2') {
+            $titre= '_produits';
+        }
+        else if ($prod == '3') {
+            $titre= '_enRupture';
+        }else {
+            $titre= '_annule';
+
+        }
+
+        if (!isset($tabBlComplet[0])){
+            $tabBlComplet[0]['appliname'] = 'pas de fichiers';
+            $tabBlComplet[0]['filename']= 'pas de fichiers';
+        }
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+        if ( sizeof($idFiles) > 1) {
+            $nomExport = str_replace(' ','',$tabBlComplet[0]['appliname'].$titre);
+
+        }else{
+            $nomExport = preg_replace ('/\s+/',"_",($tabBlComplet[0]['filename'].$titre));
+        }
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
+    }
+
+
+    public function exportTrackingExcelbyBLAction(Request $request, $idBLs, $code)
+    {
+
+        $idFiles = explode(",", $idBLs);
+
+        $em = $this->getDoctrine()->getManager();
+        $emCP = $this->getDoctrine()->getManager('colisprive');
+        $emDpd = $this->getDoctrine()->getManager('dpd');
+
+
+        $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($idFiles);
+
+
+
+        $numBLs = array();
+        foreach ($allBlByOpe as $key=>$file)
+        {
+            if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+            }
+            if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+            }
+
+        }
+        $statuts = array();
+        if ( isset($numBLs['CPRV']['numBl'])) {
+            $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+            foreach ($trackingColisPrive as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+        if (isset($numBLs['DPD']['numBl']) ) {
+            $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+            foreach ($trackingDpd as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+
+        $tabBlComplet = array();
+        foreach ($allBlByOpe as $key=>$item){
+            if (isset($statuts[$item['numbl']])){
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+
+            }
+            else{
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut']['libelle']="";
+                $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
+            }
+        }
+
+
+        $header = array('Date fichier' => 'string',
+            'n° BL'=> 'string',
+            'Ref Client'=> 'string',
+            'exp_ref'=> 'string',
+            'n° Cmde Client'=> 'string',
+            'Date Cmd'=> 'string',
+            'Destinataire'=> 'string',
+            'Rue'=> 'string',
+            'Adresse 2'=> 'string',
+            'Adresse 3'=> 'string',
+            'Adresse 4'=> 'string',
+            'Adresse 5'=> 'string',
+            'Adresse 6'=> 'string',
+            'CP'=> 'string',
+            'Ville'=> 'string',
+            'Pays'=> 'string',
+            'Telephone'=> 'string',
+            'Mail'=> 'string',
+            'Instr_Livraison 1'=> 'string',
+            'Instr_Livraison 2'=> 'string',
+            'Date Dépôt'=> 'string',
+            'N° Tracking'=> 'string',
+            'Date Production'=> 'string',
+            'Mode Expedition'=> 'string',
+            'Type'=> 'string',
+            'Poids (gr)'=> 'string',
+            'Qté'=> 'string',
+            'Date statut'=> 'string',
+            'Statut livraison'=> 'string',
+            'Nb pages'=> 'string',
+            'NbLignesCmde'=> 'string',
+            'Nom fichier'=> 'string'
+        );
+
+        $tabBlComplet2 = array();
+        foreach ($tabBlComplet as $k=>$v){
+            if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
+                $v['statut']['dateStatut'] = '';
+            }else{
+                $v['statut']['dateStatut'] = date_format($v['statut']['dateStatut'], "d-m-Y ");
+            }
+            if ($v[0]['nColis'] == '0') {
+                $v[0]['nColis'] = '';
+            }
+            $v['dateDepot'] = date_format($v['dateDepot'], "d-m-Y");
+            if($v['dateDepot'] == "30-11--0001") $v['dateDepot'] ="";
+
+            $v['dateProduction'] = date_format($v['dateProduction'], "d-m-Y h:m");
+            if($v['dateProduction'] == "30-11--0001 12:11") $v['dateProduction'] ="";
+
+            array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y"),
+                $v['numbl'],
+                $v['refclient'],
+                $v['expRef'],
+                $v['numCmdeClient'],
+                date_format($v['dateCmde'], "d-m-Y"),
+                $v['destinataire'],
+                $v['destRue'],
+                $v['destAd2'],
+                $v['destAd3'],
+                $v['destAd4'],
+                $v['destAd5'],
+                $v['destAd6'],
+                $v['destCp'],
+                $v['destVille'],
+                $v['destPays'],
+                $v['destTel'],
+                $v['destMail'],
+                $v['instrLivrais1'],
+                $v['instrLivrais2'],
+                $v['dateDepot'],
+                (string)($v[0]['nColis']),
+                $v['dateProduction'],
+                $v[0]['modexp'],
+                $v['type'],
+                ltrim($v['poidsReel'], "0"),
+                $v['quantite'],
+                $v['statut']['dateStatut'],
+                $v['statut']['libelle'],
+                $v['nbpages'],
+                $v['nbCmd'],
+                $v['filename']
+            ]);
+        }
+
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+            $nomExport = 'Export_'.$code;
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
+    }
+
+    public function exportTrackingExcelbyDateAction(Request $request, $date, $appli)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $emCP = $this->getDoctrine()->getManager('colisprive');
+        $emDpd = $this->getDoctrine()->getManager('dpd');
+
+
+        $Bls = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsbyDateDepotandop($appli, $date);
+        $BlsTab= array();
+        foreach ($Bls as $v){
+            array_push($BlsTab, $v['numbl']);
+        }
+
+
+        $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($BlsTab);
+
+
+
+        $numBLs = array();
+        foreach ($allBlByOpe as $key=>$file)
+        {
+            if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+            }
+            if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+            }
+
+        }
+        $statuts = array();
+        if ( isset($numBLs['CPRV']['numBl'])) {
+            $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+            foreach ($trackingColisPrive as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+        if (isset($numBLs['DPD']['numBl']) ) {
+            $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+            foreach ($trackingDpd as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+
+        $tabBlComplet = array();
+        foreach ($allBlByOpe as $key=>$item){
+            if (isset($statuts[$item['numbl']])){
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+
+            }
+            else{
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut']['libelle']="";
+                $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
+            }
+        }
+
+
+        $header = array('Date fichier' => 'string',
+            'n° BL'=> 'string',
+            'Ref Client'=> 'string',
+            'exp_ref'=> 'string',
+            'n° Cmde Client'=> 'string',
+            'Date Cmd'=> 'string',
+            'Destinataire'=> 'string',
+            'Rue'=> 'string',
+            'Adresse 2'=> 'string',
+            'Adresse 3'=> 'string',
+            'Adresse 4'=> 'string',
+            'Adresse 5'=> 'string',
+            'Adresse 6'=> 'string',
+            'CP'=> 'string',
+            'Ville'=> 'string',
+            'Pays'=> 'string',
+            'Telephone'=> 'string',
+            'Mail'=> 'string',
+            'Instr_Livraison 1'=> 'string',
+            'Instr_Livraison 2'=> 'string',
+            'Date Dépôt'=> 'string',
+            'N° Tracking'=> 'string',
+            'Date Production'=> 'string',
+            'Mode Expedition'=> 'string',
+            'Type'=> 'string',
+            'Poids (gr)'=> 'string',
+            'Qté'=> 'string',
+            'Date statut'=> 'string',
+            'Statut livraison'=> 'string',
+            'Nb pages'=> 'string',
+            'NbLignesCmde'=> 'string',
+            'Nom fichier'=> 'string'
+        );
+
+        $tabBlComplet2 = array();
+        foreach ($tabBlComplet as $k=>$v){
+            if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
+                $v['statut']['dateStatut'] = '';
+            }else{
+                $v['statut']['dateStatut'] = date_format($v['statut']['dateStatut'], "d-m-Y ");
+            }
+            if ($v[0]['nColis'] == '0') {
+                $v[0]['nColis'] = '';
+            }
+            $v['dateDepot'] = date_format($v['dateDepot'], "d-m-Y");
+            if($v['dateDepot'] == "30-11--0001") $v['dateDepot'] ="";
+
+            $v['dateProduction'] = date_format($v['dateProduction'], "d-m-Y h:m");
+            if($v['dateProduction'] == "30-11--0001 12:11") $v['dateProduction'] ="";
+
+            array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y"),
+                $v['numbl'],
+                $v['refclient'],
+                $v['expRef'],
+                $v['numCmdeClient'],
+                date_format($v['dateCmde'], "d-m-Y"),
+                $v['destinataire'],
+                $v['destRue'],
+                $v['destAd2'],
+                $v['destAd3'],
+                $v['destAd4'],
+                $v['destAd5'],
+                $v['destAd6'],
+                $v['destCp'],
+                $v['destVille'],
+                $v['destPays'],
+                $v['destTel'],
+                $v['destMail'],
+                $v['instrLivrais1'],
+                $v['instrLivrais2'],
+                $v['dateDepot'],
+                (string)($v[0]['nColis']),
+                $v['dateProduction'],
+                $v[0]['modexp'],
+                $v['type'],
+                ltrim($v['poidsReel'], "0"),
+                $v['quantite'],
+                $v['statut']['dateStatut'],
+                $v['statut']['libelle'],
+                $v['nbpages'],
+                $v['nbCmd'],
+                $v['filename']
+            ]);
+        }
+
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+        $nomExport = 'Export_'.$Bls[0]['appliname'].'_'.$date;
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
+    }
+
+    public function exportTrackingExcelbyBLArticleAction(Request $request, $date, $appli)
+    {
+
+
+        $em = $this->getDoctrine()->getManager();
+        $emCP = $this->getDoctrine()->getManager('colisprive');
+        $emDpd = $this->getDoctrine()->getManager('dpd');
+
+
+        $Bls = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsbyDateDepotandopAndPress($appli, $date);
+        $BlsTab= array();
+        foreach ($Bls as $v){
+            array_push($BlsTab, $v['numbl']);
+        }
+
+        $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($Bls);
+
+
+        $tabBls=[];
+        foreach ($allBlByOpe as $i){
+            array_push($tabBls,$i['numbl']);
+        }
+        $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBLsArticleArray($tabBls);
+
+        $articleArray = array();
+        foreach ($articles as $key => $item) {
+            $articleArray[$key] = $item;
+        }
+//var_dump($articleArray);
+
+
+
+
+        $numBLs = array();
+        foreach ($allBlByOpe as $key=>$file)
+        {
+            if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+            }
+            if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+            }
+
+        }
+        $statuts = array();
+        if ( isset($numBLs['CPRV']['numBl'])) {
+            $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+            foreach ($trackingColisPrive as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+        if (isset($numBLs['DPD']['numBl']) ) {
+            $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+            foreach ($trackingDpd as $cp)
+            {
+                $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+            }
+        }
+
+        $tabBlComplet = array();
+        foreach ($allBlByOpe as $key=>$item){
+            if (isset($statuts[$item['numbl']])){
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+
+            }
+            else{
+                $tabBlComplet[$key] = $item;
+                $tabBlComplet[$key]['statut']['libelle']="";
+                $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
+            }
+        }
+
+
+        $header = array(
+            'n°' => 'string',
+            'Date fichier' => 'string',
+            'n° BL'=> 'string',
+            'Ref Client'=> 'string',
+            'exp_ref'=> 'string',
+            'n° Cmde Client'=> 'string',
+            'Date Cmd'=> 'string',
+            'Destinataire'=> 'string',
+            'Rue'=> 'string',
+            'Adresse 2'=> 'string',
+            'Adresse 3'=> 'string',
+            'Adresse 4'=> 'string',
+            'Adresse 5'=> 'string',
+            'Adresse 6'=> 'string',
+            'CP'=> 'string',
+            'Ville'=> 'string',
+            'Pays'=> 'string',
+            'Telephone'=> 'string',
+            'Mail'=> 'string',
+            'Instr_Livraison 1'=> 'string',
+            'Instr_Livraison 2'=> 'string',
+            'Date Dépôt'=> 'string',
+            'N° Tracking'=> 'string',
+            'Date Production'=> 'string',
+            'Mode Expedition'=> 'string',
+            'Type'=> 'string',
+            'Poids (gr)'=> 'string',
+            'Qté'=> 'string',
+            'Date statut'=> 'string',
+            'Statut livraison'=> 'string',
+            'Nb pages'=> 'string',
+            'NbLignesCmde'=> 'string',
+            'Nom fichier'=> 'string'
+        );
+
+        $tabBlComplet2 = array();
+        $index=1;
+        foreach ($tabBlComplet as $k=>$v){
+            if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
+                $v['statut']['dateStatut'] = '';
+            }else{
+                $v['statut']['dateStatut'] = date_format($v['statut']['dateStatut'], "d-m-Y ");
+            }
+            if ($v[0]['nColis'] == '0') {
+                $v[0]['nColis'] = '';
+            }
+            $v['dateDepot'] = date_format($v['dateDepot'], "d-m-Y");
+            if($v['dateDepot'] == "30-11--0001") $v['dateDepot'] ="";
+
+            $v['dateProduction'] = date_format($v['dateProduction'], "d-m-Y h:m");
+            if($v['dateProduction'] == "30-11--0001 12:11") $v['dateProduction'] ="";
+
+            array_push(
+                $tabBlComplet2,[
+                $index,
+                date_format($v['dateFile'], "d-m-Y"),
+                $v['numbl'],
+                $v['refclient'],
+                $v['expRef'],
+                $v['numCmdeClient'],
+                date_format($v['dateCmde'], "d-m-Y"),
+                $v['destinataire'],
+                $v['destRue'],
+                $v['destAd2'],
+                $v['destAd3'],
+                $v['destAd4'],
+                $v['destAd5'],
+                $v['destAd6'],
+                $v['destCp'],
+                $v['destVille'],
+                $v['destPays'],
+                $v['destTel'],
+                $v['destMail'],
+                $v['instrLivrais1'],
+                $v['instrLivrais2'],
+                $v['dateDepot'],
+                (string)($v[0]['nColis']),
+                $v['dateProduction'],
+                $v[0]['modexp'],
+                $v['type'],
+                ltrim($v['poidsReel'], "0"),
+                $v['quantite'],
+                $v['statut']['dateStatut'],
+                $v['statut']['libelle'],
+                $v['nbpages'],
+                $v['nbCmd'],
+                $v['filename']
+            ]);
+
+            foreach ($articleArray as $key){
+                if ($key['numbl'] ==  $v['numbl']){
+                    array_push($tabBlComplet2,
+                        ["","",
+                        $v['numbl'],
+                        "code article: ".$key['codearticle'],
+                        "libelle: ".$key['libelle'],
+                        "poids: ".$key['poids']." gr",
+                        "Qté: ".$key['quantite'],
+
+                    ]);
+                }
+            }
+            $index++;
+        }
+
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+        $nomExport = 'Export_Article_'.$Bls[0]['appliname'].'_'.$date;
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
+    }
+
+    public function exportTrackingPresseAction(Request $request, $date, $appli)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+
+        $Bls = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsbyDateDepotandopAndPress($appli, $date);
+        $BlsTab= array();
+        foreach ($Bls as $v){
+            array_push($BlsTab, $v['numbl']);
+        }
+
+        $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findAllBlByBLSandPresse($BlsTab);
+
+        $groupByArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findregroupArticleByBLSandPresse($BlsTab);
+
+
+        $tabpresseTri=array();
+        $maxQuantite = $allBlByOpe[sizeof($allBlByOpe)-1]['quantite'];
+        for ($i = 1 ; $i <= $maxQuantite ; $i++){
+            $compteurQuantite=0;
+            $compteurPoids=0;
+            $inBoucle=false;
+            $tab=array();
+            foreach ($allBlByOpe as $key){
+                if ($key['quantite'] == $i){
+                    $inBoucle=true;
+                    $compteurQuantite++;
+                    $compteurPoids = $compteurPoids + $key['poids'];
+                }
+            }
+            if ($inBoucle){
+                $tab['compo'] = $i;
+                $tab['qte'] = $compteurQuantite;
+                $tab['poidsTot'] = $compteurPoids;
+                $tab['poidsMoy'] = $compteurPoids/$compteurQuantite;
+                array_push($tabpresseTri,$tab );
+            }
+
+        }
+
+
+
+
+        $header = array(
+            'detail composition' => 'string',
+            'Quantite'=> 'string',
+            'poids total (gr)'=> 'string',
+            'poids moyen (gr)'=> 'number'
+        );
+
+        $tabBlComplet2 = array();
+        foreach ($tabpresseTri as $v){
+
+            array_push($tabBlComplet2,
+                [$v['compo'],
+                 $v['qte'],
+                 $v['poidsTot'],
+                 $v['poidsMoy']
+            ]);
+
+        }
+
+        array_push($tabBlComplet2,
+            ["","","",""]);
+        array_push($tabBlComplet2,
+            ["","","",""]);
+        array_push($tabBlComplet2,
+            ["Total des articles"]);
+        array_push($tabBlComplet2,
+            ["Libelle article","quantite","poids unitaire(gr)"]);
+        foreach ($groupByArticle as $v){
+            array_push($tabBlComplet2,
+                [$v['libelle'],
+                    $v['quantite'],
+                    $v['poids']
+                ]);
+        }
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+        $nomExport = 'Export_Presse_'.$Bls[0]['appliname'].'_'.$date;
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
 
 
     }
@@ -826,10 +1868,12 @@ class ProdController extends Controller
             $emCP = $this->getDoctrine()->getManager('colisprive');
             $emDpd = $this->getDoctrine()->getManager('dpd');
 
-            $allBlByOpeByDateProd = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idAppli, $date);
+            $allBlByOpeByDate = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idAppli, $date);
+
+
 
             $numBLs = array();
-            foreach ($allBlByOpeByDateProd as $key=>$file)
+            foreach ($allBlByOpeByDate as $key=>$file)
             {
                 if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
                     $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
@@ -859,7 +1903,7 @@ class ProdController extends Controller
             }
 
             $tabBlComplet = array();
-            foreach ($allBlByOpeByDateProd as $key=>$item){
+            foreach ($allBlByOpeByDate as $key=>$item){
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
@@ -875,16 +1919,99 @@ class ProdController extends Controller
 
 
 
-
             return new JsonResponse($tabBlComplet);
 
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function exportTrackingbyDateDepotAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+            $date = $request->get('infoDate');
+            $idAppli = $request->get('infoAppli');
+
+            $em = $this->getDoctrine()->getManager();
+            $emCP = $this->getDoctrine()->getManager('colisprive');
+            $emDpd = $this->getDoctrine()->getManager('dpd');
+
+            $allBlByOpeByDate = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateDepotByAppli($idAppli, $date);
+            $nbDateDepotPresse = $em->getRepository('TMDProdBundle:EcommBl')->nbPresseByDateDepotByAppli($idAppli, $date);
+
+            $tabBls=[];
+            foreach ($allBlByOpeByDate as $i){
+                array_push($tabBls,$i['numbl']);
+            }
+            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBLsArray($tabBls);
+            $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByBLsArray($tabBls);
+
+            $articleArray = array();
+            foreach ($articles as $key => $item) {
+                $articleArray[$key] = $item;
+            }
+
+
+            $numBLs = array();
+            foreach ($allBlByOpeByDate as $key=>$file)
+            {
+                if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                    $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+                }
+                if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                    $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+                }
+
+            }
+
+            $statuts = array();
+            if ( isset($numBLs['CPRV']['numBl'])) {
+                $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+                foreach ($trackingColisPrive as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+            if (isset($numBLs['DPD']['numBl']) ) {
+                $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+                foreach ($trackingDpd as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+
+            $tabBlComplet = array();
+            foreach ($allBlByOpeByDate as $key=>$item){
+                if (isset($statuts[$item['numbl']])){
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                }
+                else{
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut']['libelle']="";
+                    $tabBlComplet[$key]['statut']['dateStatut']="";
+                }
+            }
+
+
+
+
+
+            $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos, 'nbDateDepotPresse' => $nbDateDepotPresse );
+
+            return new JsonResponse($reponse);
+
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
 
     public function viewClientAction($idClient, $idOpe, $page, $nbFichierPage)
     {
+
+
+
         if ($page < 1) {
             throw $this->createNotFoundException("La page ".$page." n'exciste pas. ");
         }
@@ -929,6 +2056,7 @@ class ProdController extends Controller
 
             $fileByOpe = $em->getRepository('TMDProdBundle:EcommTracking')->findFileByOpe($idOpe, $page, $nbParPage);
             $fileTotByOp = $em->getRepository('TMDProdBundle:EcommTracking')->findFileTotByOpe($idOpe);
+            $fileBLTotByOp = $em->getRepository('TMDProdBundle:EcommLignes')->findFileTotByOpe($idOpe);
             $nbTrackingByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbTrackingByFile($idOpe);
 
 
@@ -936,6 +2064,18 @@ class ProdController extends Controller
             foreach ($fileByOpe as $f=>$k){
                 $filesPaginator[$f] = $k['idfile'];
             }
+
+            //synthese Statut par idFile
+            $syntheseStatut = $em->getRepository('TMDProdBundle:EcommTracking')->findSyntheseStatut($idOpe);
+            $tabSyntheseStatut = array();
+            foreach ($syntheseStatut as $key=>$val)
+            {
+                if (!isset($tabSyntheseStatut[$val['idfile']]))$tabSyntheseStatut[$val['idfile']] = array();
+//                $tab = array();
+                array_push($tabSyntheseStatut[$val['idfile']],  array((strval($val['idStatut'])) => $val[1]));
+
+            }
+
 
             $trackings = array();
             $files= array();
@@ -953,8 +2093,9 @@ class ProdController extends Controller
 
 
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
-            $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($files);
-            $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommBl')->findArticlesByOpeByDateNonProd($files);
+            $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($idOpe);
+            $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeByDateNonProd($idOpe);
+            $ArticlesSyntheseRupture = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeRupture($idOpe);
             $ArticlesReclaSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesReclaByFile($files);
 
             $nbRetentionByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbRetentionByFile($files);
@@ -967,9 +2108,10 @@ class ProdController extends Controller
             }
 
             $ArticlesReclaSyntheseTab = array();
-            foreach($ArticlesReclaSynthese as $k)
-            {
-                $ArticlesReclaSyntheseTab[$k['idfile']] = $k;
+            if ( $idClient == 518 or $idClient == 146 or $idClient == 685 or $idClient == 633) {
+                foreach ($ArticlesReclaSynthese as $k) {
+                    $ArticlesReclaSyntheseTab[$k['idfile']] = $k;
+                }
             }
 
             $syntheseArticles=[];
@@ -978,9 +2120,22 @@ class ProdController extends Controller
                 $name = $article['codearticle']." -> ".$article['libelle'];
                 $syntheseArticles['tot'][$article['flagart']][$name]= $article['quantite'];
             }
+            foreach($ArticlesSyntheseRupture as $articler)
+            {
+                $name = $articler['codearticle']." -> ".$articler['libelle'];
+                $syntheseArticles['rupture'][$articler['flagart']][$name]= $articler['quantite'];
+            }
             foreach($ArticlesSyntheseNonProd as $article)
             {
-                $syntheseArticles['aProd'][$article['flagart']][$article['libelle']]= $article['quantite'];
+                $syntheseArticles['aProd'][$article['flagart']][$article['codearticle']]= $article['quantite'];
+                $name = $article['codearticle']." -> ".$article['libelle'];
+                $syntheseArticles['aProdLibelle'][$article['flagart']][$name]= $article['quantite'];
+            }
+
+            if ( $idOpe == 554){
+                $nbCarte = $em->getRepository('TMDAppliBundle:NTracking')->findNbCarteUtilByClient($idClient);
+                $syntheseArticles['coriolisCarte'] = $nbCarte;
+
             }
 
 
@@ -991,6 +2146,7 @@ class ProdController extends Controller
 
             }
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
+
             foreach ($nbBlByFile as $bl)
             {
                 $filesBl[$bl['idfile']]['nbBl'] = $bl[1];
@@ -1015,7 +2171,6 @@ class ProdController extends Controller
                 }
 
             }
-
             $countTransportbyFile = $em->getRepository('TMDProdBundle:EcommBl')->findNbTransportByFile($files);
             foreach ($countTransportbyFile  as $bl)
             {
@@ -1051,19 +2206,43 @@ class ProdController extends Controller
             }
 
 
-            $quantiteBlaProduire = 0;
-            foreach ($filesBl as $k=>$v)
+//            $quantiteBlaProduire = 0;
+//            foreach ($filesBl as $k=>$v)
+//            {
+//                if (isset($filesBlProd[$k]) && isset($v['nbBl'])){
+//                    $quantiteBlaProduire += $v['nbBl']-$filesBlProd[$k]['totProd'];
+//                }
+//                else{
+//                    if (isset($v['nbBl'])) {
+//                        $quantiteBlaProduire += $v['nbBl'];
+//                    }
+//                }
+//            }
+
+
+            $tabSyntheseGeneralaProd = 0;
+            $tabSyntheseGeneralaRupture = 0;
+            $tabSyntheseGeneralaSupp = 0;
+            foreach ($tabSyntheseStatut as $tab)
             {
-                if (isset($filesBlProd[$k]) && isset($v['nbBl'])){
-                    $quantiteBlaProduire += $v['nbBl']-$filesBlProd[$k]['totProd'];
-                }
-                else{
-                    if (isset($v['nbBl'])) {
-                        $quantiteBlaProduire += $v['nbBl'];
+                foreach ($tab as $tab1) {
+                    foreach ($tab1 as $u => $v) {
+                        if ($u == 9) {
+                            $tabSyntheseGeneralaSupp += intval($v);
+                        }
+                        if ($u == 10) {
+                            $tabSyntheseGeneralaRupture  += intval($v);
+                        }
                     }
                 }
             }
+            foreach ($filesBlProd as $tab)
+            {
+                $tabSyntheseGeneralaProd += intval($tab['totProd']);
+            }
+
             //pagination
+
 
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
             if ($page > $nbPages) {
@@ -1077,9 +2256,7 @@ class ProdController extends Controller
             ));
             }
 
-
-
-
+            $blretour = null;
 
 
             return $this->render('TMDProdBundle:Prod:suiviProd.html.twig', array(
@@ -1093,16 +2270,22 @@ class ProdController extends Controller
                 'nbFichiersPage'            => $nbFichierPage,
                 'files'                     => $fileByOpe,
                 'filesTot'                  => $fileTotByOp,
+                'filesBLtot'                => intval($fileBLTotByOp[0][1]),
                 'nbTrByFile'                => $trackings,
                 'nbBlbyfile'                => $filesBl,
                 'nbBlByFileProd'            => $filesBlProd,
-                'quantiteBlaProduire'       => $quantiteBlaProduire,
+//                'quantiteBlaProduire'       => $quantiteBlaProduire,
                 'dateMaxProdByApplication'  => $dateMaxProdByApplication,
                 'dateMinProdByApplication'  => $dateMinProdByApplication,
                 'TypeTransport'             => $modeTransport,
                 'syntheseTransport'         => $transportCount,
-                'syntheseArticle'           => $syntheseArticles
-
+                'syntheseArticle'           => $syntheseArticles,
+                'blRetour'                  => $blretour,
+                'syntheseStatut'            => $syntheseStatut,
+                'tabsyntheseStatut'         => $tabSyntheseStatut,
+                'tabSyntheseGeneralaProd'   => $tabSyntheseGeneralaProd,
+                'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
+                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture
 
             ));
         }
@@ -1115,8 +2298,12 @@ class ProdController extends Controller
 
     }
 
-    public function viewSuiviCourantAction($idClient, $idOpe, $page, $nbFichierPage)
+    public function viewSuiviCourantAction($idClient, $idOpe, $blR, $page, $nbFichierPage)
     {
+
+
+
+
         if ($page < 1) {
             throw $this->createNotFoundException("La page ".$page." n'existe pas.");
         }
@@ -1125,7 +2312,7 @@ class ProdController extends Controller
 
         if ($idOpe == 0 ) {
 
-            $operationsCournates = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsCourantes();
+            $operationsCournates = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsCourantes(12);
 
             foreach ( $operationsCournates as $u=>$v)
             {
@@ -1150,11 +2337,23 @@ class ProdController extends Controller
             $nbParPage = $nbFichierPage;
             $fileByOpe = $em->getRepository('TMDProdBundle:EcommTracking')->findFileByOpe($idOpe, $page, $nbParPage);
             $fileTotByOp = $em->getRepository('TMDProdBundle:EcommTracking')->findFileTotByOpe($idOpe);
+            $fileBLTotByOp = $em->getRepository('TMDProdBundle:EcommLignes')->findFileTotByOpe($idOpe);
             $nbTrackingByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbTrackingByFile($idOpe);
 
             $filesPaginator = array();
             foreach ($fileByOpe as $f=>$k){
                 $filesPaginator[$f] = $k['idfile'];
+            }
+
+            //synthese Statut par idFile
+            $syntheseStatut = $em->getRepository('TMDProdBundle:EcommTracking')->findSyntheseStatut($idOpe);
+            $tabSyntheseStatut = array();
+            foreach ($syntheseStatut as $key=>$val)
+            {
+                if (!isset($tabSyntheseStatut[$val['idfile']]))$tabSyntheseStatut[$val['idfile']] = array();
+               //$tab = array();
+                array_push($tabSyntheseStatut[$val['idfile']],  array((strval($val['idStatut'])) => $val[1]));
+
             }
 
 
@@ -1172,11 +2371,14 @@ class ProdController extends Controller
             $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
 
+//            $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile('5076');
+
 
 
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
-            $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($files);
-            $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommBl')->findArticlesByOpeByDateNonProd($files);
+            $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($idOpe);
+            $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeByDateNonProd($idOpe);
+            $ArticlesSyntheseRupture = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeRupture($idOpe);
             $ArticlesReclaSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesReclaByFile($files);
 
             $nbRetentionByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbRetentionByFile($files);
@@ -1201,10 +2403,24 @@ class ProdController extends Controller
                 $syntheseArticles['tot'][$article['flagart']][$name]= $article['quantite'];
 //                $syntheseArticles['tot'][$article['flagart']][$article['libelle']]= $article['quantite'];
             }
+            foreach($ArticlesSyntheseRupture as $articler)
+            {
+                $name = $articler['codearticle']." -> ".$articler['libelle'];
+                $syntheseArticles['rupture'][$articler['flagart']][$name]= $articler['quantite'];
+            }
             foreach($ArticlesSyntheseNonProd as $article)
             {
-                $syntheseArticles['aProd'][$article['flagart']][$article['libelle']]= $article['quantite'];
+                $syntheseArticles['aProd'][$article['flagart']][$article['codearticle']]= $article['quantite'];
+                $name = $article['codearticle']." -> ".$article['libelle'];
+                $syntheseArticles['aProdLibelle'][$article['flagart']][$name]= $article['quantite'];
             }
+
+            if ( $idOpe == 554){
+                $nbCarte = $em->getRepository('TMDAppliBundle:NTracking')->findNbCarteUtilByClient($idClient);
+                $syntheseArticles['coriolisCarte'] = $nbCarte;
+
+            }
+
 
             $articles=[];
             foreach ($ArticlesByIdFile as $key=>$ar)
@@ -1212,6 +2428,7 @@ class ProdController extends Controller
                 $articles[$ar['idfile']][$ar['flagart']][$ar['libelle']] =  ($ar['quantite']);
 
             }
+
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
             foreach ($nbBlByFile as $bl)
             {
@@ -1258,7 +2475,6 @@ class ProdController extends Controller
             }
 
 
-
             $nbBlByFileProd = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlByFileProd($files);
             $filesBlProd = array();
             $dateMinProdByApplication = '2040-01-01 ';
@@ -1273,18 +2489,28 @@ class ProdController extends Controller
             }
 
 
-            $quantiteBlaProduire = 0;
-            foreach ($filesBl as $k=>$v)
+            $tabSyntheseGeneralaProd = 0;
+            $tabSyntheseGeneralaRupture = 0;
+            $tabSyntheseGeneralaSupp = 0;
+            foreach ($tabSyntheseStatut as $tab)
             {
-                if (isset($filesBlProd[$k]) && isset($v['nbBl'])){
-                    $quantiteBlaProduire += $v['nbBl']-$filesBlProd[$k]['totProd'];
-                }
-                else{
-                    if (isset($v['nbBl'])) {
-                        $quantiteBlaProduire += $v['nbBl'];
+                foreach ($tab as $tab1) {
+                    foreach ($tab1 as $u => $v) {
+                        if ($u == 9) {
+                            $tabSyntheseGeneralaSupp += intval($v);
+                        }
+                        if ($u == 10) {
+                            $tabSyntheseGeneralaRupture  += intval($v);
+                        }
                     }
                 }
             }
+            foreach ($filesBlProd as $tab)
+            {
+                $tabSyntheseGeneralaProd += intval($tab['totProd']);
+            }
+
+
 
             //pagination
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
@@ -1292,6 +2518,11 @@ class ProdController extends Controller
                 throw $this->createNotFoundException("La page ".$page." n'existe pas.");
             }
 
+            //retour d'une modification de BL ou fichier
+            $blretour = null;
+            if ( $blR != 0){
+                $blretour = $blR;
+            }
             return $this->render('TMDProdBundle:Prod:SuiviProdCourant.html.twig', array(
                 'idOperation'               => $idOpe,
                 'idClient'                  => $idClient,
@@ -1300,16 +2531,22 @@ class ProdController extends Controller
                 'page'                      => $page,
                 'files'                     => $fileByOpe,
                 'filesTot'                  => $fileTotByOp,
+                'filesBLtot'                => intval($fileBLTotByOp[0][1]),
                 'nbTrByFile'                => $trackings,
                 'nbBlbyfile'                => $filesBl,
                 'nbBlByFileProd'            => $filesBlProd,
                 'nbFichiersPage'            => $nbFichierPage,
-                'quantiteBlaProduire'       => $quantiteBlaProduire,
                 'dateMaxProdByApplication'  =>$dateMaxProdByApplication,
                 'dateMinProdByApplication'  =>$dateMinProdByApplication,
                 'TypeTransport'             => $modeTransport,
                 'syntheseTransport'         => $transportCount,
-                'syntheseArticle'           => $syntheseArticles
+                'syntheseArticle'           => $syntheseArticles,
+                'blRetour'                  => $blretour,
+                'syntheseStatut'            => $syntheseStatut,
+                'tabsyntheseStatut'         => $tabSyntheseStatut,
+                'tabSyntheseGeneralaProd'   => $tabSyntheseGeneralaProd,
+                'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
+                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture
             ));
         }
 
@@ -1327,9 +2564,9 @@ class ProdController extends Controller
             $emCP = $this->getDoctrine()->getManager('colisprive');
             $emDpd = $this->getDoctrine()->getManager('dpd');
 
-            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($id);
-            $articles = $em->getRepository('TMDProdBundle:EcommBl')->findArticlesByFileArrayNonProd($id);
-            $articlesPersos = $em->getRepository('TMDProdBundle:EcommBl')->findArticlesPersoByFileArrayNonProd($id);
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlNonProdByFile($id);
+            $articles = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByFileArrayNonProd($id);
+            $articlesPersos = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesPersoByFileArrayNonProd($id);
 
             $articleArray = array();
             foreach ($articles as $key => $item) {
@@ -1386,7 +2623,6 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
-
     public function donneTrackingsByFileAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -1396,10 +2632,9 @@ class ProdController extends Controller
             $emCP = $this->getDoctrine()->getManager('colisprive');
             $emDpd = $this->getDoctrine()->getManager('dpd');
 
-            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFile($id);
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($id);
             $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileArray($id);
             $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
-
             $articleArray = array();
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;
@@ -1451,11 +2686,196 @@ class ProdController extends Controller
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
             }
+
+
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
             return new JsonResponse($reponse);
 
         };
         return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function donneRuptureByFileAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+            $id = $request->get('rupture_idbl');
+            $em = $this->getDoctrine()->getManager();
+            $emCP = $this->getDoctrine()->getManager('colisprive');
+            $emDpd = $this->getDoctrine()->getManager('dpd');
+
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByFile($id);
+
+            $listBL = array();
+            foreach ($allBlByOpe as $bl){
+                array_push($listBL, $bl[0]['numbl']);
+            }
+
+            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesRuptureByFileArray($listBL);
+//            $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
+            $articleArray = array();
+            foreach ($articles as $key => $item) {
+                $articleArray[$key] = $item;
+            }
+
+
+            $numBLs = array();
+            foreach ($allBlByOpe as $key=>$file)
+            {
+                if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                    $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+                }
+                if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                    $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+                }
+
+
+            }
+
+
+            $statuts = array();
+            if ( isset($numBLs['CPRV']['numBl'])) {
+                $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+                foreach ($trackingColisPrive as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+            if (isset($numBLs['DPD']['numBl']) ) {
+                $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+                foreach ($trackingDpd as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+
+
+            $tabBlComplet = array();
+            foreach ($allBlByOpe as $key=>$item){
+                if (isset($statuts[$item['numbl']])){
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                }
+                else{
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut']['libelle']="";
+                    $tabBlComplet[$key]['statut']['dateStatut']="";
+                }
+            }
+
+
+            $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray);
+            return new JsonResponse($reponse);
+
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function exportResteProdExcelAction($idoperation)
+    {
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeNonProd($idoperation);
+
+
+
+
+
+
+        $header = array('Code article' => 'string',
+                        'Libelle'=> 'string',
+                        'Reste à produire'=> 'number'
+                    );
+
+        $tabBlComplet2 = array();
+        foreach ($ArticlesSyntheseNonProd as $k=>$v){
+
+
+            array_push($tabBlComplet2,[
+                $v['codearticle'],
+                $v['libelle'],
+                $v['quantite']
+            ]);
+        }
+
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+
+            $nomExport = preg_replace ('/\s+/',"_",($ArticlesSyntheseNonProd[0]['appliname']));
+
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'_resteAproduire.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
+    }
+
+    public function exportRuptureProdExcelAction($idoperation)
+    {
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpRupture($idoperation);
+
+        $header = array('Code article' => 'string',
+            'Libelle'=> 'string',
+            'Qté en rupture'=> 'number'
+        );
+
+        $tabBlComplet2 = array();
+        foreach ($ArticlesSyntheseNonProd as $k=>$v){
+
+
+            array_push($tabBlComplet2,[
+                $v['codearticle'],
+                $v['libelle'],
+                $v['quantite']
+            ]);
+        }
+
+
+
+        $writer = new XLSXWriter();
+        $writer->writeSheet($tabBlComplet2,'extraction',$header);
+
+
+
+        $nomExport = preg_replace ('/\s+/',"_",($ArticlesSyntheseNonProd[0]['appliname']));
+
+
+
+        return new Response(
+            $writer->writeToString(),  // read from output buffer
+            200,
+            array(
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment ;filename='.$nomExport.'_article_rupture.xlsx',
+                'Content-Transfer-Encoding' =>  'binary',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' =>  'public'
+            )
+        );
+
+
     }
 
     public function exportSynthesebyDateAction(Request $request)
@@ -1555,6 +2975,45 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function exportSynthesebyDateDepotAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+            $date = $request->get('infoDate');
+            $idAppli = $request->get('infoAppli');
+
+            $em = $this->getDoctrine()->getManager();
+
+            $nbBlByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBlByOpeByDateDepot( $date, $idAppli);
+            $bls = array();
+            foreach ($nbBlByFile as $f=>$k){
+                array_push($bls,intval($k->getBl()->getNumbl()) ) ;
+            }
+
+            $filesBl= array();
+
+            $ArticlesByBl = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bls);
+
+            $syntheseArticles=[];
+            foreach($ArticlesByBl as $article)
+            {
+                $syntheseArticles[$article['flagart']][$article['libelle']]= $article['quantite'];
+            }
+
+
+            $countTransportbyFile = $em->getRepository('TMDProdBundle:EcommBl')->findNbTransportByBls($bls);
+            foreach ($countTransportbyFile  as $bl)
+            {
+                $filesBl[$bl['modexp']] = $bl[1];
+            }
+
+
+            return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
+
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
     public function calendarAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -1575,6 +3034,25 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function calendarDepotAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $id = $request->get('idappli');
+
+            $em = $this->getDoctrine()->getManager();
+            //test
+            $test = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlDepotByDate($id);
+
+//            $tab = array(["title" =>"New Event","start" =>"2017-11-24","end" =>"2017-11-26","allDay" => 0 ]);
+
+
+
+            return new JsonResponse( $test );
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
 
     public function articleByBlAction(Request $request)
     {
@@ -1605,4 +3083,26 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function donneAllTransportAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+
+            $em = $this->getDoctrine()->getManager();
+
+            $allTransport= $em->getRepository('TMDAppliBundle:EcommTransport')->findallTransport();
+            $allTransporteur= $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
+            $allTransporteurCompte= $em->getRepository('TMDAppliBundle:EcommCompteTransport')->findallTransporteurCompte();
+            $allCompte= $em->getRepository('TMDAppliBundle:EcommCompte')->findallCompte();
+
+            $arrayClientCompte = array();
+            foreach ($allCompte as $v){
+                    array_push($arrayClientCompte,$v['idclient']);
+            }
+            $allCLient= $em->getRepository('TMDProdBundle:Client')->findallCLientCompte($arrayClientCompte);
+
+            return new JsonResponse(array($allTransport,$allTransporteur,$allTransporteurCompte,$allCompte,$allCLient));
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
 }
