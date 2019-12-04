@@ -1,0 +1,4 @@
+services:
+#    tmd_stat.example:
+#        class: TMD\StatBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]
