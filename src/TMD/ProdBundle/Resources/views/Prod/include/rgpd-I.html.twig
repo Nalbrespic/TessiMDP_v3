@@ -1,0 +1,100 @@
+{% block javascriptsPlus %}
+    <div class="row">
+        <div class="col-md-5" style="margin-top: 23px;">
+            <button type="submit" onclick="anonymisation();" class="btn btn-default">Anonymisation de l'opération</button>
+        </div>
+
+    </div>
+
+    <div id="ModalRgpd" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="ModalRgpdContenu" class="ModalCarte-title"></h4>
+            </div>
+
+            <div class="modal-footer">
+                <button id="ModalRgpdAnnule" type="button" class="btn btn-default" >Annuler</button>
+                <button id="ModalRgpdConfirme"type="button" class="btn btn-primary">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ModalRgpd2" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="ModalRgpdContenu2" class="ModalCarte-title"></h4>
+            </div>
+
+            <div class="modal-footer">
+                <button id="ModalRgpdConfirme2"type="button" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+
+
+    <script>
+        function anonymisation() {
+            var idClient = $('#idClient').text();
+            var idopera = $('#idOperation').text();
+            var client = $('#nomClientR').text();
+            var operation = $('#nomOperationR').text();
+            var modal = document.getElementById('ModalRgpd');
+            var modalAnnule = document.getElementById('ModalRgpdAnnule');
+            var modalConfirme = document.getElementById('ModalRgpdConfirme');
+//            var span = document.getElementsByClassName("closeModalCarte");
+//            var contenuModal = document.getElementsByClassName("ModalCarte-title");
+            $("#ModalRgpdContenu").html("Confirmer l'anonymisation de <span style='font-size: 1.2em;'>"+client+ " - "+operation+"</span>");
+
+            modal.style.display = "block";
+            window.onclick = function (event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+                if (event.target === modalAnnule) {
+                    modal.style.display = "none";
+                }
+                if (event.target === modalConfirme) {
+
+                    $.ajax({
+                        url: "{{ path('tmd_prod_suppNameOperation') }}",
+                        type: "POST",
+                        data: {idClient:  idClient,ipOpe:  idopera },
+                        dataType: "html",
+                        contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                        complete: function (data) {
+                            modal.style.display = "none";
+
+                            var modal2 = document.getElementById('ModalRgpd2');
+                            var modalConfirme2 = document.getElementById('ModalRgpdConfirme2');
+                            $("#ModalRgpdContenu2").html("L'opération "+operation+" a bien été anonymisée !");
+                            modal2.style.display = "block";
+                            window.onclick = function (event) {
+                                if (event.target === modal2) {
+                                    modal2.style.display = "none";
+                                }
+                                if (event.target === modalConfirme2) {
+                                    modal2.style.display = "none";
+                                }
+                            }
+
+                        }
+
+                    })
+
+                }
+
+            }
+
+
+        }
+    </script>
+
+
+{% endblock %}
+

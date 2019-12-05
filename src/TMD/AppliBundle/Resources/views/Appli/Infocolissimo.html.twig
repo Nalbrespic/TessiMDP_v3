@@ -1,0 +1,128 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Colissimo
+{% endblock %}
+
+
+
+{% block body %}
+
+    <div id="myModalCN23" class="modalCN23" style="display: none;">
+        <!-- Modal content -->
+        <div class="modal-content" style="width: 60%;">
+            <div style="text-align: right;"><a href="#"><span class="closeArticle2">&times;</span></a></div>
+            <div id="modalCN23Contenu">A imprimer ...</div>
+        </div>
+    </div>
+
+
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: -9px;">Information colissimo</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">{#background: #d34026;#}
+        <div class="col-md-7 col-md-offset-4" id="messageB" style="border-bottom-left-radius: 10px;color: white;font-size: 1.3em;padding-left: 39px;height: 30px;display:none;background: #d34026;font-family: initial;">
+            <div class="row">
+                <div  class="col-md-9"><p id ="message"></p></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-5" style="margin-top: 23px;">
+        <div class="form-group">
+            <label for="entered_search">Recherche par N° de colis</label>
+            <input  name="entered_search" onchange="InfoColissimo()" type="text" style="width: 150px;" class="form-control"  id="entered_ColInfo" >
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+    <script>
+
+        function InfoColissimo() {
+            var numCol =  $('#entered_ColInfo').val();
+            $.ajax({
+                url: "{{ path('tmd_zpl_imprimColissimoInformation') }}",
+                data: 'numCol='+numCol,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (html) {
+                    var bl = html.responseText;
+                    var obj = JSON.parse(bl);
+                    if (html.status === 407){
+                        $('#message').html(obj['error']);
+                    }else{
+                        $('#message').html(obj['message']);
+                        document.getElementById('messageB').style.backgroundColor = '#BFD626';
+                        editBordereauInfo(numCol);
+                    }
+
+
+                    document.getElementById('messageB').style.display = '';
+
+                }
+            })
+        }
+    </script>
+
+    <script>
+        function editBordereauInfo(track) {
+
+            if (doesFileExist('../../Colissimo/Formulaire/colissimo_' + track + '.pdf')) {
+                printIframe(track);
+                document.getElementById('myModalCN23').style.display = '';
+
+
+                var modalcn = document.getElementById('myModalCN23');
+                var spancn = document.getElementsByClassName("closeArticle2")[0];
+                spancn.onclick = function () {
+                    modalcn.style.display = "none";
+                }
+            }
+
+            function printIframe(date) {
+                var objFra = document.createElement('iframe');// CREATE AN IFRAME.
+                var asset = '{{ asset('Colissimo/Formulaire/colissimo_date.pdf') }}';
+                asset = asset.replace('date', date);
+                objFra.src = asset;
+                objFra.width = '100%';
+                objFra.height = '390px';
+
+                var cont = document.getElementById('modalCN23Contenu');// SET SOURCE.
+                $('#modalCN23Contenu').html('');
+                cont.appendChild(objFra);  // APPEND THE FRAME TO THE PAGE.
+            }
+
+
+            function doesFileExist(urlToFile) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('HEAD', urlToFile, false);
+                xhr.send();
+                if (xhr.status == "404") {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+
+
+
+    </script>
+
+
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Colissimo
+{% endblock %}
+
+
+
+{% block body %}
+
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: -9px;">Traitement fichiers</h3>
+            </div>
+        </div>
+    </div>
+
+
+
+
+   <p style="font-size: 1.4em;margin-top: 30px;">Recup fichier</p>
+
+
+    {#<div id="dropfile" style="width: 300px;height: 50px;border: 3px dashed #BBBBBB;line-height:50px;text-align: center;">Drop an image from your computer</div>#}
+
+    <div id="output" style="width: 300px;height: 50px;border: 3px dashed #BBBBBB;line-height:50px;text-align: center;">
+        <p id="output-listing"></p>
+    </div>
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+    <script>
+
+        $(document).ready(function(){
+
+            $.event.props.push("dataTransfer");
+
+            // On pose les évènements nécessaires au drag'n'drop
+            $('#output').bind({
+                "dragenter dragexit dragover" : do_nothing,
+                drop : drop
+            });
+
+        });
+
+        function do_nothing(evt){
+            evt.stopPropagation();
+            evt.preventDefault();
+        }
+
+        function drop(evt){
+            do_nothing(evt);
+
+            var files = evt.dataTransfer.files;
+
+            // On vérifie que des fichiers ont bien été déposés
+            if(files.length>0){
+                for(var i in files){
+                    // Si c'est bien un fichier
+                    if(files[i].size!==undefined) {
+
+                        var fic=files[i];
+
+                        // On construit notre objet FormData
+                        var fd=new FormData;
+                        fd.append('fic',fic);
+
+                        // Requete ajax pour envoyer le fichier
+                        $.ajax({
+                            url:"{{ path('tmd_appli_traitementFichier') }}",
+                            type: 'POST',
+                            data: fd,
+                            processData:false,
+                            contentType:false
+                            complete: function (html) {
+
+                            }
+                        });
+
+                        // On ajoute notre fichier à la liste
+                        $('#output-listing').append('<p>'+files[i].name+'</p>');
+
+                    }
+                }
+            }
+
+        }
+
+
+
+    </script>
+
+
+
+
+{% endblock %}

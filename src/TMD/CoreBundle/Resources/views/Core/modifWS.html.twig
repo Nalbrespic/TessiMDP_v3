@@ -1,0 +1,215 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    WebService Erreur
+{% endblock %}
+
+
+
+{% block body %}
+
+
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: 1px;">Correction adresse WebService </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% for message in app.session.flashbag.get( 'erreurWSConfirmation') %}
+                <div class="row" id="saisiCarteConfirm">
+                    <div class="col-md-10"  style="background-color: #BFD626;border-radius: 9px;height: 30px;margin-bottom: 8px;margin-left: 15px;">
+                        <div class="alert alert-notice" style="padding: inherit;font-size: 1.2em;">
+                            <p>{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {{ form_start(form, {'action': path('tmd_core_rectificationWS', { 'current': current , 'idOpe' : idope})}) }}
+
+
+    <div class="row">
+
+
+        <div class="col-md-offset-2 col-md-4" style="position: relative;">
+            <div class="row">
+                <div class="col-md-4">
+                     {{ form_label(form.numligne.destinataire) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destinataire) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destRue) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destRue) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destAd2) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destAd2) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destAd3) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destAd3) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destAd4) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destAd4) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destAd5) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destAd5) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destAd6) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destAd6) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destCp) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destCp) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destVille) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destVille) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destPays) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destPays) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destTel) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destTel) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.numligne.destMail) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.numligne.destMail) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_label(form.poids) }}
+                </div>
+                <div class="col-md-8">
+                    {{ form_widget(form.poids) }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-5" style="margin-bottom: -41px;">
+            <p style="font-size: 1.2em;">BL: {{ (form.numbl.vars.value) }}</p>
+            <p style="display: none;">{{ form_widget(form.numbl) }}</p>
+            <p style="font-size: 1.4em;">Motif erreur: {{ motif }}</p>
+            <p style="font-size: 1.4em;">Adresse {{ current+1 }}/{{ autreErreur }}</p>
+
+            <div style="margin-top: 50px;">
+                   {% if articles|length > 0 %}
+                    <p style="font-size: 1.4em;">Articles:</p>
+                    <div class="col-md-9" style="max-height: 170px;overflow-y: auto;">
+                        <table class="table table-hover table-bordered " >
+                           <tr  style="font-weight: bold;font-size: 1em;border-bottom: 2px solid #504A62">
+                               <td>Code article</td>
+                               <td>Libelle</td>
+                               <td>Quantite</td>
+                               <td>Poids</td>
+                           </tr>
+                            {% for art in articles %}
+                                <tr style="font-size: 0.9em;">
+                                    <td style="padding-bottom: 0px;"> {{ art['codearticle'] }}</td>
+                                    <td style="padding-bottom: 0px;"> {{ art['libelle'] }}</td>
+                                    <td style="padding-bottom: 0px;"> {{ art['quantite'] }}</td>
+                                    <td style="padding-bottom: 0px;"> {{ art['poids'] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                       {% endif %}
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-offset-7 col-md-5" style="margin-top: 10px;">
+            <div class="row">
+                <div class="col-md-2">
+                    {{ form_widget(form.Valider) }}
+                </div>
+                {#{% if autreErreur > 1 %}#}
+                    <div class="col-md-2">
+                        <a href="{{ path('tmd_core_homepage') }}" class="btn btn-default" >Quitter</a>
+                    </div>
+                {#{% endif %}#}
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {% if current < autreErreur-1 %}
+        <div class="col-md-2" style="position: absolute;top: 46%;right: 0;">
+            <a  href="{{ path('tmd_core_rectificationWS', {'current' : current+1 , 'idOpe' : idope}) }}"><img style="height: 28px;"  src="{{ asset('Images/flecheD.png') }}"></a>
+        </div>
+    {% endif %}
+    {% if current > 0  %}
+        <div class="col-md-2" style="position: absolute;top: 46%;left: 8%;">
+            <a  href="{{ path('tmd_core_rectificationWS', {'current' : current-1 , 'idOpe' : idope}) }}"><img style="height: 28px;"  src="{{ asset('Images/flecheGau.png') }}"></a>
+        </div>
+    {% endif %}
+
+    {#<p style="display: none;">{{ form_widget(form.saveAndMore) }}</p>#}
+    <p style="display: none;">{{ form_widget(form.numligne) }}</p>
+
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+
+{% endblock %}

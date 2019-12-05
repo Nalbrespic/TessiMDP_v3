@@ -1,0 +1,93 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Election
+{% endblock %}
+
+
+
+{% block body %}
+
+
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: 1px;">Suivi Election </h3>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li  {% if statut == 11 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 11 , 'jour': jour}) }}" aria-controls="home" role="tab" >Mise sous pli</a></li>
+        <li {% if statut == 12 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 12, 'jour': jour}) }}" aria-controls="profile" role="tab" >Collage</a></li>
+        <li {% if statut == 2 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 2, 'jour': jour}) }}" aria-controls="recherche" role="tab" >Expédition</a></li>
+    </ul>
+
+    <span id="theStatut" style="display: none;">{{ statut }}</span>
+
+
+                <div class="row" style="position: relative;">
+                   <div class="col-md-12" style="position: absolute;text-align: end;margin-top: -3px;z-index: 2;">
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 0}) }}" {% if jour == 0 %}style="color: #DC3912;"{% endif %}>Lundi 13</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 1}) }}" style="margin-left: 20px;{% if jour == 1 %}color: #DC3912;{% endif %}">Mardi 14</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 2}) }}" style="margin-left: 20px;{% if jour == 2 %}color: #DC3912;{% endif %}">Mercredi 15</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 3}) }}" style="margin-left: 20px;{% if jour == 3 %}color: #DC3912;{% endif %}">Jeudi 16</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 4}) }}" style="margin-left: 20px;{% if jour == 4 %}color: #DC3912;{% endif %}">Vendredi 17</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 5}) }}" style="margin-left: 20px;{% if jour == 5 %}color: #DC3912;{% endif %}">Samedi 18</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 6}) }}" style="margin-left: 20px;{% if jour == 6 %}color: #DC3912;{% endif %}">Lundi 20</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 7}) }}" style="margin-left: 20px;{% if jour == 7 %}color: #DC3912;{% endif %}">Mardi 21</a>
+                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 8}) }}" style="margin-left: 20px;{% if jour == 8 %}color: #DC3912;{% endif %}">Mercredi 22</a>
+                    </div>
+                </div>
+
+                                    <div role="tabpanel" class="tab-pane active" id="home">
+                                        <div class="row" style="margin-left: 0px;margin-top: 30px;">
+                                            <div class="col-md-12" style="border: 2px solid #504A62;border-radius: 15px;padding: 10px;width: 833px;position: relative;">
+                                                <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                                                    <p style="font-weight: bold;font-size: 1.1em;">Production totale</p>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <p style="margin-top: 163px;margin-left: 103px;z-index: 2;position: absolute;font-size: 1.2em;">Par Kub:</p>
+                                                         <div id="div_piechart" ></div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p style="margin-top: 163px;margin-left: 103px;z-index: 2;position: absolute;font-size: 1.2em;">Par électeur:</p>
+                                                        <div id="div_piechart2" ></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-left: 0px;margin-top: 30px;">
+                                            <div class="col-md-7" style="border: 2px solid #504A62;border-radius: 15px;padding: 17px;width: 833px;position: relative;">
+                                                <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
+                                                    <p style="font-weight: bold;font-size: 1.1em;">Production journalière</p>
+                                                </div>
+                                                <div id="div_line"></div>
+                                                <div id="div_chart"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+{% endblock %}
+
+{% block javascriptsPlus %}
+
+    <script type="text/javascript">
+
+        var statut = $('#theStatut').val();
+        if (statut == 0){
+            statut = 11
+        }
+
+        {{ gc_draw([piechart,piechart2, line , chart],['div_piechart','div_piechart2', 'div_line', 'div_chart']) }}
+
+
+        {#{{ gc_draw([piechart[11],piechart2[11], line[11][1]], ['div_piechart_11','div_piechart2_11', 'div_line_11']) }}#}
+    </script>
+
+
+{% endblock %}
