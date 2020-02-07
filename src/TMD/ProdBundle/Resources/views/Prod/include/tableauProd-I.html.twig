@@ -37,7 +37,7 @@
         {% if Colrecla == 1 %}
             <th style="text-align: center;padding-bottom: 0px;">Cmd Recla</th>
         {% endif %}
-
+        <th style="text-align: center;padding-bottom: 0px;">Date depôt</th>
         <th style="text-align: center;padding-bottom: 0px;">PremièrePROD</th>
         <th style="text-align: center;padding-bottom: 0px;">Dernière PROD</th>
         <th style="text-align: center;padding-bottom: 0px;"></th>
@@ -358,6 +358,16 @@
                 <td></td>
             {% else %}
             {% endif %}
+            <td>
+                {% if nbBLWtihDepotNull[file['idfile']] is defined %}
+                    <div style = "">
+                        <a  href="#{{ loop.index }}"  id="{{ file['idfile'] }}"  class=" ProfilDepotNull tableToggleButton" data-toggle="collapse"  style="color: white;">
+{#                            {{ nbBLWtihDepotNull[file['idfile']] }}#}
+
+                        <img class="img-responsive"  src="{{ asset('Images/PanneauAttention.png') }}" style="padding: 0px;max-width: 17px;margin: auto;"></a>
+                    </div>
+                {% endif %}
+            </td>
             <td style="width: 122px;">{% if nbBlByFileProd[file['idfile']]['minProd'] is defined %}
                     {{ nbBlByFileProd[file['idfile']]['minProd']|date("d/m/Y H:i") }}
                 {%  else %}
@@ -399,6 +409,12 @@
 
         <tr >
             <td colspan="{{ nbColonne +9 +TypeTransport|length}}" class="toggleableRupture" id="afficherProfileRupture{{ file['idfile'] }}" style="font-family: initial;font-size: 0.7em;">
+
+            </td>
+        </tr>
+
+        <tr >
+            <td colspan="{{ nbColonne +9 +TypeTransport|length}}" class="toggleableDepotNull" id="afficherProfileDepotNull{{ file['idfile'] }}" style="font-family: initial;font-size: 0.7em;">
 
             </td>
         </tr>

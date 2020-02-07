@@ -12,10 +12,10 @@ class AppKernel extends Kernel
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Symfony\Bundle\MonologBundle\MonologBundle(),
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new FOS\RestBundle\FOSRestBundle(),
-            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+//            new FOS\RestBundle\FOSRestBundle(),
+
             new TMD\CoreBundle\TMDCoreBundle(),
             new TMD\ZplBundle\TMDZplBundle(),
             new TMD\ProdBundle\TMDProdBundle(),
@@ -29,18 +29,18 @@ class AppKernel extends Kernel
             new TMD\DpdBundle\TMDDpdBundle(),
             new TMD\AppliBundle\TMDAppliBundle(),
             new TMD\CoriolisBundle\TMDCoriolisBundle(),
-            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
-            new Tms\Bundle\RestBundle\TmsRestBundle(),
-            new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
+//            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
+//            new Tms\Bundle\RestBundle\TmsRestBundle(),
+//            new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
             new TMD\StatBundle\TMDStatBundle(),
             new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
-            new TMD\MinosBundle\TMDMinosBundle(),
+            new TMD\MinosBundle\TMDMinosBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
             $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
+
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
         }
 

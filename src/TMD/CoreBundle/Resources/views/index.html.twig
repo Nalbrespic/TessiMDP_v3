@@ -319,6 +319,9 @@
             }
 
             $(".toggleable").hide();
+            $(".toggleableFile").hide();
+            $(".toggleableRupture").hide();
+            $(".toggleableDepotNull").hide();
             function afficherProfile($obj){
                 var annonce = $obj.attr('id');
                 if (initbl === annonce)
@@ -354,10 +357,15 @@
 
                             var art = obj['articles'];
                             var lenA = art.length;
-                            html += '<div class="row"><div class="col-md-5" style="overflow: auto;max-height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Article</td><td>Quantité</td></tr>';
+                            html += '<div class="row"><div class="col-md-5" style="overflow: auto;max-height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code article</td><td>Article</td><td>Quantité</td><td>Statut</td></tr>';
                             for (var j = 0; j < lenA; j++) {
 
+
                                 html += '<tr class="tabSyntheseBlanc"><td ';
+                                if(!art[j]['flagart'] ){
+                                    html+='Style="font-size: 1.2em;"';
+                                }
+                                html +='>' + art[j]['codearticle'] + '</td><td ';
                                 if(!art[j]['flagart'] ){
                                     html+='Style="font-size: 1.2em;"';
                                 }
@@ -366,7 +374,18 @@
                                 if(!art[j]['flagart']){
                                     html+='Style="font-size: 1.2em;"';
                                 }
-                                html+= '>' + art[j]['quantite'] + '</td></tr>';
+                                html+= '>' + art[j]['quantite'] + '</td><td ';
+                                if(!art[j]['flagart']){
+                                    html+='Style="font-size: 1.2em;"';
+                                }
+
+                                if (art[j]['trStatut'] !== "Mise en PROD")
+                                {
+                                    html+= art[j]['trStatut'] +'</td></tr>';
+                                }
+                                else {
+                                    html += '</td></tr>';
+                                }
                             }
                             html += '</table></div>';
 
@@ -387,69 +406,69 @@
                             }
                             html += '</div>';
 
-                            html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Ajout date Depot/Production: </p><hr class="menutr">';
-
-
-
-
-                            if (obj['add'][0]['dateDepot']['date'].split(" ")[0] === '-0001-11-30'){
-                                html+= '<div class="row">'
-                                            +'<div class="col-md-12">'
-                                                +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de depôt: </p>'
-                                            +'</div>'
-                                            +'<div class="col-md-offset-1 col-md-2">'
-                                                +'<div id="retourdatedepotOk">'
-                                                    +'<div class="input-group date" data-provide="datepicker"  style="width: 150px;">'
-                                                        +'<input id="dateDepotValue" type="text" class="form-control" >'
-                                                            +'<div class="input-group-addon">'
-                                                                +'<span class="glyphicon glyphicon-th"></span>'
-                                                            +'</div>'
-                                                    +'</div>'
-                                                +'</div>'
-                                            +'</div>'
-                                            +'<div class="col-md-2" id="retourdatedepotBouton" style="text-align: left;">'
-                                                        +'<button class="btn btn-default" onclick="valideDateDepot('+annonce+')" >Valide</button>'
-                                            +'</div>'
-                                            +'<div class="col-md-12" id="retourdatedepot" style="display: none;text-align: left;margin-left: 10px;">'
-                                            +'</div>'
-                                        +'</div>';
-
-                            }
-                            else{
-                                html+='<div class="row">'
-                                            +'<div class="col-md-12">'
-                                                +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de depôt: </p>'
-                                            +'</div>'
-                                            +'<div class="col-md-12" style="text-align: left;margin-left: 10px;">'
-                                                +'<p style="font-size: 1.8em;">'+obj['add'][0]['dateDepot']['date'].split(" ")[0]+'</p>'
-                                            +'</div>'
-                                      +'</div>';
-
-                            }
-
-                            html+= '<div id="dateProductionAValide"';
-                            if (obj['add'][0]['dateDepot']['date'].split(" ")[0] !== '-0001-11-30'){
-
-                            }
-                            else{
-                                html+=' style="display: none;"';
-                            }
-                           html += '<div class="row">'
-                                            +'<div class="col-md-12">'
-                                                +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de Production: </p>'
-                                            +'</div>'
-                                            +'<div class="col-md-offset-1 col-md-2">'
-                                                    +'<div id="gggf" class="input-group date " data-provide="datepicker" style="width: 150px;">'
-                                                        +'<input id="dateProductionValue" type="text" class="form-control" >'
-                                                            +'<div class="input-group-addon">'
-                                                                +'<span class="glyphicon glyphicon-th"></span>'
-                                                            +'</div>'
-                                                    +'</div>'
-                                            +'</div>'
-                                            +'<div class="col-md-2" style="text-align: left;">'
-                                                        +'<button class="btn btn-default" onclick="valideDateProduction('+annonce+')" >Valide</button>'
-                                            +'</div>'
-                                    +'</div>';
+                           //  html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Ajout date Depot/Production: </p><hr class="menutr">';
+                           //
+                           //
+                           //
+                           //
+                           //  if (obj['add'][0]['dateDepot']['date'].split(" ")[0] === '-0001-11-30'){
+                           //      html+= '<div class="row">'
+                           //                  +'<div class="col-md-12">'
+                           //                      +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de depôt: </p>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-offset-1 col-md-2">'
+                           //                      +'<div id="retourdatedepotOk">'
+                           //                          +'<div class="input-group date" data-provide="datepicker"  style="width: 150px;">'
+                           //                              +'<input id="dateDepotValue" type="text" class="form-control" >'
+                           //                                  +'<div class="input-group-addon">'
+                           //                                      +'<span class="glyphicon glyphicon-th"></span>'
+                           //                                  +'</div>'
+                           //                          +'</div>'
+                           //                      +'</div>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-2" id="retourdatedepotBouton" style="text-align: left;">'
+                           //                              +'<button class="btn btn-default" onclick="valideDateDepot('+annonce+')" >Valide</button>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-12" id="retourdatedepot" style="display: none;text-align: left;margin-left: 10px;">'
+                           //                  +'</div>'
+                           //              +'</div>';
+                           //
+                           //  }
+                           //  else{
+                           //      html+='<div class="row">'
+                           //                  +'<div class="col-md-12">'
+                           //                      +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de depôt: </p>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-12" style="text-align: left;margin-left: 10px;">'
+                           //                      +'<p style="font-size: 1.8em;">'+obj['add'][0]['dateDepot']['date'].split(" ")[0]+'</p>'
+                           //                  +'</div>'
+                           //            +'</div>';
+                           //
+                           //  }
+                           //
+                           //  html+= '<div id="dateProductionAValide"';
+                           //  if (obj['add'][0]['dateDepot']['date'].split(" ")[0] !== '-0001-11-30'){
+                           //
+                           //  }
+                           //  else{
+                           //      html+=' style="display: none;"';
+                           //  }
+                           // html += '<div class="row">'
+                           //                  +'<div class="col-md-12">'
+                           //                      +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de Production: </p>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-offset-1 col-md-2">'
+                           //                          +'<div id="gggf" class="input-group date " data-provide="datepicker" style="width: 150px;">'
+                           //                              +'<input id="dateProductionValue" type="text" class="form-control" >'
+                           //                                  +'<div class="input-group-addon">'
+                           //                                      +'<span class="glyphicon glyphicon-th"></span>'
+                           //                                  +'</div>'
+                           //                          +'</div>'
+                           //                  +'</div>'
+                           //                  +'<div class="col-md-2" style="text-align: left;">'
+                           //                              +'<button class="btn btn-default" onclick="valideDateProduction('+annonce+')" >Valide</button>'
+                           //                  +'</div>'
+                           //          +'</div>';
 
                             var expor = "{{ path('tmd_prod_exportTrackings', {'idFile': 'kannonce' ,'prod': '1' }) }}";
                             expor = expor.replace("kannonce", annonce);
@@ -466,7 +485,11 @@
             }
 
             $('.ProfilMini').click( function(event){
+
+                $(".toggleable").hide();
                 $(".toggleableFile").hide();
+                $(".toggleableRupture").hide();
+                $(".toggleableDepotNull").hide();
                 afficherProfile($(this));
 
             });
@@ -492,28 +515,30 @@
       function valideDateDepot(idFile) {
 //          var idFile = idFile;
 
-
-          var dateObject = $("#dateDepotValue").datepicker("getDate");
-//          var dateString = moment(dateObject).format('YYYY-MM-DD')
-          var dateString = $.datepicker.formatDate("yy-mm-dd", dateObject);
-//          var dateString = moment(dateObject).format('YYYY-MM-DD');
+          var modDatedepotS = $("#dateDepotValue").val();
+          var modDatedepot = (moment(modDatedepotS, "DD/MM/YYYY")).format('YYYY-MM-DD');
+//           var dateObject = $("#dateDepotValue").datepicker("getDate");
+// //          var dateString = moment(dateObject).format('YYYY-MM-DD')
+//           var dateString = $.datepicker.formatDate("yy-mm-dd", dateObject);
+// //          var dateString = moment(dateObject).format('YYYY-MM-DD');
           $.ajax({
               url: "{{ path('tmd_prod_modifDateDepot') }}",
               type: "POST",
-              data: {idFile:  idFile,dateDepot:  dateString },
+              data: {idFile:  idFile,dateDepot:  modDatedepot },
               dataType: "html",
               contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
               complete: function (data) {
 
-                  var json = data.responseText;
-                  var objet = JSON.parse(json);
-                  var len = objet.length;
-                document.getElementById('retourdatedepotBouton').style.display = 'none';
-                document.getElementById('retourdatedepotOk').style.display = 'none';
-                var htmlr = '<p style="font-size: 1.8em;">'+objet+'</p>';
-                $("#retourdatedepot").append(htmlr);
-                document.getElementById('retourdatedepot').style.display = '';
-                document.getElementById('dateProductionAValide').style.display = '';
+                  document.location.reload();
+                //   var json = data.responseText;
+                //   var objet = JSON.parse(json);
+                //   var len = objet.length;
+                // document.getElementById('retourdatedepotBouton').style.display = 'none';
+                // document.getElementById('retourdatedepotOk').style.display = 'none';
+                // var htmlr = '<p style="font-size: 1.8em;">'+objet+'</p>';
+                // $("#retourdatedepot").append(htmlr);
+                // document.getElementById('retourdatedepot').style.display = '';
+                // document.getElementById('dateProductionAValide').style.display = '';
 
 
               }
@@ -547,12 +572,114 @@
 
     </script>
 
+    {#   lien des depot null  #}
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            var initbl = 0;
+
+            function initialiseInitdepot()
+            {
+                initbl = 0;
+            }
+
+            $(".toggleable").hide();
+            $(".toggleableFile").hide();
+            $(".toggleableRupture").hide();
+            $(".toggleableDepotNull").hide();
+            function afficherProfileDepotNull($obj){
+                var annonce = $obj.attr('id');
+                if (initbl === annonce)
+                {
+                    $("#afficherProfileDepotNull".concat(annonce)).hide();
+                    initialiseInitdepot() ;
+                }
+                else {
+                    $.ajax({
+                        url: "{{ path('tmd_prod_donneDepotNull') }}",
+                        type: "POST",
+                        data: 'annonce_depot=' + annonce,
+                        dataType: "html",
+                        contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                        complete: function (data) {
+
+                            var json = data.responseText;
+                            var obj = JSON.parse(json);
+//
+                            $("#afficherProfileDepotNull".concat(annonce)).text(" ");
+
+                            var afficheTout = false;
+                            var titre = "Trackings:";
+                            var html ="";
+
+                            html+= tabTrackings(obj['add'], obj['add'].length, titre, afficheTout, html);
+
+
+
+                            html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Ajout date Depot pour '+ obj['add'].length +' BL </p><hr class="menutr">';
+
+
+
+
+
+                                html+= '<div class="row" style="margin-bottom: 32px;">'
+                                    +'<div class="col-md-12">'
+                                    +'<p style="font-size: 1.6em;width: 150px;text-align: left;margin-left: 10px;">Date de depôt: </p>'
+                                    +'</div>'
+                                    +'<div class="col-md-offset-1 col-md-2">'
+                                    +'<div id="retourdatedepotOk">'
+                                    +'<div class="input-group date" data-provide="datepicker" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true"  style="width: 150px;">'
+                                        +'<input id="dateDepotValue" type="text" class="form-control" >'
+                                    +'<div class="input-group-addon">'
+                                    +'<span class="glyphicon glyphicon-th"></span>'
+                                    +'</div>'
+                                    +'</div>'
+                                    +'</div>'
+                                    +'</div>'
+                                    +'<div class="col-md-2" id="retourdatedepotBouton" style="text-align: left;">'
+                                    +'<button class="btn btn-default" onclick="valideDateDepot('+annonce+')" >Valide</button>'
+                                    +'</div>'
+                                    +'<div class="col-md-12" id="retourdatedepot" style="display: none;text-align: left;margin-left: 10px;">'
+                                    +'</div>'
+                                    +'</div>';
+
+
+
+
+                            $(".toggleableDepotNull").hide();
+                            $("#afficherProfileDepotNull".concat(annonce)).append(html);
+                            $("#afficherProfileDepotNull".concat(annonce)).show();
+                            initbl = annonce;
+                        }
+                    });
+                }
+            }
+
+            $('.ProfilDepotNull').click( function(event){
+                $(".toggleable").hide();
+                $(".toggleableFile").hide();
+                $(".toggleableRupture").hide();
+                $(".toggleableDepotNull").hide();
+                afficherProfileDepotNull($(this));
+
+            });
+
+
+        });
+    </script>
+
+
+
+
     {#   lien des bl en rupture  #}
     <script type="text/javascript">
         $(document).ready(function(){
             var init = 0;
 
+            $(".toggleable").hide();
+            $(".toggleableFile").hide();
             $(".toggleableRupture").hide();
+            $(".toggleableDepotNull").hide();
             function afficherProfileRupture($obj){
                 var  annonce  = $obj.attr('id');
                 if (init === annonce)
@@ -588,7 +715,7 @@
                                 html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse: </p><hr class="menutr">';
                                 var art = obj['articles'];
                                 var lenA = art.length;
-                                html += '<div class="row"><div class="col-md-5" style="overflow: auto;height: 200px;text-align: left;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code articcle</td><td>Article</td><td>Quantité</td><td></td></tr>';
+                                html += '<div class="row"><div class="col-md-5" style="overflow: auto;height: 200px;text-align: left;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code article</td><td>Article</td><td>Quantité</td><td>Statut</td></tr>';
                                 for (var j = 0; j < lenA; j++) {
 
                                     html += '<tr class="tabSyntheseBlanc"><td ';
@@ -606,16 +733,23 @@
                                     }
                                     html+= '>' + art[j]['quantite'] + '</td><td ';
 
-                                    if(!art[j]['flagart']){
-                                        html+='Style="font-size: 1.2em;"';
+                                    if(!art[j]['flagart'] ){
+                                        html+='Style="font-size: 1.2em;">';
                                     }
-                                    html+= '>';
-                                    if (art[j]['idStatut'] === 10){
-                                        html += 'rupture</td></tr>'
+
+                                    if (art[j]['trStatut'] !== "Mise en PROD")
+                                        {
+                                            html+= art[j]['trStatut'] +'</td></tr>';
                                     }
                                     else {
-                                        html += '</td></tr>'
+                                        html += '</td></tr>';
                                     }
+                                    // if (art[j]['idStatut'] === 10){
+                                    //     html += 'rupture</td></tr>'
+                                    // }
+                                    // else {
+                                    //     html += '</td></tr>'
+                                    // }
 
 
 
@@ -655,7 +789,11 @@
             }
 
             $('.ProfilRupture').click( function(event){
+
+                $(".toggleable").hide();
+                $(".toggleableFile").hide();
                 $(".toggleableRupture").hide();
+                $(".toggleableDepotNull").hide();
                 afficherProfileRupture($(this));
 
             });
@@ -670,7 +808,10 @@
             var init = 0;
 
 
+            $(".toggleable").hide();
             $(".toggleableFile").hide();
+            $(".toggleableRupture").hide();
+            $(".toggleableDepotNull").hide();
             function afficherProfileFile($obj){
                 var  annonce  = $obj.attr('id');
                 if (init === annonce)
@@ -706,10 +847,14 @@
                                     html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse: </p><hr class="menutr">';
                                     var art = obj['articles'];
                                     var lenA = art.length;
-                                    html += '<div class="row"><div class="col-md-5" style="overflow: auto;height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Article</td><td>Quantité</td></tr>';
+                                    html += '<div class="row"><div class="col-md-5" style="overflow: auto;height: 200px;"><table class="table table-hover table-bordered table-responsive" style="margin-left: 40px;z-index: 1;font-size: 1.2em;width: 90%;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code article</td><td>Article</td><td>Quantité</td><td></td></tr>';
                                     for (var j = 0; j < lenA; j++) {
 
                                         html += '<tr class="tabSyntheseBlanc"><td ';
+                                        if(!art[j]['flagart'] ){
+                                            html+='Style="font-size: 1.2em;"';
+                                        }
+                                        html +='>' + art[j]['codearticle'] + '</td><td ';
                                         if(!art[j]['flagart'] ){
                                             html+='Style="font-size: 1.2em;"';
                                         }
@@ -718,7 +863,22 @@
                                         if(!art[j]['flagart']){
                                             html+='Style="font-size: 1.2em;"';
                                         }
-                                        html+= '>' + art[j]['quantite'] + '</td></tr>';
+                                        html+= '>' + art[j]['quantite'] + '</td><td ';
+                                        if(!art[j]['flagart']){
+                                            html+='Style="font-size: 1.2em;"';
+                                        }
+                                        if(!art[j]['flagart'] ){
+                                            html+='Style="font-size: 1.2em;">';
+                                        }
+
+                                        if (art[j]['trStatut'] !== "Mise en PROD")
+                                        {
+                                            html+= art[j]['trStatut'] +'</td></tr>';
+                                        }
+                                        else {
+                                            html += '</td></tr>';
+                                        }
+
                                     }
                                     html += '</table></div>';
 
@@ -755,7 +915,11 @@
             }
 
             $('.ProfilFile').click( function(event){
+
                 $(".toggleable").hide();
+                $(".toggleableFile").hide();
+                $(".toggleableRupture").hide();
+                $(".toggleableDepotNull").hide();
                 afficherProfileFile($(this));
 
             });
@@ -1566,12 +1730,11 @@
     <script>
         function tabTrackings(obj, len, titre, afficheTout, html)
         {
-            console.log(html)
             html += '<div class="fondBlanc " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
 
             html += '<div style="overflow: auto;"><table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.2em;"><tr style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62"><td>Date fichier</td><td>N° BL</td><td>RefClient</td><td>Exp_ref</td><td>num_cmde_client</td>' +
             '<td>date Cmd</td><td>Destinataire</td><td style="padding: 0 50px 0 50px;">rue</td><td>ad2</td><td>ad3</td><td>ad4</td><td>ad5</td><td>ad6</td><td>dest_cp</td><td>dest_ville</td>' +
-            '<td>dest_pays</td><td >telephone</td><td>dateDepot</td><td>n° Tracking</td><td>dateProd</td><td>ModExp</td><td>Assurance</td><td>Poids (gr)</td><td>Qté</td><td>NumTrack</td><td>Date statut</td><td>Statut_livraison</td><td>Nb pages</td></tr>';
+            '<td>dest_pays</td><td >telephone</td><td>dateDepot</td><td>n° Tracking</td><td>dateProd</td><td>ModExp</td><td>Assurance</td><td>Poids (gr)</td><td>statut</td><td>Qté</td><td>NumTrack</td><td>Date statut</td><td>Statut_livraison</td><td>Nb pages</td></tr>';
             for (var i = 0; i < len; i++) {
 
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"'
@@ -1615,6 +1778,10 @@
                 {
                     html += '</td>';
                 }
+                else if ( obj[i]['nColis'] === '0')
+                {
+                    html += '</td>';
+                }
                 else if ( obj[i]['modexp'] !== null && obj[i]['modexp'] !== undefined && obj[i]['modexp'].substring(0,6) === "CHRONO" )
                 {
                     html += '<a href="https://www.chronopost.fr/fr/chrono_suivi_search?listeNumerosLT='+obj[i]['nColis']+'" target="_blank" >'+ obj[i]['nColis'] + '</a></td>';
@@ -1652,7 +1819,7 @@
                     html += '<td>' + obj[i]['modexp'] + '</td>';
                 }
 
-                html+= '<td>' + obj[i]['montant'] + '</td><td>' + (obj[i]['poidsReel']).replace(/^0+/, "") + '</td>';
+                html+= '<td>' + obj[i]['montant'] + '</td><td>' + (obj[i]['poidsReel']).replace(/^0+/, "") + '</td><td>' + obj[i]['trStatut'] + '</td>';
                 if ( obj[i]['quantite'] > 0 ) {
                     html += '<td><a id="'+obj[i]['numbl']+'" onclick="afficherArticle('+obj[i]['numbl']+')" href="#'+obj[i]['numbl']+'">details</a></td>'
                 }
@@ -1762,6 +1929,9 @@
             document.getElementById('menuSuiviPliscache').style.display = "none";
         }
     </script>
+
+
+
 
 
 

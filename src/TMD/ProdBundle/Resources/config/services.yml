@@ -2,3 +2,6 @@ services:
 #    tmd_prod.example:
 #        class: TMD\ProdBundle\Example
 #        arguments: ["@service_id", "plain_value", "%parameter%"]
+    tmd_getInfo:
+        class: TMD\ProdBundle\Service\GetInfoTracking
+        arguments: ['@doctrine.orm.entity_manager']

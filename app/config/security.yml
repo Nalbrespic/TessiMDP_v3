@@ -31,6 +31,7 @@ security:
                 # Cette expression régulière permet de prendre /login (mais pas /login_check !)
                 pattern:   ^/login$
                 anonymous: true
+                logout_on_user_change: true
         api:
                 pattern:  ^/api
                 security: false
@@ -49,6 +50,7 @@ security:
                 secret:   '%kernel.secret%'
                 lifetime: 604800 # 1 week in seconds
                 path:     /
+            logout_on_user_change: true
             # activate different ways to authenticate
 
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate

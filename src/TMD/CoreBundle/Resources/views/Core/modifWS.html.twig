@@ -147,6 +147,7 @@
 
         <div class="col-md-5" style="margin-bottom: -41px;">
             <p style="font-size: 1.2em;">BL: {{ (form.numbl.vars.value) }}</p>
+            <p style="font-size: 1.2em;">Transport: {{ (form.numligne.vars.value).typeTransport }}</p>
             <p style="display: none;">{{ form_widget(form.numbl) }}</p>
             <p style="font-size: 1.4em;">Motif erreur: {{ motif }}</p>
             <p style="font-size: 1.4em;">Adresse {{ current+1 }}/{{ autreErreur }}</p>

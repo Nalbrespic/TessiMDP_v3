@@ -20,6 +20,13 @@ parameters:
     database_user3: Tessi_Admin
     database_password3: TessiAdmin2013?#
 
+    database_host4: 172.17.82.208
+    database_port4: 1521
+    database_name4: minos
+    database_user4: MINOSP
+    database_password4: 'agenoria'
+#   database_url4: jdbc:oracle:oci8:@//172.17.82.208:1521/minos
+
     mailer_transport: smtp
     mailer_host: 127.0.0.1
     mailer_user: null

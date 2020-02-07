@@ -143,6 +143,8 @@ class EcommTrackingRepository extends EntityRepository
             ->setParameter('flag', -1)
             ->andWhere('file.dateFile > :nb')
             ->setParameter('nb', $date)
+            ->andWhere('tr.idStatut != :stat1')
+            ->setParameter('stat1', 9)
             ->groupBy('app.appliname')
             ->getQuery()
             ->getArrayResult()
@@ -169,9 +171,45 @@ class EcommTrackingRepository extends EntityRepository
 
     }
 
+    public function findnbBlWithDepotNull($idOpe)
+    {
+        return $this
+            ->createQueryBuilder('tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('file.idappli IN (:id)')
+            ->setParameter('id', $idOpe)
+            ->andWhere('tr.dateDepot = (:ida)')
+            ->setParameter('ida', "0000-00-00")
+            ->andWhere('tr.idStatut != (:st)')
+            ->setParameter('st', 9)
+            ->select('file.idfile')
+            ->addselect('count(tr.expRef)')
+            ->groupBy('file.idfile')
+            ->getQuery()
+            ->getArrayResult()
 
+            ;
 
-//
+    }
+
+    public function findBlbyFileWithDepotNull($idFile)
+    {
+        return $this
+            ->createQueryBuilder('tr')
+            ->where('tr.idfile = (:id)')
+            ->setParameter('id', $idFile)
+            ->andWhere('tr.dateDepot = (:ida)')
+            ->setParameter('ida', "0000-00-00")
+            ->andWhere('tr.idStatut != (:st)')
+            ->setParameter('st', 9)
+            ->groupBy('tr.expRef')
+            ->getQuery()
+            ->getResult()
+
+            ;
+
+    }
+
 
 
 

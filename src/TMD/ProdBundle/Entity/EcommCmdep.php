@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * EcommCmdep
  *
- * @ORM\Table(name="ecomm_cmdep", indexes={@ORM\Index(name="numBL", columns={"numBL"}), @ORM\Index(name="numRef", columns={"numRef"}), @ORM\Index(name="numcmde", columns={"numcmde"}), @ORM\Index(name="idFile", columns={"idFile"}), @ORM\Index(name="codeArticle", columns={"codeArticle"}), @ORM\Index(name="record", columns={"record"})})
+ * @ORM\Table(name="ecomm_cmdep", indexes={@ORM\Index(name="numBL", columns={"numBL"}), @ORM\Index(name="numRef", columns={"numRef"}) , @ORM\Index(name="libelle", columns={"libelle"}), @ORM\Index(name="numcmde", columns={"numcmde"}), @ORM\Index(name="idFile", columns={"idFile"}), @ORM\Index(name="codeArticle", columns={"codeArticle"}), @ORM\Index(name="record", columns={"record"})})
  * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\EcommCmdepRepository")
  */
 class EcommCmdep
