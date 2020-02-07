@@ -68,19 +68,19 @@ class ProdController extends Controller
             $dateDepot = $request->get('dateDepot');
             $emanager = $this->getDoctrine()->getManager();
             $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
-            $allTrByFile = $emanager->getRepository('TMDProdBundle:EcommTracking')->findBy(array('idfile' => $id));
+            $allTrByFile = $emanager->getRepository('TMDProdBundle:EcommTracking')->findBlbyFileWithDepotNull($id);
 
 
             foreach ($allTrByFile as $tr){
                 $tr->setDateDepot($date);
             }
-
+//dump($allTrByFile);
             $emanager->flush();
 
 
 
 
-            return new JsonResponse(array( date_format($date, 'd-m-Y')));
+            return new JsonResponse(array( 'ok', 'd-m-Y'));
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
@@ -203,7 +203,6 @@ class ProdController extends Controller
 
 
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmd($cmd,$idClient, $idope );
-dump($allBlByOpe);
             $tabBls=[];
             foreach ($allBlByOpe as $i){
                 array_push($tabBls,$i['numbl']);
@@ -249,6 +248,7 @@ dump($allBlByOpe);
             }
 
             $tabBlComplet = array();
+
             foreach ($allBlByOpe as $key=>$item){
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
@@ -259,6 +259,7 @@ dump($allBlByOpe);
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
+
             }
 
 
@@ -339,7 +340,6 @@ dump($allBlByOpe);
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
             }
-
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
 
             return new JsonResponse($reponse);
@@ -1208,7 +1208,6 @@ dump($allBlByOpe);
 
 
     }
-
 
     public function exportTrackingExcelbyBLAction(Request $request, $idBLs, $code)
     {
@@ -2090,6 +2089,14 @@ dump($allBlByOpe);
             $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
 
+            // on comptabise le nombre de BL par fichier dont date depot n'est pas renseigner = 0000-00-00
+            $nbBlWithDepotNull = $em->getRepository('TMDProdBundle:EcommTracking')->findnbBlWithDepotNull($idOpe);
+            $TrDepotNull = array();
+            foreach ($nbBlWithDepotNull as $key=>$file)
+            {
+                $TrDepotNull[$file['idfile']] = intval($file[1]);
+            }
+
 
 
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
@@ -2285,7 +2292,8 @@ dump($allBlByOpe);
                 'tabsyntheseStatut'         => $tabSyntheseStatut,
                 'tabSyntheseGeneralaProd'   => $tabSyntheseGeneralaProd,
                 'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
-                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture
+                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture,
+                'nbBLWtihDepotNull'         => $TrDepotNull
 
             ));
         }
@@ -2300,9 +2308,6 @@ dump($allBlByOpe);
 
     public function viewSuiviCourantAction($idClient, $idOpe, $blR, $page, $nbFichierPage)
     {
-
-
-
 
         if ($page < 1) {
             throw $this->createNotFoundException("La page ".$page." n'existe pas.");
@@ -2371,8 +2376,13 @@ dump($allBlByOpe);
             $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
 
-//            $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile('5076');
-
+            // on comptabise le nombre de BL par fichier dont date depot n'est pas renseigner = 0000-00-00
+            $nbBlWithDepotNull = $em->getRepository('TMDProdBundle:EcommTracking')->findnbBlWithDepotNull($idOpe);
+            $TrDepotNull = array();
+            foreach ($nbBlWithDepotNull as $key=>$file)
+            {
+                $TrDepotNull[$file['idfile']] = intval($file[1]);
+            }
 
 
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
@@ -2546,7 +2556,8 @@ dump($allBlByOpe);
                 'tabsyntheseStatut'         => $tabSyntheseStatut,
                 'tabSyntheseGeneralaProd'   => $tabSyntheseGeneralaProd,
                 'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
-                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture
+                'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture,
+                'nbBLWtihDepotNull'         => $TrDepotNull
             ));
         }
 
@@ -2623,6 +2634,83 @@ dump($allBlByOpe);
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function donneDepotNullAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest())
+        {
+            $id = $request->get('annonce_depot');
+            $em = $this->getDoctrine()->getManager();
+            $emCP = $this->getDoctrine()->getManager('colisprive');
+            $emDpd = $this->getDoctrine()->getManager('dpd');
+
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDepotNullByFile($id);
+
+            $listBL = array();
+            foreach ($allBlByOpe as $bl){
+                array_push($listBL, $bl[0]['numbl']);
+            }
+
+            $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesRuptureByFileArray($listBL);
+//            $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
+            $articleArray = array();
+            foreach ($articles as $key => $item) {
+                $articleArray[$key] = $item;
+            }
+
+
+            $numBLs = array();
+            foreach ($allBlByOpe as $key=>$file)
+            {
+                if ( $file['typeTransport'] == 'CPRV' OR $file['typeTransport'] == 'CPRVE' OR $file['typeTransport'] == 'CPRVTC' OR $file['typeTransport'] == 'CPRVT'){
+                    $numBLs['CPRV']['numBl'][$key] = $file['numbl'];
+                }
+                if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
+                    $numBLs['DPD']['numBl'][$key] = $file['numbl'];
+                }
+
+
+            }
+
+
+            $statuts = array();
+            if ( isset($numBLs['CPRV']['numBl'])) {
+                $trackingColisPrive = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByBL($numBLs['CPRV']['numBl']);
+                foreach ($trackingColisPrive as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+            if (isset($numBLs['DPD']['numBl']) ) {
+                $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByBL($numBLs['DPD']['numBl']);
+                foreach ($trackingDpd as $cp)
+                {
+                    $statuts[$cp['numbl']]['libelle'] = $cp['libelle'];
+                    $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
+                }
+            }
+
+
+            $tabBlComplet = array();
+            foreach ($allBlByOpe as $key=>$item){
+                if (isset($statuts[$item['numbl']])){
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                }
+                else{
+                    $tabBlComplet[$key] = $item;
+                    $tabBlComplet[$key]['statut']['libelle']="";
+                    $tabBlComplet[$key]['statut']['dateStatut']="";
+                }
+
+            }
+            $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray);
+            return new JsonResponse($reponse);
+
+        };
+        return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
     public function donneTrackingsByFileAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -2685,6 +2773,8 @@ dump($allBlByOpe);
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
+//                $statutLibelle = $this->container->get('tmd_getInfo');
+//                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
 
 
@@ -2763,8 +2853,9 @@ dump($allBlByOpe);
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
+//                $statutLibelle = $this->container->get('tmd_getInfo');
+//                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
-
 
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray);
             return new JsonResponse($reponse);

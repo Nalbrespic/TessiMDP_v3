@@ -194,14 +194,14 @@
                                     <ul class="pagination">
                                         {% if  nbPages > 8 and page > 5 %}
                                             <li>
-                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': 1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
+                                                <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': 1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
                                                     <span aria-hidden="true">First</span>
                                                 </a>
                                             </li>
                                         {% endif %}
                                         {% if  page > 1 %}
                                             <li>
-                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': page-1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
+                                                <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': page-1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
                                                     <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
@@ -213,7 +213,7 @@
                                                 </li>
                                                 {% for p in range(page - 3 , page + 3) %}
                                                     <li{% if p == page %} class="active"{% endif %}>
-                                                        <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
+                                                        <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
                                                     </li>
                                                 {% endfor %}
                                                 <li>
@@ -222,7 +222,7 @@
                                             {% elseif  nbPages > 8 and page <  nbPages-3  %}
                                                 {% for p in range(1 , 8) %}
                                                     <li{% if p == page %} class="active"{% endif %}>
-                                                        <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
+                                                        <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
                                                     </li>
                                                 {% endfor %}
                                                 <li>
@@ -234,27 +234,27 @@
                                                 </li>
                                                 {% for p in range(nbPages -8 , nbPages) %}
                                                     <li{% if p == page %} class="active"{% endif %}>
-                                                        <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
+                                                        <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
                                                     </li>
                                                 {% endfor %}
                                             {% else %}
                                                 {% for p in range(1 , nbPages) %}
                                                     <li{% if p == page %} class="active"{% endif %}>
-                                                        <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
+                                                        <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': p, 'nbFichierPage':nbFichiersPage }) }}">{{ p }}</a>
                                                     </li>
                                                 {% endfor %}
                                             {% endif %}
                                         {% endif %}
                                         {% if page < nbPages %}
                                             <li>
-                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': page+1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Next">
+                                                <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': page+1, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Next">
                                                     <span aria-hidden="true">&raquo;</span>
                                                 </a>
                                             </li>
                                         {% endif %}
                                         {% if  nbPages > 8 and page < nbPages - 3 %}
                                             <li>
-                                                <a href="{{ path('tmd_prod_client',{'idClient': idClient, 'idOpe': idOperation, 'page': nbPages, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
+                                                <a href="{{ path('tmd_prod_suiviCourant',{'idClient': idClient, 'idOpe': idOperation, 'page': nbPages, 'nbFichierPage':nbFichiersPage }) }}" aria-label="Previous">
                                                     <span aria-hidden="true">Last</span>
                                                 </a>
                                             </li>

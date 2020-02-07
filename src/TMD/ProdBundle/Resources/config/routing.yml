@@ -60,6 +60,12 @@ tmd_prod_donneRuptureByFile:
         _controller: TMDProdBundle:Prod:donneRuptureByFile
     methods: [POST]
 
+tmd_prod_donneDepotNull:
+    path: /depotNull
+    defaults:
+        _controller: TMDProdBundle:Prod:donneDepotNull
+    methods: [POST]
+
 tmd_prod_calendar:
     path: /calendar
     defaults:

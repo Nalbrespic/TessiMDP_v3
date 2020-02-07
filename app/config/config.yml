@@ -6,6 +6,7 @@ imports:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    container.autowiring.strict_mode: true
 
 framework:
     #esi: ~
@@ -71,18 +72,18 @@ doctrine:
                 user: '%database_user3%'
                 password: '%database_password3%'
                 charset: UTF8
-            minos:
-                driver: oci8
-                host: '%database_host4%'
-                port: '%database_port4%'
-                dbname: '%database_name4%'
-                user: '%database_user4%'
-#                url: '%database_url4%'
-#                schema_filter: /^CLIENT/
-                password: '%database_password4%'
-                charset: UTF8
-                mapping_types:
-                    ty_noeud_contenant: string
+#            minos:
+#                driver: oci8
+#                host: '%database_host4%'
+#                port: '%database_port4%'
+#                dbname: '%database_name4%'
+#                user: '%database_user4%'
+##                url: '%database_url4%'
+##                schema_filter: /^CLIENT/
+#                password: '%database_password4%'
+#                charset: UTF8
+#                mapping_types:
+#                    ty_noeud_contenant: string
 
     orm:
 
@@ -97,7 +98,7 @@ doctrine:
                     TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
                     TMDZplBundle: ~
-                    TmsLogisticBundle: ~
+#                    TmsLogisticBundle: ~
                     TMDStatBundle: ~
             colisprive:
                 connection: colisprive
@@ -107,36 +108,36 @@ doctrine:
                 connection: dpd
                 mappings:
                     TMDDpdBundle: ~
-            minos:
-                connection: minos
-                mappings:
-                    TMDMinosBundle: ~
+#            minos:
+#                connection: minos
+#                mappings:
+#                    TMDMinosBundle: ~
 
 
-# FOSRest Configuration
-fos_rest:
-    routing_loader:
-        default_format: json
-    param_fetcher_listener: force
-    service:
-        serializer: jms_serializer.serializer
-    serializer:
-        version: ~
-        groups: []
-        serialize_null: false
-
-# TmsRest
-tms_rest:
-    default:
-        pagination:
-            limit:
-                default: 50
-                maximum: 500
+## FOSRest Configuration
+#fos_rest:
+#    routing_loader:
+#        default_format: json
+#    param_fetcher_listener: force
+#    service:
+#        serializer: jms_serializer.serializer
+#    serializer:
+#        version: ~
+#        groups: []
+#        serialize_null: false
+#
+## TmsRest
+#tms_rest:
+#    default:
+#        pagination:
+#            limit:
+#                default: 50
+#                maximum: 500
 
 # Swiftmailer Configuration
-swiftmailer:
-    transport: '%mailer_transport%'
-    host: '%mailer_host%'
-    username: '%mailer_user%'
-    password: '%mailer_password%'
-    spool: { type: memory }
+#swiftmailer:
+#    transport: '%mailer_transport%'
+#    host: '%mailer_host%'
+#    username: '%mailer_user%'
+#    password: '%mailer_password%'
+#    spool: { type: memory }

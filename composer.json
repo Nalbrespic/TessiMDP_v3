@@ -1,5 +1,5 @@
 {
-    "name": "jjoyeux/.checkout",
+    "name": "TMDjjoyeux",
     "license": "proprietary",
     "type": "project",
     "autoload": {
@@ -18,42 +18,21 @@
             "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"
         ]
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/Tessi-Tms/TmsLogisticBundle.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/Tessi-Tms/TmsRestBundle.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/Tessi-Tms/TmsRestClientBundle"
-        }
-    ],
+
     "require": {
-        "php": ">=5.3.9",
+        "php": ">=5.5",
         "doctrine/doctrine-bundle": "~1.4",
         "doctrine/orm": "^2.4.8",
         "incenteev/composer-parameter-handler": "~2.0",
-        "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "symfony/monolog-bundle": "^3.0.2",
-        "symfony/swiftmailer-bundle": "~2.3,>=2.3.10",
-        "symfony/symfony": "2.8.*",
-        "twig/twig": "1.34.*",
-        "symfony/finder": "3.4.*",
+        "symfony/symfony": "3.4.*",
+        "twig/twig": "2.12.*",
         "jms/serializer-bundle":  "2.2.*",
         "paragonie/random_compat": "1.*",
         "phpoffice/phpspreadsheet": "1.*",
-        "tms/logistic-bundle": "dev-master",
-        "tms/rest-bundle": "~1.4",
-        "tms/rest-client-bundle": "~1.0",
-        "besimple/soap": "0.2.*",
         "mk-j/php_xlsxwriter": "0.*",
         "cmen/google-charts-bundle": "3.*"
-
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -61,12 +40,8 @@
     },
     "scripts": {
         "symfony-scripts": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+
         ],
         "post-install-cmd": [
             "@symfony-scripts"

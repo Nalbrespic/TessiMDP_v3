@@ -2,6 +2,7 @@
 
 namespace TMD\ProdBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -22,6 +23,9 @@ class EcommLignesType extends AbstractType
             ->add('poids', TextType::class, array(
                 'label' => 'Poids (gr)'
             ))
+            ->add('numligne', EntityType::class, [
+                'class'  => 'TMD\ProdBundle\Entity\EcommTracking',
+            ])
 //            ->add('montant')
 //            ->add('epaisseur')
 //            ->add('numOrder')
