@@ -39,3 +39,8 @@
 # other
 .env
 .idea/*
+
+# eclipse
+.buildpath
+.project
+.settings/*
