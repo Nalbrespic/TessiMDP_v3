@@ -34,12 +34,8 @@ class EcommLigneRepository extends EntityRepository
             ->orderBy('tr.numligne','ASC')
             ->getQuery()
             ->getResult()
-
-
-
             ;
     }
-
 
     public function findTrackingsbyDateDepotandop($iop, $date)
     {
@@ -58,6 +54,7 @@ class EcommLigneRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
     public function findTrackingsbyDateDepotandopAndPress($iop, $date)
     {
         return $this
@@ -660,7 +657,6 @@ class EcommLigneRepository extends EntityRepository
             ->groupBy('cmd.codearticle')
             ->getQuery()
             ->getArrayResult()
-
             ;
     }
 
@@ -674,14 +670,9 @@ class EcommLigneRepository extends EntityRepository
             ->where('app.idappli = :id')
             ->setParameter('id', $idappli)
             ->select('count(ligne.numbl)')
-
             ->getQuery()
             ->getArrayResult()
-
             ;
-
-
-
     }
 
     public function donneNbAllBlnonProd()
@@ -739,6 +730,68 @@ class EcommLigneRepository extends EntityRepository
             ->setParameter('qt', 0)
 //            ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('app.appliname')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findAllBlByCmd($cmd, $idClient, $idope)
+    {
+        return $this
+            ->createQueryBuilder('ligne')
+            ->leftJoin('ligne.bls', 'bl')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('tr.idStatut', 'statut')
+            ->where('cmd.numcmde LIKE :cmd')
+            ->orWhere('ligne.numbl LIKE :cmd3')
+            ->orWhere('tr.refclient LIKE :cmd2')
+            ->orWhere('UPPER(tr.destinataire) LIKE UPPER(:cmd5)')
+            ->setParameter('cmd', '%'.$cmd.'%')
+            ->setParameter('cmd3', '%'.$cmd.'%')
+            ->setParameter('cmd2', '%'.$cmd.'%')
+            ->setParameter('cmd5', '%'.$cmd.'%' )
+            ->andWhere('ligne.idclient = :client')
+            ->setParameter('client', $idClient)
+            ->andWhere('file.idappli = :ope')
+            ->setParameter('ope', $idope)
+            ->select('tr.destinataire')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
+            ->addSelect('tr.numCmdeClient')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.destRue')
+            ->addSelect('tr.destAd2')
+            ->addSelect('tr.destAd3')
+            ->addSelect('tr.destAd4')
+            ->addSelect('tr.destAd5')
+            ->addSelect('tr.destAd6')
+            ->addSelect('tr.destTel')
+            ->addSelect('tr.expRef')
+            ->addSelect('tr.refclient')
+            ->addSelect('tr.destVille')
+            ->addSelect('tr.dateDepot')
+            ->addSelect('file.dateFile')
+            ->addSelect('tr.dateCmde')
+            ->addSelect('tr.instrLivrais1')
+            ->addSelect('tr.instrLivrais2')
+            ->addSelect('tr.destPays')
+            ->addSelect('tr.montant')
+            ->addSelect('file.nbpages')
+            ->addSelect('file.filename')
+            ->addSelect('ligne.poids as poidsReel')
+            ->addSelect('sum(cmd.quantite) as quantite')
+            ->addSelect('cmd.numTrack')
+            ->addSelect('bl.nColis')
+            ->addSelect('bl.modexp')
+            ->addSelect('statut.statut as trStatut')
+            ->addSelect('bl.dateProduction')
+
+//            ->andWhere('cmd.flagart = (:qt)')
+//            ->setParameter('qt', 0)
+            ->orderBy('tr.dateInsert', 'DESC')
+            ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;

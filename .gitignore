@@ -44,3 +44,6 @@
 .buildpath
 .project
 .settings/*
+
+# netbeans
+/nbproject/*

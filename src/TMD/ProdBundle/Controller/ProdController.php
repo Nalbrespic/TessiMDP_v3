@@ -24,11 +24,9 @@ class ProdController extends Controller
 
 //        $bl = $em->getRepository('TMDProdBundle:EcommTracking')->findLimit();
 
-
         return $this->render('TMDProdBundle:Prod:index.html.twig', array(
 //            'bl' => $bl
         ));
-
     }
 
     public function addApplicationAction(Request $request){
@@ -53,11 +51,9 @@ class ProdController extends Controller
             return $this->redirectToRoute('tmd_core_homepage', array());
         }
 
-
         return $this->render('TMDProdBundle:Prod:addApplication.html.twig', array(
             'form' => $form->createView(),
         ));
-
     }
 
     public function modifDateDepotAction(Request $request)
@@ -70,15 +66,11 @@ class ProdController extends Controller
             $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
             $allTrByFile = $emanager->getRepository('TMDProdBundle:EcommTracking')->findBlbyFileWithDepotNull($id);
 
-
             foreach ($allTrByFile as $tr){
                 $tr->setDateDepot($date);
             }
 //dump($allTrByFile);
             $emanager->flush();
-
-
-
 
             return new JsonResponse(array( 'ok', 'd-m-Y'));
         };
@@ -95,15 +87,11 @@ class ProdController extends Controller
             $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
             $allBlByFile = $emanager->getRepository('TMDProdBundle:EcommBl')->findBy(array('idfile' => $id));
 
-
             foreach ($allBlByFile as $bl){
                 $bl->setDateProduction($date);
             }
 
             $emanager->flush();
-
-
-
 
             return new JsonResponse(array( 'OK MODIF'));
         };
@@ -115,7 +103,6 @@ class ProdController extends Controller
     {
         if ($request->isXmlHttpRequest())
         {
-
             $bl = $request->get('bl');
             $tracking = $request->get('tracking');
             $dateDepot = $request->get('dateDepot');
@@ -136,9 +123,6 @@ class ProdController extends Controller
 
             $em->flush();
 
-
-
-
             return new JsonResponse(array("bl" => $bl, "tracking" => $tracking, "dateProd" => $dateProd, "dateDepot" => $dateDepot));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
@@ -148,7 +132,6 @@ class ProdController extends Controller
     {
         if ($request->isXmlHttpRequest())
         {
-
             $file = $request->get('idfile');
             $dateDepot = $request->get('dateDepot');
             $dateProd = $request->get('dateProd');
@@ -156,16 +139,13 @@ class ProdController extends Controller
             $em = $this->getDoctrine()->getManager();
             $allTrByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBy(array('idfile' => $file));
 
-
             if ($dateDepot != '0000-00-00'){
                 $date = DateTime::createFromFormat('Y-m-d',$dateDepot );
                 foreach ($allTrByFile as $tr){
                     if ( date_format($tr->getBl()->getNumligne()->getDateDepot(), "Y-m-d") == '-0001-11-30'){
                         $tr->getBl()->getNumligne()->setDateDepot($date);
                     }
-
                 }
-
             }
             if ($dateProd != '0000-00-00'){
                 $date = DateTime::createFromFormat('Y-m-d',$dateProd );
@@ -176,13 +156,9 @@ class ProdController extends Controller
                 }
             }
 
-
-
-
             $em->flush();
 
             $name = $tr->getBl()->getNumligne()->getIdfile()->getFilename();
-
 
             return new JsonResponse(array("name" => $name, "dateProd" => $dateProd, "dateDepot" => $dateDepot));
         };
@@ -193,7 +169,6 @@ class ProdController extends Controller
     {
         if ($request->isXmlHttpRequest())
         {
-
             $cmd = $request->get('cmd');
             $idClient = $request->get('idClient');
             $idope = $request->get('idope');
@@ -201,8 +176,8 @@ class ProdController extends Controller
             $emCP = $this->getDoctrine()->getManager('colisprive');
             $emDpd = $this->getDoctrine()->getManager('dpd');
 
+            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByCmd($cmd, $idClient, $idope);
 
-            $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmd($cmd,$idClient, $idope );
             $tabBls=[];
             foreach ($allBlByOpe as $i){
                 array_push($tabBls,$i['numbl']);
@@ -215,8 +190,6 @@ class ProdController extends Controller
                 $articleArray[$key] = $item;
             }
 
-
-
             $numBLs = array();
             foreach ($allBlByOpe as $key=>$file)
             {
@@ -226,7 +199,6 @@ class ProdController extends Controller
                 if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
                     $numBLs['DPD']['numBl'][$key] = $file['numbl'];
                 }
-
             }
 
             $statuts = array();
@@ -262,7 +234,6 @@ class ProdController extends Controller
 
             }
 
-
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
 
             return new JsonResponse($reponse);
@@ -282,7 +253,6 @@ class ProdController extends Controller
             $emCP = $this->getDoctrine()->getManager('colisprive');
             $emDpd = $this->getDoctrine()->getManager('dpd');
 
-
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdandCodeArticle($code,$idClient, $idope );
 
             $tabBls=[];
@@ -296,7 +266,6 @@ class ProdController extends Controller
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;
             }
-
 
             $numBLs = array();
             foreach ($allBlByOpe as $key=>$file)
@@ -351,25 +320,22 @@ class ProdController extends Controller
     {
         if ($request->isXmlHttpRequest())
         {
-
             $cmd = $request->get('cmd');
             $idClient = $request->get('idClient');
             $idope = $request->get('idope');
+
             $em = $this->getDoctrine()->getManager();
 
-
-
-            $allBlByOpeBL = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModifb($cmd,$idClient, $idope );
-            $allBlByOpeFILE = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiff($cmd,$idClient, $idope );
-            $allBlByOpeFILEAUpdateDepot = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateDepot($cmd,$idClient, $idope );
-            $allBlByOpeFILEAUpdateFab = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateFab($cmd,$idClient, $idope );
-
+            $allBlByOpeBL = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModifb($cmd, $idClient, $idope);
+            $allBlByOpeFILE = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiff($cmd, $idClient, $idope);
+            $allBlByOpeFILEAUpdateDepot = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateDepot($cmd, $idClient, $idope);
+            $allBlByOpeFILEAUpdateFab = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByCmdModiffaUpdateFab($cmd ,$idClient, $idope);
 
             $tabBlComplet = array();
-            $tabBlComplet['file'] =array();
-            $tabBlComplet['fileNoCompletedepot'] =array();
-            $tabBlComplet['fileNoCompletefab'] =array();
-            $tabBlComplet['bl'] =array();
+            $tabBlComplet['file'] = array();
+            $tabBlComplet['fileNoCompletedepot'] = array();
+            $tabBlComplet['fileNoCompletefab'] = array();
+            $tabBlComplet['bl'] = array();
             if (sizeof($allBlByOpeBL) > 0){
                 foreach ($allBlByOpeBL as $val){
                     array_push($tabBlComplet['bl'],$val);
@@ -391,8 +357,6 @@ class ProdController extends Controller
                     $tabBlComplet['fileNoCompletefab'][$val[0]['idfile']] = 1;
                 }
             }
-
-
             return new JsonResponse($tabBlComplet);
         };
         return new Response("erreur: ce n'est pas du Json", 400);
@@ -474,7 +438,6 @@ class ProdController extends Controller
                                     and !preg_match('/Recla/', $v['libelle'])
                                         and !preg_match('/Kit Noel/', $v['libelle'])){
 
-
                     if ( array_key_exists($v['numbl'], $cmdArt) ) {
                         if (preg_match('/Basket Pack/', $v['libelle'])){
                             $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*8;
@@ -518,12 +481,7 @@ class ProdController extends Controller
 
                 }
             }
-
-
-
     }
-
-
 
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setCreator('Rob Gravelle')
@@ -650,14 +608,7 @@ class ProdController extends Controller
                 ->setCellValue('C' . $ligne2, $compt4);
         }
 
-
-
-
-
-
         if ( ($compt3) == null and ($compt3) == null and ($compt3) == null and ($compt4) == null){
-
-
             $spreadsheet->setActiveSheetIndex(0)
                 ->setCellValue('A1', 'Aucune ligne de commande en multi !');
         }else{
@@ -679,13 +630,10 @@ class ProdController extends Controller
 
         $writer->save('php://output');
         exit;
-
-
     }
 
     public function exportTrackingExcelAction(Request $request, $idFile, $prod)
     {
-
         $idFiles = explode(",", $idFile);
         $em = $this->getDoctrine()->getManager();
         $emCP = $this->getDoctrine()->getManager('colisprive');
@@ -759,8 +707,6 @@ class ProdController extends Controller
             }
 
 //        }
-
-
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -949,7 +895,6 @@ class ProdController extends Controller
             $nomExport = preg_replace ('/\s+/',"_",($tabBlComplet[0]['filename'].$titre));
         }
 
-
         return new Response(
             $writer->writeToString(),  // read from output buffer
             200,
@@ -961,19 +906,14 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingArticleExcelAction(Request $request, $idFile, $prod)
     {
-
         $idFiles = explode(",", $idFile);
         $em = $this->getDoctrine()->getManager();
         $emCP = $this->getDoctrine()->getManager('colisprive');
         $emDpd = $this->getDoctrine()->getManager('dpd');
-
-
 
         if ($prod == '0') {
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFileArticle($idFiles);
@@ -990,8 +930,6 @@ class ProdController extends Controller
         }
 
 //        }
-
-
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -1193,7 +1131,6 @@ class ProdController extends Controller
             $nomExport = preg_replace ('/\s+/',"_",($tabBlComplet[0]['filename'].$titre));
         }
 
-
         return new Response(
             $writer->writeToString(),  // read from output buffer
             200,
@@ -1205,13 +1142,10 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingExcelbyBLAction(Request $request, $idBLs, $code)
     {
-
         $idFiles = explode(",", $idBLs);
 
         $em = $this->getDoctrine()->getManager();
@@ -1220,8 +1154,6 @@ class ProdController extends Controller
 
 
         $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($idFiles);
-
-
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -1265,7 +1197,6 @@ class ProdController extends Controller
                 $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
             }
         }
-
 
         $header = array('Date fichier' => 'string',
             'n° BL'=> 'string',
@@ -1352,14 +1283,10 @@ class ProdController extends Controller
             ]);
         }
 
-
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
-
             $nomExport = 'Export_'.$code;
-
 
         return new Response(
             $writer->writeToString(),  // read from output buffer
@@ -1372,17 +1299,13 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingExcelbyDateAction(Request $request, $date, $appli)
     {
-
         $em = $this->getDoctrine()->getManager();
         $emCP = $this->getDoctrine()->getManager('colisprive');
         $emDpd = $this->getDoctrine()->getManager('dpd');
-
 
         $Bls = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsbyDateDepotandop($appli, $date);
         $BlsTab= array();
@@ -1390,10 +1313,7 @@ class ProdController extends Controller
             array_push($BlsTab, $v['numbl']);
         }
 
-
         $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($BlsTab);
-
-
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -1429,7 +1349,6 @@ class ProdController extends Controller
             if (isset($statuts[$item['numbl']])){
                 $tabBlComplet[$key] = $item;
                 $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
-
             }
             else{
                 $tabBlComplet[$key] = $item;
@@ -1437,7 +1356,6 @@ class ProdController extends Controller
                 $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
             }
         }
-
 
         $header = array('Date fichier' => 'string',
             'n° BL'=> 'string',
@@ -1532,7 +1450,6 @@ class ProdController extends Controller
 
         $nomExport = 'Export_'.$Bls[0]['appliname'].'_'.$date;
 
-
         return new Response(
             $writer->writeToString(),  // read from output buffer
             200,
@@ -1544,14 +1461,10 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingExcelbyBLArticleAction(Request $request, $date, $appli)
     {
-
-
         $em = $this->getDoctrine()->getManager();
         $emCP = $this->getDoctrine()->getManager('colisprive');
         $emDpd = $this->getDoctrine()->getManager('dpd');
@@ -1565,7 +1478,6 @@ class ProdController extends Controller
 
         $allBlByOpe = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByBLS($Bls);
 
-
         $tabBls=[];
         foreach ($allBlByOpe as $i){
             array_push($tabBls,$i['numbl']);
@@ -1578,9 +1490,6 @@ class ProdController extends Controller
         }
 //var_dump($articleArray);
 
-
-
-
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
         {
@@ -1590,7 +1499,6 @@ class ProdController extends Controller
             if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
                 $numBLs['DPD']['numBl'][$key] = $file['numbl'];
             }
-
         }
         $statuts = array();
         if ( isset($numBLs['CPRV']['numBl'])) {
@@ -1623,7 +1531,6 @@ class ProdController extends Controller
                 $tabBlComplet[$key]['statut']['dateStatut']= new DateTime('00000-00-00');
             }
         }
-
 
         $header = array(
             'n°' => 'string',
@@ -1731,14 +1638,10 @@ class ProdController extends Controller
             $index++;
         }
 
-
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
-
         $nomExport = 'Export_Article_'.$Bls[0]['appliname'].'_'.$date;
-
 
         return new Response(
             $writer->writeToString(),  // read from output buffer
@@ -1751,13 +1654,10 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingPresseAction(Request $request, $date, $appli)
     {
-
         $em = $this->getDoctrine()->getManager();
 
         $Bls = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsbyDateDepotandopAndPress($appli, $date);
@@ -1769,7 +1669,6 @@ class ProdController extends Controller
         $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findAllBlByBLSandPresse($BlsTab);
 
         $groupByArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findregroupArticleByBLSandPresse($BlsTab);
-
 
         $tabpresseTri=array();
         $maxQuantite = $allBlByOpe[sizeof($allBlByOpe)-1]['quantite'];
@@ -1794,9 +1693,6 @@ class ProdController extends Controller
             }
 
         }
-
-
-
 
         $header = array(
             'detail composition' => 'string',
@@ -1833,13 +1729,10 @@ class ProdController extends Controller
                 ]);
         }
 
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
-
         $nomExport = 'Export_Presse_'.$Bls[0]['appliname'].'_'.$date;
-
 
         return new Response(
             $writer->writeToString(),  // read from output buffer
@@ -1852,8 +1745,6 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
 
     public function exportTrackingbyDateAction(Request $request)
@@ -1869,8 +1760,6 @@ class ProdController extends Controller
 
             $allBlByOpeByDate = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idAppli, $date);
 
-
-
             $numBLs = array();
             foreach ($allBlByOpeByDate as $key=>$file)
             {
@@ -1880,7 +1769,6 @@ class ProdController extends Controller
                 if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
                     $numBLs['DPD']['numBl'][$key] = $file['numbl'];
                 }
-
             }
 
             $statuts = array();
@@ -1914,12 +1802,7 @@ class ProdController extends Controller
                 }
             }
 
-
-
-
-
             return new JsonResponse($tabBlComplet);
-
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
@@ -1994,10 +1877,6 @@ class ProdController extends Controller
                 }
             }
 
-
-
-
-
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos, 'nbDateDepotPresse' => $nbDateDepotPresse );
 
             return new JsonResponse($reponse);
@@ -2008,48 +1887,29 @@ class ProdController extends Controller
 
     public function viewClientAction($idClient, $idOpe, $page, $nbFichierPage)
     {
-
-
-
         if ($page < 1) {
             throw $this->createNotFoundException("La page ".$page." n'exciste pas. ");
         }
-
 
         $clients = null;
         $OperationsByClient = null;
         $filesByClient = null;
 
-        $em = $this
-            ->getDoctrine()
-            ->getManager();
-
-        $clients = $em
-            ->getRepository('TMDProdBundle:EcommAppli')
-            ->findClientWithOperation();
-
-
-
+        $em = $this ->getDoctrine() ->getManager();
+        $clients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
         if ($idClient != 0)
         {
-            $OperationsByClient = $em
-                ->getRepository('TMDProdBundle:EcommAppli')
-                ->findAppliByClient($idClient)
-            ;
-
+            $OperationsByClient = $em->getRepository('TMDProdBundle:EcommAppli')->findAppliByClient($idClient);
         }
 
         if ($idOpe !=0 )
         {
-
             $logo = $em->getRepository('TMDProdBundle:EcommAppli')->findBy(array('idappli' => $idOpe));
 
             if( $logo[0]->getAppliImage() != null) {
                 $logo['appliImage'] = (base64_encode(stream_get_contents($logo[0]->getAppliImage())));
             }
-
-
 
             $nbParPage = $nbFichierPage;
 
@@ -2057,7 +1917,6 @@ class ProdController extends Controller
             $fileTotByOp = $em->getRepository('TMDProdBundle:EcommTracking')->findFileTotByOpe($idOpe);
             $fileBLTotByOp = $em->getRepository('TMDProdBundle:EcommLignes')->findFileTotByOpe($idOpe);
             $nbTrackingByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbTrackingByFile($idOpe);
-
 
             $filesPaginator = array();
             foreach ($fileByOpe as $f=>$k){
@@ -2072,9 +1931,7 @@ class ProdController extends Controller
                 if (!isset($tabSyntheseStatut[$val['idfile']]))$tabSyntheseStatut[$val['idfile']] = array();
 //                $tab = array();
                 array_push($tabSyntheseStatut[$val['idfile']],  array((strval($val['idStatut'])) => $val[1]));
-
             }
-
 
             $trackings = array();
             $files= array();
@@ -2088,7 +1945,6 @@ class ProdController extends Controller
             $filesBl= array();
             $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
-
             // on comptabise le nombre de BL par fichier dont date depot n'est pas renseigner = 0000-00-00
             $nbBlWithDepotNull = $em->getRepository('TMDProdBundle:EcommTracking')->findnbBlWithDepotNull($idOpe);
             $TrDepotNull = array();
@@ -2097,8 +1953,6 @@ class ProdController extends Controller
                 $TrDepotNull[$file['idfile']] = intval($file[1]);
             }
 
-
-
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
             $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($idOpe);
             $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeByDateNonProd($idOpe);
@@ -2106,7 +1960,6 @@ class ProdController extends Controller
             $ArticlesReclaSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesReclaByFile($files);
 
             $nbRetentionByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbRetentionByFile($files);
-
 
             $nbRetentionByFileS = array();
             foreach($nbRetentionByFile as $k)
@@ -2142,7 +1995,6 @@ class ProdController extends Controller
             if ( $idOpe == 554){
                 $nbCarte = $em->getRepository('TMDAppliBundle:NTracking')->findNbCarteUtilByClient($idClient);
                 $syntheseArticles['coriolisCarte'] = $nbCarte;
-
             }
 
 
@@ -2176,7 +2028,6 @@ class ProdController extends Controller
                 if ( array_key_exists($bl['idfile'], $ArticlesReclaSyntheseTab)) {
                     $filesBl[$bl['idfile']]['articlesReclamation'] = $ArticlesReclaSyntheseTab[$bl['idfile']]['q'];
                 }
-
             }
             $countTransportbyFile = $em->getRepository('TMDProdBundle:EcommBl')->findNbTransportByFile($files);
             foreach ($countTransportbyFile  as $bl)
@@ -2197,8 +2048,6 @@ class ProdController extends Controller
                 }
             }
 
-
-
             $nbBlByFileProd = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlByFileProd($files);
             $filesBlProd = array();
             $dateMinProdByApplication = '2040-01-01 ';
@@ -2212,7 +2061,6 @@ class ProdController extends Controller
                 }
             }
 
-
 //            $quantiteBlaProduire = 0;
 //            foreach ($filesBl as $k=>$v)
 //            {
@@ -2225,7 +2073,6 @@ class ProdController extends Controller
 //                    }
 //                }
 //            }
-
 
             $tabSyntheseGeneralaProd = 0;
             $tabSyntheseGeneralaRupture = 0;
@@ -2249,8 +2096,6 @@ class ProdController extends Controller
             }
 
             //pagination
-
-
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
             if ($page > $nbPages) {
 
@@ -2264,7 +2109,6 @@ class ProdController extends Controller
             }
 
             $blretour = null;
-
 
             return $this->render('TMDProdBundle:Prod:suiviProd.html.twig', array(
                 'idOperation'               => $idOpe,
@@ -2294,7 +2138,6 @@ class ProdController extends Controller
                 'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
                 'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture,
                 'nbBLWtihDepotNull'         => $TrDepotNull
-
             ));
         }
 
