@@ -57,7 +57,7 @@ class AppliController extends Controller
 
 
                 $retourIfexistCont = $em->getRepository('TMDAppliBundle:NTracking')->findBy(array('box' => $refCont, 'idclient' => $idClient));
-                if (sizeof($retourIfexistCont) > 0) {
+                if (count($retourIfexistCont) > 0) {
                     $request->getSession()->getFlashBag()->add('ErrorRecepCartesContenant', $retourIfexistCont);
 
                     return $this->redirectToRoute('tmd_appli_cartepage', array(
@@ -68,7 +68,7 @@ class AppliController extends Controller
 
                 $retourIfexistPlage = $em->getRepository('TMDAppliBundle:NTracking')->findCorrespondancePlage($plageDebut, $idClient);
                 $retourIfexistPlage2 = $em->getRepository('TMDAppliBundle:NTracking')->findCorrespondancePlage($plageFin, $idClient);
-                if (sizeof($retourIfexistPlage) > 0 or sizeof($retourIfexistPlage2) > 0) {
+                if (count($retourIfexistPlage) > 0 or count($retourIfexistPlage2) > 0) {
                     $request->getSession()->getFlashBag()->add('ErrorRecepCartest', "pb d'enregistrement");
                     return $this->redirectToRoute('tmd_appli_cartepage', array(
                         'idClient' => $idClient
@@ -180,7 +180,7 @@ class AppliController extends Controller
 
             $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => $statut));
 
-            if (sizeof($Cmd) == 0){
+            if (count($Cmd) == 0){
                 $request->getSession()->getFlashBag()->add('PbBlexistepas', $bl);
                 return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                     'statut' => $statut
@@ -189,7 +189,7 @@ class AppliController extends Controller
             }
 
 
-            if (sizeof($histo) > 0){
+            if (count($histo) > 0){
                 $request->getSession()->getFlashBag()->add('PbStatutidentique', $Cmd->getBl()->getNumbl());
                 return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                     'statut' => $statut
@@ -198,7 +198,7 @@ class AppliController extends Controller
             }
             if ( $statut === '12'){
                 $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '11'));
-                if (sizeof($histo) == 0 ){
+                if (count($histo) == 0 ){
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                         'statut' => $statut
@@ -209,7 +209,7 @@ class AppliController extends Controller
 
             if ( $statut === '2'){
                 $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '12'));
-                if (sizeof($histo) == 0 ){
+                if (count($histo) == 0 ){
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                         'statut' => $statut
@@ -239,7 +239,7 @@ class AppliController extends Controller
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
                     $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '11'));
-                    if (sizeof($jouristoVerif) == 0) {
+                    if (count($jouristoVerif) == 0) {
                         $break++;
                         $em->persist($jouristo);
                         $em->flush();
@@ -282,7 +282,7 @@ class AppliController extends Controller
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
                     $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '12'));
-                    if (sizeof($jouristoVerif) == 0) {
+                    if (count($jouristoVerif) == 0) {
                         $break++;
                         $em->persist($jouristo);
                         $em->flush();
@@ -294,7 +294,7 @@ class AppliController extends Controller
                 $break3 = 0;
                 while (!$updateProdOK and $break3 < 3) {
                     $dateProdVerif = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $Cmd->getBl()->getNumbl(), 'dateProduction' => $dateProdAverif));
-                    if (sizeof($dateProdVerif) == 0) {
+                    if (count($dateProdVerif) == 0) {
                         $break3++;
                         $Cmd->setDateProduction($dateProdAverif);
                         $em->flush();
@@ -338,7 +338,7 @@ class AppliController extends Controller
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
                     $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '2'));
-                    if (sizeof($jouristoVerif) == 0) {
+                    if (count($jouristoVerif) == 0) {
                         $break++;
                         $em->persist($jouristo);
                         $em->flush();
@@ -350,7 +350,7 @@ class AppliController extends Controller
                 $break2 = 0;
                 while (!$updateDateDepotOK and $break2 < 3) {
                     $dateVerif = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('expRef' => $Cmd->getBl()->getNumligne()->getExpRef(), 'dateDepot' => DateTime::createFromFormat('Y-m-d', $dateProdAverif->format('Y-m-d')) ));
-                    if (sizeof($dateVerif) == 0) {
+                    if (count($dateVerif) == 0) {
                         $break2++;
                         $Cmd->getBl()->getNumligne()->setDateDepot($dateProdAverif);
                         $em->flush();
@@ -515,19 +515,18 @@ class AppliController extends Controller
                             $indexeArtVerif++;
                         }
 
-                        if (sizeof($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
+                        if (strlen($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
                             if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
                                 $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
                                 $dimensions = getimagesizefromstring(file_get_contents($chemeinImageMod1.$v->getNomimg()));
                                 $articleArray['art'][$k]['dimensionL'] = $dimensions[0];
                                 $articleArray['art'][$k]['dimensionH'] = $dimensions[1];
                             }
-
                         }
                         $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
                     }
                     else{
-                        if (sizeof($cheminImage . $v->getNomimg()) > 0 and $cheminImage . $v->getNomimg() != ""  ) {
+                        if (strlen($cheminImage . $v->getNomimg()) > 0 and $cheminImage . $v->getNomimg() != ""  ) {
                             if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
                                     $articleArray['emb'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
                             }
@@ -707,8 +706,8 @@ class AppliController extends Controller
             $pieChart->getData()->setArrayToDataTable(
                 [
                     ['Etat', 'Mise sous pli'],
-                    ['MSP', sizeof($nbKubByStatut)],
-                    ['Reste à produire', sizeof($nbKubTotal)-sizeof($nbKubByStatut)]
+                    ['MSP', count($nbKubByStatut)],
+                    ['Reste à produire', count($nbKubTotal)-count($nbKubByStatut)]
 
                 ]
             );
@@ -738,7 +737,7 @@ class AppliController extends Controller
 
 
             
-                for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+                for ($j = 0; $j < count($joureureInterro); $j++) {
                     $nbKubByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
                     $nbElecteurByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
                 }
@@ -749,13 +748,13 @@ class AppliController extends Controller
 //                dump(intval(date_format(new DateTime(),"d" )));
 
                 $tabLine=[];
-                for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+                for ($j = 0; $j < count($joureureInterro); $j++) {
                     if ($j == 0) {
                         array_push($tabLine, ['', 'Nombre de plis', 'Nombre de KUB']);
                     }
                     if (intval(substr($joureureInterro[$j],0,2)) <= intval(date_format(new DateTime(),"H")) or
                             intval(substr($dateJour[$jour],8,2)) < intval(date_format(new DateTime(),"d" ))){
-                        array_push($tabLine, [new DateTime($joureureInterro[$j]), intval($nbElecteurByStatut[$j][0][1]), sizeof($nbKubByStatut[$j])]);
+                        array_push($tabLine, [new DateTime($joureureInterro[$j]), intval($nbElecteurByStatut[$j][0][1]), count($nbKubByStatut[$j])]);
                     }else{
                         array_push($tabLine, [new DateTime($joureureInterro[$j]), 'none', 'none']);
                     }
@@ -763,13 +762,13 @@ class AppliController extends Controller
         $tabChart=[];
         $nbKubByStatut[-1]=null;
         $nbElecteurByStatut[-1]=null;
-        for ($j = 0; $j < sizeof($joureureInterro); $j++) {
+        for ($j = 0; $j < count($joureureInterro); $j++) {
             if ($j == 0) {
                 array_push($tabChart, ['', 'Nombre de plis', 'Nombre de KUB']);
             }
             if (intval(substr($joureureInterro[$j],0,2)) <= intval(date_format(new DateTime(),"H")) or
                 intval(substr($dateJour[$jour],8,2)) < intval(date_format(new DateTime(),"d" ))){
-                array_push($tabChart, [new DateTime($joureureInterro[$j]),intval($nbElecteurByStatut[$j][0][1])-intval($nbElecteurByStatut[$j-1][0][1]), sizeof($nbKubByStatut[$j])-sizeof($nbKubByStatut[$j-1])]);
+                array_push($tabChart, [new DateTime($joureureInterro[$j]),intval($nbElecteurByStatut[$j][0][1])-intval($nbElecteurByStatut[$j-1][0][1]), count($nbKubByStatut[$j])-count($nbKubByStatut[$j-1])]);
             }else{
                 array_push($tabChart, [new DateTime($joureureInterro[$j]), 'none', 'none']);
             }
