@@ -2,8 +2,6 @@
 
 namespace TMD\AppliBundle\Controller;
 
-
-
 use BeSimple\SoapBundle\BeSimpleSoapBundle;
 use BeSimple\SoapBundle\Controller\SoapWebServiceController;
 use BeSimple\SoapClient\SoapClient;
@@ -29,19 +27,13 @@ class AppliController extends Controller
 {
     public function carteAction(Request $request, $idClient)
     {
-
-
         $em = $this->getDoctrine()->getManager();
 
         $clients = $em
             ->getRepository('TMDProdBundle:EcommAppli')
             ->findClientWithOperation();
 
-
-
-
         if ($idClient != 0) {
-
 
             $articlesByPlage = new NTracking();
             $form = null;
@@ -78,9 +70,6 @@ class AppliController extends Controller
                 $client = $em->getRepository('TMDProdBundle:Client')->findOneBy(array('idclient' => $idClient));
 
                 $nbCartes = intval($plageFin) - intval($plageDebut) + 1;
-
-
-
 
 
                 $articlesByPlage->setCurrent($plageDebut);
@@ -126,7 +115,6 @@ class AppliController extends Controller
     }
     public function deleteAction(Request $request)
     {
-
         if ($request->isXmlHttpRequest()) {
             $id = $request->get('carteLot');
             $em = $this->getDoctrine()->getManager();
@@ -143,7 +131,6 @@ class AppliController extends Controller
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
-
     }
 
     public function editCodeHeinekenAction(Request $request)
@@ -161,10 +148,7 @@ class AppliController extends Controller
             }
             $em->flush();
 
-
-
                 return new JsonResponse(array('OK VERIF'));
-
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
@@ -173,7 +157,6 @@ class AppliController extends Controller
     public function editStatutAction($bl, $statut, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-
 
         if ($statut != 0 ) {
             $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
@@ -202,7 +185,6 @@ class AppliController extends Controller
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                         'statut' => $statut
-
                     ));
                 }
             }
@@ -213,7 +195,6 @@ class AppliController extends Controller
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                         'statut' => $statut
-
                     ));
                 }
             }
@@ -361,9 +342,6 @@ class AppliController extends Controller
                 }
 
 
-
-
-
                 if (!$updateHistoOK  OR !$updateDateDepotOK){
                     $request->getSession()->getFlashBag()->add('NOConfirmValidationcommande', $Cmd->getBl()->getNumbl());
 
@@ -375,17 +353,10 @@ class AppliController extends Controller
                 $request->getSession()->getFlashBag()->add('ConfirmValidationcommande', $Cmd->getBl()->getNumbl());
             }
 
-
-
-
-
             return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
                 'statut' => $statut
             ));
         }
-
-
-
 
         return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
             'statut' => $statut
@@ -407,7 +378,6 @@ class AppliController extends Controller
 
     public function traitementFichierAction(Request $request)
     {
-
         if ($request->isXmlHttpRequest()) {
             $id = $request->get('carteLot');
             $em = $this->getDoctrine()->getManager();
@@ -420,13 +390,10 @@ class AppliController extends Controller
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
-
     }
 
     public function listeCarteAction(Request $request)
     {
-
-
         if ($request->isXmlHttpRequest()) {
             $idClient = $request->get('idClient');
             $em = $this->getDoctrine()->getManager();
@@ -446,9 +413,6 @@ class AppliController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $button = true;
-
-
-
 
         if ($etat != 'nc' and $etat != '3' ) {
             if ($etat != '9'){
@@ -482,8 +446,6 @@ class AppliController extends Controller
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
-
-
 
                 $articleArray = array();
                 $articlesAverif = array();
@@ -533,7 +495,6 @@ class AppliController extends Controller
                         }
                         $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
                     }
-
                 }
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
@@ -598,7 +559,6 @@ class AppliController extends Controller
         }
         if ($dateDepot == 0){
             $dateDepot = null;
-
         }
 
         $articlesAverif = null;
@@ -611,9 +571,7 @@ class AppliController extends Controller
             'error'         =>$error,
             'appAverif'     =>$appAverif,
             'articlesAverif' => $articlesAverif,
-
         ));
-
     }
 
     public function verifArticleAction(Request $request)
@@ -660,10 +618,8 @@ class AppliController extends Controller
 
     public function verifElectionAction($statut , $jour)
     {
-
 //       $jour = 6;
 //
-
         $dateJour = ['2019-05-13',
             '2019-05-14 ',
             '2019-05-15 ',
@@ -700,8 +656,6 @@ class AppliController extends Controller
             $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour]);
             $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour]);
 
-
-
             $pieChart = new PieChart();
             $pieChart->getData()->setArrayToDataTable(
                 [
@@ -735,14 +689,10 @@ class AppliController extends Controller
             $pieChart2->getOptions()->setWidth(350);
             $pieChart2->getOptions()->getLegend()->setPosition('none');
 
-
-            
                 for ($j = 0; $j < count($joureureInterro); $j++) {
                     $nbKubByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
                     $nbElecteurByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
                 }
-
-
 
 //                dump( date_format(new DateTime(),"d" ));
 //                dump(intval(date_format(new DateTime(),"d" )));
@@ -774,18 +724,9 @@ class AppliController extends Controller
             }
         }
 
-
-//
-//
-
                 $line = new \CMEN\GoogleChartsBundle\GoogleCharts\Charts\Material\LineChart();
                 $line->getData()->setArrayToDataTable(
-
-
-
                      $tabLine
-
-
                 );
                 //        $line->getOptions()->getChart()
                 //            ->setTitle('Average Temperatures and Daylight in Iceland Throughout the Year');
@@ -798,13 +739,9 @@ class AppliController extends Controller
                 $line->getOptions()
                     ->getHAxis()->setFormat('H:mm');
 
-
-
                 $chart = new \CMEN\GoogleChartsBundle\GoogleCharts\Charts\Material\ColumnChart();
                 $chart->getData()->setArrayToDataTable(
-//
                     $tabChart
-
                 );
 
 //                $chart->getOptions()->getChart()
@@ -831,7 +768,6 @@ class AppliController extends Controller
 
         return $this->render('TMDAppliBundle:Appli:colissimo.html.twig', array(
             'bls'  => $nbBlforBordreau
-
         ));
     }
 
@@ -842,7 +778,6 @@ class AppliController extends Controller
 
         return $this->render('TMDAppliBundle:Appli:Infocolissimo.html.twig', array(
             'bls'  => $nbBlforBordreau
-
         ));
     }
 }
