@@ -11,6 +11,9 @@ web_profiler:
     toolbar: true
     intercept_redirects: false
 
+twig:
+#    cache: false
+
 #monolog:
 #    handlers:
 #        main:
@@ -32,3 +35,6 @@ web_profiler:
 
 #swiftmailer:
 #    delivery_addresses: ['me@example.com']
+
+parameters:
+    database_name: ecommerce_preprod

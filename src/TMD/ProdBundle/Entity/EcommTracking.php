@@ -2,7 +2,6 @@
 
 namespace TMD\ProdBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -190,8 +189,6 @@ class EcommTracking
      * @ORM\Column(name="Instr_livrais2", type="string", length=70, nullable=false)
      */
     private $instrLivrais2;
-
-
 
 
     /**
@@ -414,7 +411,6 @@ class EcommTracking
     /**
      * @return Client
      */
-
     public function getIdclient()
     {
         return $this->idclient;
@@ -1292,7 +1288,6 @@ class EcommTracking
     {
         $this->idStatut = $idStatut;
     }
-
 
 }
 

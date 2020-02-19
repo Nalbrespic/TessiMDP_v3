@@ -13,6 +13,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 class EcommTrackingRepository extends EntityRepository
 {
+
     public function clientWithFile(){
 
         return $this
@@ -21,6 +22,7 @@ class EcommTrackingRepository extends EntityRepository
             ;
 
     }
+
 
     public function findNbRetentionByFile( $files)
     {
@@ -36,10 +38,8 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('tr.idfile')
             ->getQuery()
             ->getArrayResult()
-
             ;
     }
-
 
 
     public function findFileByOpe($idappli, $page, $nbParPage)
@@ -69,9 +69,8 @@ class EcommTrackingRepository extends EntityRepository
         // Enfin, on retourne l'objet Paginator correspondant à la requête construite
         // (n'oubliez pas le use correspondant en début de fichier)
         return new Paginator($query, true);
-
-
     }
+
 
     public function findFileTotByOpe($idappli)
     {
@@ -88,12 +87,9 @@ class EcommTrackingRepository extends EntityRepository
             ->orderBy('tr.dateInsert', 'DESC')
             ->getQuery()
             ->getResult()
-
         ;
-
-
-
     }
+
 
     public function findNbTrackingByFile($idappli)
     {
@@ -108,9 +104,7 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('fl.idfile')
             ->getQuery()
             ->getResult()
-
         ;
-
     }
 
 
@@ -122,9 +116,7 @@ class EcommTrackingRepository extends EntityRepository
             ->setParameter('id', $idfile)
             ->getQuery()
             ->getArrayResult()
-
             ;
-
     }
 
     public function findTrackingsPbWS()
@@ -148,7 +140,6 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('app.appliname')
             ->getQuery()
             ->getArrayResult()
-
             ;
     }
 
@@ -166,9 +157,7 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('tr.idfile, stat.idStatut')
             ->getQuery()
             ->getResult()
-
             ;
-
     }
 
     public function findnbBlWithDepotNull($idOpe)
@@ -187,9 +176,7 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('file.idfile')
             ->getQuery()
             ->getArrayResult()
-
             ;
-
     }
 
     public function findBlbyFileWithDepotNull($idFile)
@@ -205,12 +192,7 @@ class EcommTrackingRepository extends EntityRepository
             ->groupBy('tr.expRef')
             ->getQuery()
             ->getResult()
-
             ;
-
     }
-
-
-
 
 }

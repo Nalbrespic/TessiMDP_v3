@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use TMD\ProdBundle\Entity\EcommArticles;
 use TMD\ProdBundle\Entity\EcommCmdep;
+use TMD\ProdBundle\Entity\EcommHistoStatut;
+use TMD\ProdBundle\Entity\EcommLignes;
 use TMD\ProdBundle\Form\EcommLignesType;
 use TMD\ProdBundle\Form\EcommTrackingType;
 
@@ -210,6 +212,7 @@ class CoreController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function erreurWSAction(Request $request){
         if ($request->isXmlHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
@@ -220,4 +223,36 @@ class CoreController extends Controller
 
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
+
+    public function saisiePndAction(Request $request)
+    {
+        $numCmd = null;
+        if($request->getMethod() === 'POST') {
+            $numCmd = $request->request->get('numCmd');
+            $em = $this->getDoctrine()->getManager();
+            $idStatutPnd = $em->getRepository('TMDProdBundle:EcommStatut')->find(7); // statut PND
+
+            // marquer la commande (tracking) en statut PND
+            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
+            $tracking->setIdStatut($idStatutPnd);
+
+            // historiser le statut
+            $user = $this->getUser();
+            $jouristo = new EcommHistoStatut();
+            $jouristo->setDatestatut(new \DateTime());
+            $jouristo->setIdstatut($idStatutPnd->getIdStatut());
+            $jouristo->setObservation("Saisie PND");
+            $jouristo->setNumbl($numCmd);
+            $jouristo->setIduser($user->getId());
+            $em->persist($jouristo);
+
+            $em->flush();
+        }
+
+        return $this->render('TMDCoreBundle:Core:saisiePnd.html.twig', array(
+            'numCmd' => $numCmd,
+        ));
+    }
+
 }

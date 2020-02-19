@@ -1,0 +1,45 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Saisie PND
+{% endblock %}
+
+
+{% block body %}
+
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: 1px;">Saisie PND</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 5px;margin-left: -1px;">
+
+        <form action="" method="post">
+            <div class="col-md-offset-3 col-md-3" style="margin-top: 20px;">
+                {% if numCmd %}
+                    <p>PND # {{ numCmd }} enregistré.</p>
+                {% endif %}
+                <div class="form-group">
+                    <label for="entered_bl">N° BL</label>
+                    <input name="numCmd" type="text" style="width: 150px;" class="form-control"  id="entered_bl" placeholder="cmd n°" autofocus>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}
+
+
+{% block javascriptsPlus %}
+
+    <script>
+        $(document).ready(function(){
+
+        })
+    </script>
+
+{% endblock %}

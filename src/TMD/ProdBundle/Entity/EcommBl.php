@@ -119,7 +119,6 @@ class EcommBl
     private $bl;
 
 
-
     /**
      * @return int
      */
@@ -344,7 +343,4 @@ class EcommBl
         $this->bl = $bl;
     }
 
-
-
 }
-
