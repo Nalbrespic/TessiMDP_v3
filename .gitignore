@@ -12,7 +12,6 @@
 # Managed by Composer
 /app/bootstrap.php.cache
 /build/
-/bin/
 /vendor/
 /app/SymfonyRequirements.php
 /web/config.php

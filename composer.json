@@ -1,5 +1,5 @@
 {
-    "name": " tms/tessimd-portail",
+    "name": "tms/tessimd-portail",
     "license": "proprietary",
     "type": "project",
     "autoload": {
@@ -35,7 +35,7 @@
     ],
 
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=7.0",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/orm": "^2.5",
         "incenteev/composer-parameter-handler": "^2.0",
@@ -55,7 +55,7 @@
         "cmen/google-charts-bundle": "3.*"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~3.0",
+        "symfony/maker-bundle": "^1.14",
         "symfony/phpunit-bridge": "~2.7"
     },
     "scripts": {
