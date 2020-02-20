@@ -98,7 +98,7 @@ doctrine:
                     TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
                     TMDZplBundle: ~
-#                    TmsLogisticBundle: ~
+                    TmsLogisticBundle: ~
                     TMDStatBundle: ~
             colisprive:
                 connection: colisprive
@@ -113,6 +113,25 @@ doctrine:
 #                mappings:
 #                    TMDMinosBundle: ~
 
+# FOSRest Configuration
+fos_rest:
+    routing_loader:
+        default_format: json
+    param_fetcher_listener: force
+    service:
+        serializer: jms_serializer.serializer
+    serializer:
+        version: ~
+        groups: []
+        serialize_null: false
+
+# TmsRest
+tms_rest:
+    default:
+        pagination:
+            limit:
+                default: 50
+                maximum: 500
 
 ## FOSRest Configuration
 #fos_rest:
