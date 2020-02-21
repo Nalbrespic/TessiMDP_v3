@@ -3845,17 +3845,17 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:Tessi-Tms/TmsLogisticBundle.git",
-                "reference": "eea30b9fa55ae4991b28355692809646bf0c33ec"
+                "reference": "a9504594c857bcf265399ce7264ed64d64ecd68a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Tessi-Tms/TmsLogisticBundle/zipball/eea30b9fa55ae4991b28355692809646bf0c33ec",
-                "reference": "eea30b9fa55ae4991b28355692809646bf0c33ec",
+                "url": "https://api.github.com/repos/Tessi-Tms/TmsLogisticBundle/zipball/a9504594c857bcf265399ce7264ed64d64ecd68a",
+                "reference": "a9504594c857bcf265399ce7264ed64d64ecd68a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.9",
-                "symfony/framework-bundle": ">=2.3",
+                "php": ">=5.5.9",
+                "symfony/framework-bundle": ">=3.4",
                 "tms/rest-bundle": "~1.2",
                 "tms/rest-client-bundle": "~1.0"
             },
@@ -3887,10 +3887,10 @@
                 "tessi"
             ],
             "support": {
-                "source": "https://github.com/Tessi-Tms/TmsLogisticBundle/tree/v1.0.1",
+                "source": "https://github.com/Tessi-Tms/TmsLogisticBundle/tree/master",
                 "issues": "https://github.com/Tessi-Tms/TmsLogisticBundle/issues"
             },
-            "time": "2019-03-06T14:28:30+00:00"
+            "time": "2020-02-20T16:17:14+00:00"
         },
         {
             "name": "tms/rest-bundle",
