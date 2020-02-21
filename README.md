@@ -17,17 +17,19 @@ main external dependency : https://github.com/Tessi-Tms/TmsLogisticBundle (logis
 install server
 --------------
 ```
-git clone https://github.com/Tessi-Tms/TessiMDP.git .
+git clone git@github.com:Tessi-Tms/TessiMDP.git .
 composer install
 ```
 - fill-in values of ```app/config/parameters.yml``` prompted  
-- copy and fill-in .dist files (...)
 
 
 force update dependencies
 -------------------------
 - edit ```composer.json``` if needed  
-```COMPOSER_MEMORY_LIMIT=-1 composer update```  
+```
+COMPOSER_MEMORY_LIMIT=-1 composer update
+rm -Rf app/cache/{dev,prod}
+```
 - test the application
 ```  
 git add composer.json composer.lock  
@@ -41,4 +43,5 @@ update server
 ```
 git pull
 composer install
+rm -Rf app/cache/{dev,prod}
 ```

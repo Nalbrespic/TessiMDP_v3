@@ -35,7 +35,7 @@
     ],
 
     "require": {
-        "php": ">=7.0",
+        "php": "7.0.*",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/orm": "^2.5",
         "incenteev/composer-parameter-handler": "^2.0",
@@ -75,6 +75,9 @@
         "sort-packages": true,
         "github-oauth": {
             "github.com": "29b3721ad5b3b7ad0849eddb4045666c0c66be8d"
+        },
+        "platform": {
+            "php": "7.0.33"
         }
     },
     "extra": {
