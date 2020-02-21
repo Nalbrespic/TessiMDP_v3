@@ -255,4 +255,11 @@ class CoreController extends Controller
         ));
     }
 
+
+    public function rootAction(Request $request)
+    {
+        // redirects to the homepage
+        return $this->redirectToRoute('tmd_core_homepage');
+    }
+
 }

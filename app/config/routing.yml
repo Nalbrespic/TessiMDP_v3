@@ -6,6 +6,11 @@
 #    resource: "@TMDStatBundle/Resources/config/routing.yml"
 #    prefix:   /
 
+tmd_root :
+    path: /
+    defaults:
+        _controller: TMDCoreBundle:Core:root
+
 tmd_coriolis:
     resource: "@TMDCoriolisBundle/Resources/config/routing.yml"
     prefix:   /coriolis
@@ -58,8 +63,3 @@ login_check:
 
 logout:
     path: /logout
-
-#tms_logistic:
-#    type: rest
-#    resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
-#    prefix:   /api
