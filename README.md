@@ -4,11 +4,12 @@ Tessi MD Portail
 
 Intranet app to handle all production of Montargis
 
+
 technical informations (production env)
 ----------------------
 - Debian 8
 - nginx 1.6.2
-- PHP 7.0 (FPM)
+- PHP 7.0.33 (FPM)
 - Symfony 3.4
 - MySQL 5.6 + Oracle (on other hosts)
 
@@ -44,4 +45,28 @@ update server
 git pull
 composer install
 rm -Rf app/cache/{dev,prod}
+```
+
+
+empty preprod
+-------------
+```shell script
+echo "SET FOREIGN_KEY_CHECKS = 0;" > ./temp.sql
+mysqldump --add-drop-table --no-data -h 172.17.82.194 -u Tessi_Admin -p ecommerce_preprod | grep 'DROP TABLE' >> ./temp.sql # extract drop queries
+    password
+echo "SET FOREIGN_KEY_CHECKS = 1;" >> ./temp.sql
+mysql -h 172.17.82.194 -u Tessi_Admin -p ecommerce_preprod < ./temp.sql # run script
+    password
+rm -f temp.sql # remove temp script
+```
+
+copy prod DB to preprod
+-----------------------
+```shell script
+mysqldump --single-transaction=TRUE -h 172.17.82.194 -u Tessi_Admin -p ecommerce | gzip --fast ecommerce.sql.gz # dump prod
+    password
+gunzip < ecommerce.sql.gz | mysql -h 172.17.82.194 -u Tessi_Admin ecommerce_preprod # load preprod
+    password
+rm -f ecommerce.sql.gz # remote dump file
+    
 ```
