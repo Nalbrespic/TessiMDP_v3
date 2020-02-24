@@ -17,22 +17,11 @@ use TMD\ProdBundle\Form\EcommTrackingType;
 class CoreController extends Controller
 {
 
-
     public function indexAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
 
         $operationsCournates = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsCourantes(6);
-
-//        $oracle = $this->getDoctrine()->getManager('minos');
-//        $req = "SELECT TRAVEE_EMPL FROM EMPLACEMENT";
-//        $result = $oracle->createQuery($req);
-//        $data = $result->execute();
-//        dump($data);
-
-//        $eo = $this->getDoctrine()->getManager('minos');
-//        $client = $eo->getRepository('TMDMinosBundle:Client')->findAll();
-//dump($client);
 
         $user = $this->getUser();
         $roles = $user->getRole()->getOwner()->getRoles();
@@ -62,7 +51,6 @@ class CoreController extends Controller
             $date = date("Y-m-d", strtotime('-2 day'));
         }
 
-
         return $this->render('TMDCoreBundle:Core:accueil.html.twig', array(
             'operations'                => $operationsCournates,
         'dateVeille'                    => $date,
@@ -70,8 +58,11 @@ class CoreController extends Controller
         ));
     }
 
+
     public function prodJourAction(Request $request)
     {
+        $this->get('session')->save(); // close session, which allow concurrent requests for the same session
+
         if ($request->isXmlHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
 
@@ -86,8 +77,11 @@ class CoreController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function prodVeilleAction(Request $request)
     {
+        $this->get('session')->save(); // close session, which allow concurrent requests for the same session
+
         if ($request->isXmlHttpRequest()) {
             $date = $request->get('date');
             $em = $this->getDoctrine()->getManager();
@@ -96,12 +90,12 @@ class CoreController extends Controller
             $nbNumBl = intval($nbNumBl[0][1])-200000;
             $operationsVeille = $em->getRepository('TMDProdBundle:EcommBl')->findOperationsVeille($date, $nbNumBl);
 
-
             return new JsonResponse(array($operationsVeille));
         };
 
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function rectificationWSAction(Request $request, $idOpe, $current)
     {
@@ -128,8 +122,6 @@ class CoreController extends Controller
 
             $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsPbWSwithop($idOpe);
             $trackLength = sizeof($trackingsErreurWS);
-
-
 
             if ($trackLength > 0){
 
@@ -166,8 +158,11 @@ class CoreController extends Controller
         ));
     }
 
+
     public function resteProdAction(Request $request)
     {
+        $this->get('session')->save(); // close session, which allow concurrent requests for the same session
+
         if ($request->isXmlHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
 
@@ -179,8 +174,6 @@ class CoreController extends Controller
                 $tabidAppli[$key]=$val['idappli'];
             }
             $allArtNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->donneNbAllArticlenonProd( );
-
-
 
             foreach ($allBlNonProd as $key=>$val){
                 foreach ($allArtNonProd as $k => $v){
@@ -199,12 +192,8 @@ class CoreController extends Controller
                     if ($key == $v['nomclient']){
                         array_push($allBlNonProdb[$key],$allBlNonProd[$k]);
                     }
-
-
                 }
-
             }
-
 
             return new JsonResponse(array($allBlNonProdb));
         };
@@ -213,7 +202,9 @@ class CoreController extends Controller
     }
 
 
-    public function erreurWSAction(Request $request){
+    public function erreurWSAction(Request $request) {
+        $this->get('session')->save(); // close session, which allow concurrent requests for the same session
+
         if ($request->isXmlHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
 
