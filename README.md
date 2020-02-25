@@ -10,10 +10,11 @@ technical informations (production env)
 - Debian 8
 - nginx 1.6.2
 - PHP 7.0.33 (FPM)
-- Symfony 3.4
+- Symfony 3.4.37
 - MySQL 5.6 + Oracle (on other hosts)
 
 main external dependency : https://github.com/Tessi-Tms/TmsLogisticBundle (logistic WS for Guyancourt)
+
 
 install server
 --------------
@@ -21,7 +22,9 @@ install server
 git clone git@github.com:Tessi-Tms/TessiMDP.git .
 composer install
 ```
-- fill-in values of ```app/config/parameters.yml``` prompted  
+- fill-in values of ```app/config/parameters.yml``` prompted
+    - database password
+    - secret  
 
 
 force update dependencies
@@ -48,6 +51,17 @@ rm -Rf app/cache/{dev,prod}
 ```
 
 
+qualification environment configuration
+---------------------------------------
+with SF profiling (ie. debug bar) enabled  
+- edit ```web/app.php``` :  
+```$kernel = new AppKernel('dev', true);```   
+- edit ```app/config/config_dev.yml``` :  
+```database_name: ecommerce```
+- then exec :  
+```rm -Rf app/cache/{dev,prod}/```
+
+
 empty preprod
 -------------
 ```shell script
@@ -60,6 +74,7 @@ mysql -h 172.17.82.194 -u Tessi_Admin -p ecommerce_preprod < ./temp.sql # run sc
 rm -f temp.sql # remove temp script
 ```
 
+
 copy prod DB to preprod
 -----------------------
 ```shell script
@@ -68,5 +83,4 @@ mysqldump --single-transaction=TRUE -h 172.17.82.194 -u Tessi_Admin -p ecommerce
 gunzip < ecommerce.sql.gz | mysql -h 172.17.82.194 -u Tessi_Admin ecommerce_preprod # load preprod
     password
 rm -f ecommerce.sql.gz # remote dump file
-    
 ```
