@@ -32,8 +32,3 @@ tmd_core_rectificationWS:
         _controller: TMDCoreBundle:Core:rectificationWS
         idOpe: 0
         current: 0
-
-tmd_core_saisiePnd :
-    path: /saisiePnd
-    defaults:
-        _controller: TMDCoreBundle:Core:saisiePnd

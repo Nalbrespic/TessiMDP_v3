@@ -5,10 +5,44 @@ namespace TMD\ProdBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use TMD\ProdBundle\Entity\EcommHistoStatut;
 use XLSXWriter;
 
 class PndController extends Controller
 {
+
+    public function saisiePndAction(Request $request)
+    {
+        $numCmd = null;
+        if ($request->getMethod() === 'POST') {
+            $numCmd = $request->request->get('numCmd');
+            if (!empty($numCmd)) {
+                $em = $this->getDoctrine()->getManager();
+                $idStatutPnd = $em->getRepository('TMDProdBundle:EcommStatut')->find(7); // statut PND
+
+                // marquer la commande (tracking) en statut PND
+                $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
+                $tracking->setIdStatut($idStatutPnd);
+
+                // historiser le statut
+                $user = $this->getUser();
+                $jouristo = new EcommHistoStatut();
+                $jouristo->setDatestatut(new \DateTime());
+                $jouristo->setIdstatut($idStatutPnd->getIdStatut());
+                $jouristo->setObservation("Saisie PND");
+                $jouristo->setNumbl($numCmd);
+                $jouristo->setIduser($user->getId());
+                $em->persist($jouristo);
+
+                $em->flush();
+            }
+        }
+
+        return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
+            'numCmd' => $numCmd,
+        ));
+    }
+
 
     /**
      * affiche la page de téléchargement des PND
@@ -17,7 +51,7 @@ class PndController extends Controller
      * @param $idOpe
      * @return Response
      */
-    public function indexAction(Request $request, $idClient, $idOpe)
+    public function extractAction(Request $request, $idClient, $idOpe)
     {
         $message = $request->query->get('message');
 
@@ -29,7 +63,7 @@ class PndController extends Controller
             }
         }
 
-        return $this->render('TMDProdBundle:Prod:pnd.html.twig', [
+        return $this->render('TMDProdBundle:Pnd:pnd.html.twig', [
             'idClient'          => $idClient,
             'idOpe'             => $idOpe,
             'idOperation'       => $idOpe,

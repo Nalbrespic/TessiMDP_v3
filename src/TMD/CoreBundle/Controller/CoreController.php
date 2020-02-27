@@ -216,39 +216,6 @@ class CoreController extends Controller
     }
 
 
-    public function saisiePndAction(Request $request)
-    {
-        $numCmd = null;
-        if ($request->getMethod() === 'POST') {
-            $numCmd = $request->request->get('numCmd');
-            if (!empty($numCmd)) {
-                $em = $this->getDoctrine()->getManager();
-                $idStatutPnd = $em->getRepository('TMDProdBundle:EcommStatut')->find(7); // statut PND
-
-                // marquer la commande (tracking) en statut PND
-                $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
-                $tracking->setIdStatut($idStatutPnd);
-
-                // historiser le statut
-                $user = $this->getUser();
-                $jouristo = new EcommHistoStatut();
-                $jouristo->setDatestatut(new \DateTime());
-                $jouristo->setIdstatut($idStatutPnd->getIdStatut());
-                $jouristo->setObservation("Saisie PND");
-                $jouristo->setNumbl($numCmd);
-                $jouristo->setIduser($user->getId());
-                $em->persist($jouristo);
-
-                $em->flush();
-            }
-        }
-
-        return $this->render('TMDCoreBundle:Core:saisiePnd.html.twig', array(
-            'numCmd' => $numCmd,
-        ));
-    }
-
-
     public function rootAction(Request $request)
     {
         // redirects to the homepage

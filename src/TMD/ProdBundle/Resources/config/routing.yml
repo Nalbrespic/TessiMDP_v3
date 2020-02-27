@@ -188,10 +188,16 @@ tmd_prod_donneTransport:
     defaults:
         _controller: TMDProdBundle:Prod:donneAllTransport
 
+
+tmd_prod_saisiePnd :
+    path: /saisiePnd
+    defaults:
+        _controller: TMDProdBundle:Pnd:saisiePnd
+
 tmd_prod_pnd:
     path:     /pnd/{idClient}/{idOpe}
     defaults:
-        _controller: TMDProdBundle:Pnd:index
+        _controller: TMDProdBundle:Pnd:extract
         message:  ''
 
 tmd_prod_pnd_download:

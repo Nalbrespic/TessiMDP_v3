@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use TMD\ProdBundle\Entity\EcommAppli;
+use TMD\ProdBundle\Entity\EcommHistoStatut;
 use TMD\ProdBundle\Form\EcommAppliType;
 use XLSXWriter;
 
