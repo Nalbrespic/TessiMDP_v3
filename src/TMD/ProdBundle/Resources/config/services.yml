@@ -5,3 +5,7 @@ services:
     tmd_getInfo:
         class: TMD\ProdBundle\Service\GetInfoTracking
         arguments: ['@doctrine.orm.entity_manager']
+
+    tmd_statut:
+        class: TMD\ProdBundle\Service\StatutManager
+        arguments: ['@doctrine.orm.entity_manager']

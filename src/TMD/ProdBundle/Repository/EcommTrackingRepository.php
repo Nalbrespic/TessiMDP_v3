@@ -4,6 +4,7 @@ namespace TMD\ProdBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use TMD\ProdBundle\Entity\EcommTracking;
 
 /**
  * EcommTrackingRepository
@@ -190,6 +191,21 @@ class EcommTrackingRepository extends EntityRepository
             ->andWhere('tr.idStatut != (:st)')
             ->setParameter('st', 9)
             ->groupBy('tr.expRef')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
+    /**
+     * find all ecommtracking's by their numligne
+     * @param array $numLignes array of numligne
+     * @return EcommTracking[]
+     */
+    public function findAllNumlignes (array $numLignes) {
+        return $this->createQueryBuilder('tr')
+            ->where('tr.numligne IN (:numlignes)')
+            ->setParameter('numlignes', $numLignes)
             ->getQuery()
             ->getResult()
             ;

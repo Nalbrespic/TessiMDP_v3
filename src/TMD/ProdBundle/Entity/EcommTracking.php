@@ -3,6 +3,7 @@
 namespace TMD\ProdBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use TMD\ProdBundle\Repository\EcommTrackingRepository;
 
 /**
  * EcommTracking
@@ -1290,4 +1291,3 @@ class EcommTracking
     }
 
 }
-

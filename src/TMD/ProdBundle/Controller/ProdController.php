@@ -16,24 +16,22 @@ use XLSXWriter;
 
 class ProdController extends Controller
 {
+
     public function indexAction(Request $request)
     {
         $em = $this
             ->getDoctrine()
             ->getManager();
 
-//        $bl = $em->getRepository('TMDProdBundle:EcommTracking')->findLimit();
-
         return $this->render('TMDProdBundle:Prod:index.html.twig', array(
-//            'bl' => $bl
         ));
     }
+
 
     public function addApplicationAction(Request $request){
 
         $appli = new EcommAppli();
         $form = $this->get('form.factory')->create(EcommAppliType::class, $appli);
-
 
         if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
             $em = $this->getDoctrine()->getManager();
@@ -55,6 +53,7 @@ class ProdController extends Controller
             'form' => $form->createView(),
         ));
     }
+
 
     public function modifDateDepotAction(Request $request)
     {
@@ -78,6 +77,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function modifDateProductionAction(Request $request)
     {
         if ($request->isXmlHttpRequest()) {
@@ -98,6 +98,7 @@ class ProdController extends Controller
 
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function modifDateProductionDepotTrackingAction(Request $request)
     {
@@ -127,6 +128,7 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function modifDateProductionDepotAction(Request $request)
     {
@@ -164,6 +166,7 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function rechercheByCmdAction(Request $request)
     {
@@ -231,7 +234,6 @@ class ProdController extends Controller
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
                 }
-
             }
 
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
@@ -240,6 +242,7 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function rechercheByCodeArticleAction(Request $request)
     {
@@ -316,6 +319,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function rechercheModifAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -361,6 +365,7 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function suppNameOperationAction(Request $request)
     {
@@ -420,6 +425,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function syntheseCokeAction(Request $request, $date)
     {
         $em = $this->getDoctrine()->getManager();
@@ -445,13 +451,9 @@ class ProdController extends Controller
                         elseif (preg_match('/ffret 6 cans Collector C/', $v['libelle'])){
                             $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*6;
                         }
-//                        elseif (preg_match('/Kit Noel/', $v['libelle'])){
-//                            $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1])*2;
-//                        }
                         else{
                             $cmdArt[$v['numbl']] = $cmdArt[$v['numbl']] + intval($v[1]);
                         }
-
 
                     } else {
                         if (preg_match('/Basket Pack/', $v['libelle'])){
@@ -495,13 +497,10 @@ class ProdController extends Controller
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="SyntheseNbBouteilles.xlsx.xlsx"');
 
-
-
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue( 'A1', 'Nbre de commande');
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue( 'B1', 'quantite de bouteilles');
-
         ;
 
         $indice = 2;
@@ -512,20 +511,17 @@ class ProdController extends Controller
             $indice ++;
         }
 
-
         $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('A')->setWidth(15);
         $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('B')->setWidth(15);
 
-
         $writer =  IOFactory::createWriter($spreadsheet, 'Xlsx');
 
         $writer->save('php://output');
         exit;
-
-
     }
+
 
     public function syntheseCoriolisAction(Request $request, $date)
     {
@@ -550,7 +546,6 @@ class ProdController extends Controller
         foreach ($multiP4 as $v){
             $compt4 = $compt4 + 1;
         }
-
 
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setCreator('Rob Gravelle')
@@ -618,19 +613,17 @@ class ProdController extends Controller
                 ->setCellValue('C11', '= C2 + C4 + C6 + C8');
         }
 
-
         $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('A')->setWidth(20);
         $spreadsheet->setActiveSheetIndex(0)
             ->getColumnDimension('B')->setWidth(15);
-
-
 
         $writer =  IOFactory::createWriter($spreadsheet, 'Xlsx');
 
         $writer->save('php://output');
         exit;
     }
+
 
     public function exportTrackingExcelAction(Request $request, $idFile, $prod)
     {
@@ -639,59 +632,8 @@ class ProdController extends Controller
         $emCP = $this->getDoctrine()->getManager('colisprive');
         $emDpd = $this->getDoctrine()->getManager('dpd');
 
-
         $allBlByOpekey=array();
 
-//        if (sizeof($idFiles) > 8) {
-//
-//            $size = sizeof($idFiles);
-//            $index = 0;
-//            while ($size > 0) {
-//                $idFileb = array_splice($idFiles, 0, 8);
-//
-//                $index = $index + 8;
-//                $size = $size - 8;
-//
-//
-//                //tous les fichiers
-//                if ($prod == '0') {
-//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($idFileb);
-//                    array_push($allBlByOpekey, $allBlByOpeb);
-//                }
-//                //en attente de production
-//                if ($prod == '1') {
-//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlNonProdByFile($idFileb);
-//                    array_push($allBlByOpekey, $allBlByOpeb);
-//                }
-//                //produit
-//                else if ($prod == '2') {
-//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByFile($idFileb);
-//                    array_push($allBlByOpekey, $allBlByOpeb);
-//
-//                }
-//                //rupture
-//                else if ($prod == '3') {
-//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByFile($idFileb);
-//                    array_push($allBlByOpekey, $allBlByOpeb);
-//                }
-//                //supprime
-//                else {
-//                    $allBlByOpeb = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFileb);
-//                    array_push($allBlByOpekey, $allBlByOpeb);
-//
-//                }
-//            }
-//            $allBlByOpe = array();
-//            foreach ($allBlByOpekey as $k => $v) {
-//                foreach ($v as $k1 => $v1) {
-//                    array_push($allBlByOpe,  $v1);
-//                }
-//
-//
-//            }
-//            $idFiles = explode(",", $idFile);
-//        }
-//        else{
             if ($prod == '0') {
                 $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($idFiles);
             }
@@ -705,8 +647,6 @@ class ProdController extends Controller
                 $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFiles);
 
             }
-
-//        }
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -908,6 +848,7 @@ class ProdController extends Controller
         );
     }
 
+
     public function exportTrackingArticleExcelAction(Request $request, $idFile, $prod)
     {
         $idFiles = explode(",", $idFile);
@@ -928,8 +869,6 @@ class ProdController extends Controller
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlDeleteByFile($idFiles);
 
         }
-
-//        }
 
         $numBLs = array();
         foreach ($allBlByOpe as $key=>$file)
@@ -1144,6 +1083,7 @@ class ProdController extends Controller
         );
     }
 
+
     public function exportTrackingExcelbyBLAction(Request $request, $idBLs, $code)
     {
         $idFiles = explode(",", $idBLs);
@@ -1301,6 +1241,7 @@ class ProdController extends Controller
         );
     }
 
+
     public function exportTrackingExcelbyDateAction(Request $request, $date, $appli)
     {
         $em = $this->getDoctrine()->getManager();
@@ -1442,8 +1383,6 @@ class ProdController extends Controller
             ]);
         }
 
-
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
@@ -1462,6 +1401,7 @@ class ProdController extends Controller
             )
         );
     }
+
 
     public function exportTrackingExcelbyBLArticleAction(Request $request, $date, $appli)
     {
@@ -1656,6 +1596,7 @@ class ProdController extends Controller
         );
     }
 
+
     public function exportTrackingPresseAction(Request $request, $date, $appli)
     {
         $em = $this->getDoctrine()->getManager();
@@ -1747,6 +1688,7 @@ class ProdController extends Controller
         );
     }
 
+
     public function exportTrackingbyDateAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -1807,6 +1749,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function exportTrackingbyDateDepotAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -1832,7 +1775,6 @@ class ProdController extends Controller
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;
             }
-
 
             $numBLs = array();
             foreach ($allBlByOpeByDate as $key=>$file)
@@ -1884,6 +1826,7 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function viewClientAction($idClient, $idOpe, $page, $nbFichierPage)
     {
@@ -2061,19 +2004,6 @@ class ProdController extends Controller
                 }
             }
 
-//            $quantiteBlaProduire = 0;
-//            foreach ($filesBl as $k=>$v)
-//            {
-//                if (isset($filesBlProd[$k]) && isset($v['nbBl'])){
-//                    $quantiteBlaProduire += $v['nbBl']-$filesBlProd[$k]['totProd'];
-//                }
-//                else{
-//                    if (isset($v['nbBl'])) {
-//                        $quantiteBlaProduire += $v['nbBl'];
-//                    }
-//                }
-//            }
-
             $tabSyntheseGeneralaProd = 0;
             $tabSyntheseGeneralaRupture = 0;
             $tabSyntheseGeneralaSupp = 0;
@@ -2149,9 +2079,9 @@ class ProdController extends Controller
 
     }
 
+
     public function viewSuiviCourantAction($idClient, $idOpe, $blR, $page, $nbFichierPage)
     {
-
         if ($page < 1) {
             throw $this->createNotFoundException("La page ".$page." n'existe pas.");
         }
@@ -2169,17 +2099,11 @@ class ProdController extends Controller
                 }
             }
         }
-        else{
-            $operationsCournates = null;
-        }
-
-        if ($idOpe !=0 )
-        {
-
-            $operationCournate = $em->getRepository('TMDProdBundle:EcommAppli')->findBy(array('idappli' => $idOpe));
-            foreach ( $operationCournate as $u) {
+        else {
+            $operationCourante = $em->getRepository('TMDProdBundle:EcommAppli')->findBy(array('idappli' => $idOpe));
+            foreach ( $operationCourante as $u) {
                 if ($u->getAppliImage() != null) {
-                    $operationCournate['appliImage'] = (base64_encode(stream_get_contents($operationCournate[0]->getAppliImage())));
+                    $operationCourante['appliImage'] = (base64_encode(stream_get_contents($operationCourante[0]->getAppliImage())));
                 }
             }
             $nbParPage = $nbFichierPage;
@@ -2204,7 +2128,6 @@ class ProdController extends Controller
 
             }
 
-
             $trackings = array();
             $files= array();
             foreach ($nbTrackingByFile as $key=>$file)
@@ -2218,7 +2141,6 @@ class ProdController extends Controller
             $filesBl= array();
             $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
-
             // on comptabise le nombre de BL par fichier dont date depot n'est pas renseigner = 0000-00-00
             $nbBlWithDepotNull = $em->getRepository('TMDProdBundle:EcommTracking')->findnbBlWithDepotNull($idOpe);
             $TrDepotNull = array();
@@ -2227,7 +2149,6 @@ class ProdController extends Controller
                 $TrDepotNull[$file['idfile']] = intval($file[1]);
             }
 
-
             $ArticlesByIdFile = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFile($filesPaginator);
             $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($idOpe);
             $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeByDateNonProd($idOpe);
@@ -2235,7 +2156,6 @@ class ProdController extends Controller
             $ArticlesReclaSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesReclaByFile($files);
 
             $nbRetentionByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbRetentionByFile($files);
-
 
             $nbRetentionByFileS = array();
             foreach($nbRetentionByFile as $k)
@@ -2273,7 +2193,6 @@ class ProdController extends Controller
                 $syntheseArticles['coriolisCarte'] = $nbCarte;
 
             }
-
 
             $articles=[];
             foreach ($ArticlesByIdFile as $key=>$ar)
@@ -2327,7 +2246,6 @@ class ProdController extends Controller
                 }
             }
 
-
             $nbBlByFileProd = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlByFileProd($files);
             $filesBlProd = array();
             $dateMinProdByApplication = '2040-01-01 ';
@@ -2340,7 +2258,6 @@ class ProdController extends Controller
                     $dateMinProdByApplication = $blp['minDate'];
                 }
             }
-
 
             $tabSyntheseGeneralaProd = 0;
             $tabSyntheseGeneralaRupture = 0;
@@ -2363,8 +2280,6 @@ class ProdController extends Controller
                 $tabSyntheseGeneralaProd += intval($tab['totProd']);
             }
 
-
-
             //pagination
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
             if ($page > $nbPages) {
@@ -2379,7 +2294,7 @@ class ProdController extends Controller
             return $this->render('TMDProdBundle:Prod:SuiviProdCourant.html.twig', array(
                 'idOperation'               => $idOpe,
                 'idClient'                  => $idClient,
-                'operation'                => $operationCournate,
+                'operation'                => $operationCourante,
                 'nbPages'                   => $nbPages,
                 'page'                      => $page,
                 'files'                     => $fileByOpe,
@@ -2400,15 +2315,17 @@ class ProdController extends Controller
                 'tabSyntheseGeneralaProd'   => $tabSyntheseGeneralaProd,
                 'tabSyntheseGeneralaSupp'   => $tabSyntheseGeneralaSupp,
                 'tabSyntheseGeneralaRupture'=> $tabSyntheseGeneralaRupture,
-                'nbBLWtihDepotNull'         => $TrDepotNull
+                'nbBLWtihDepotNull'         => $TrDepotNull,
+                'idOpe'                     => $idOpe,
+                'blR'                       => $blR
             ));
         }
-
 
         return $this->render('TMDProdBundle:Prod:SuiviProdCourant.html.twig', array(
                 'operations' => $operationsCournates
         ));
     }
+
 
     public function donneBlNonProdAction(Request $request)
     {
@@ -2477,6 +2394,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function donneDepotNullAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -2500,7 +2418,6 @@ class ProdController extends Controller
                 $articleArray[$key] = $item;
             }
 
-
             $numBLs = array();
             foreach ($allBlByOpe as $key=>$file)
             {
@@ -2510,10 +2427,7 @@ class ProdController extends Controller
                 if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
                     $numBLs['DPD']['numBl'][$key] = $file['numbl'];
                 }
-
-
             }
-
 
             $statuts = array();
             if ( isset($numBLs['CPRV']['numBl'])) {
@@ -2532,7 +2446,6 @@ class ProdController extends Controller
                     $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
                 }
             }
-
 
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
@@ -2554,6 +2467,7 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function donneTrackingsByFileAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
@@ -2571,7 +2485,6 @@ class ProdController extends Controller
                 $articleArray[$key] = $item;
             }
 
-
             $numBLs = array();
             foreach ($allBlByOpe as $key=>$file)
             {
@@ -2584,7 +2497,6 @@ class ProdController extends Controller
 
 
             }
-
 
             $statuts = array();
             if ( isset($numBLs['CPRV']['numBl'])) {
@@ -2604,7 +2516,6 @@ class ProdController extends Controller
                 }
             }
 
-
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
                 if (isset($statuts[$item['numbl']])){
@@ -2620,13 +2531,13 @@ class ProdController extends Controller
 //                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
 
-
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
             return new JsonResponse($reponse);
 
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function donneRuptureByFileAction(Request $request)
     {
@@ -2651,7 +2562,6 @@ class ProdController extends Controller
                 $articleArray[$key] = $item;
             }
 
-
             $numBLs = array();
             foreach ($allBlByOpe as $key=>$file)
             {
@@ -2661,10 +2571,7 @@ class ProdController extends Controller
                 if ( $file['typeTransport'] == 'DPD' OR $file['typeTransport'] == 'DPDPREDI' OR $file['typeTransport'] == 'DPDRELAIS'){
                     $numBLs['DPD']['numBl'][$key] = $file['numbl'];
                 }
-
-
             }
-
 
             $statuts = array();
             if ( isset($numBLs['CPRV']['numBl'])) {
@@ -2683,7 +2590,6 @@ class ProdController extends Controller
                     $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
                 }
             }
-
 
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
@@ -2707,18 +2613,12 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function exportResteProdExcelAction($idoperation)
     {
-
-
         $em = $this->getDoctrine()->getManager();
 
         $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommLignes')->findArticlesByOpeNonProd($idoperation);
-
-
-
-
-
 
         $header = array('Code article' => 'string',
                         'Libelle'=> 'string',
@@ -2727,8 +2627,6 @@ class ProdController extends Controller
 
         $tabBlComplet2 = array();
         foreach ($ArticlesSyntheseNonProd as $k=>$v){
-
-
             array_push($tabBlComplet2,[
                 $v['codearticle'],
                 $v['libelle'],
@@ -2736,16 +2634,10 @@ class ProdController extends Controller
             ]);
         }
 
-
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
-
-
             $nomExport = preg_replace ('/\s+/',"_",($ArticlesSyntheseNonProd[0]['appliname']));
-
-
 
         return new Response(
             $writer->writeToString(),  // read from output buffer
@@ -2758,14 +2650,11 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
+
 
     public function exportRuptureProdExcelAction($idoperation)
     {
-
-
         $em = $this->getDoctrine()->getManager();
 
         $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpRupture($idoperation);
@@ -2778,7 +2667,6 @@ class ProdController extends Controller
         $tabBlComplet2 = array();
         foreach ($ArticlesSyntheseNonProd as $k=>$v){
 
-
             array_push($tabBlComplet2,[
                 $v['codearticle'],
                 $v['libelle'],
@@ -2786,16 +2674,10 @@ class ProdController extends Controller
             ]);
         }
 
-
-
         $writer = new XLSXWriter();
         $writer->writeSheet($tabBlComplet2,'extraction',$header);
 
-
-
         $nomExport = preg_replace ('/\s+/',"_",($ArticlesSyntheseNonProd[0]['appliname']));
-
-
 
         return new Response(
             $writer->writeToString(),  // read from output buffer
@@ -2808,9 +2690,8 @@ class ProdController extends Controller
                 'Pragma' =>  'public'
             )
         );
-
-
     }
+
 
     public function exportSynthesebyDateAction(Request $request)
     {
@@ -2828,59 +2709,13 @@ class ProdController extends Controller
             }
 
             $filesBl= array();
-                                                //            $dateMaxProdByApplication = (new DateTime('1980-01-01 '))->format('Y-m-d h:i');
 
             $ArticlesByBl = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bls);
-                                            //            $ArticlesSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpe($files);
-                                            //            $ArticlesSyntheseNonProd = $em->getRepository('TMDProdBundle:EcommBl')->findArticlesByOpeByDateNonProd($files);
-//            $ArticlesReclaSynthese = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesReclaByFile($files);
-
-//            $nbRetentionByFile = $em->getRepository('TMDProdBundle:EcommTracking')->findNbRetentionByFile($files);
-
-
-//            $nbRetentionByFileS = array();
-//            foreach($nbRetentionByFile as $k)
-//            {
-//                $nbRetentionByFileS[$k['idfile']] = $k;
-//            }
-
-//            $ArticlesReclaSyntheseTab = array();
-//            foreach($ArticlesReclaSynthese as $k)
-//            {
-//                $ArticlesReclaSyntheseTab[$k['idfile']] = $k;
-//            }
             $syntheseArticles=[];
             foreach($ArticlesByBl as $article)
             {
                 $syntheseArticles[$article['flagart']][$article['libelle']]= $article['quantite'];
             }
-                                            //            foreach($ArticlesSyntheseNonProd as $article)
-                                            //            {
-                                            //                $syntheseArticles['aProd'][$article['flagart']][$article['libelle']]= $article['quantite'];
-                                            //            }
-
-
-                                            //            $articles=[];
-                                            //            foreach ($ArticlesByIdFile as $key=>$ar)
-                                            //            {
-                                            //                $articles[$ar['idfile']][$ar['flagart']][$ar['libelle']] =  ($ar['quantite']);
-                                            //
-//                                                        }
-//
-//            $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByBls($bls);
-//
-//                foreach ($modeTransport as $transport)
-//                {
-//                    $filesBl[$transport['typeTransport']]=0;
-//                }
-                                            //                if ( $bl['maxDate'] > $dateMaxProdByApplication)
-                                            //                {
-                                            //                    $dateMaxProdByApplication = $bl['maxDate'];
-
-                                            //                if ( array_key_exists($bl['idfile'], $ArticlesReclaSyntheseTab)) {
-                                            //                    $filesBl[$bl['idfile']]['articlesReclamation'] = $ArticlesReclaSyntheseTab[$bl['idfile']]['q'];
-                                            //                }
-
 
             $countTransportbyFile = $em->getRepository('TMDProdBundle:EcommBl')->findNbTransportByBls($bls);
             foreach ($countTransportbyFile  as $bl)
@@ -2888,26 +2723,11 @@ class ProdController extends Controller
                 $filesBl[$bl['modexp']] = $bl[1];
             }
 
-            // donne un tableau qui fait la synthese du transport: liste des transports utilisé avec le total des BL pour chacun
-//            $transportCount=[];
-//            foreach ($filesBl as $file)
-//            {
-//                foreach ($file['transport'] as $key=>$val) {
-//                    if (isset($transportCount[$key])) {
-//                        $transportCount[$key] = $transportCount[$key] + $val;
-//                    } else {
-//                        $transportCount[$key] = $val;
-//                    }
-//                }
-//            }
-
-
-
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
-
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function exportSynthesebyDateDepotAction(Request $request)
     {
@@ -2934,13 +2754,11 @@ class ProdController extends Controller
                 $syntheseArticles[$article['flagart']][$article['libelle']]= $article['quantite'];
             }
 
-
             $countTransportbyFile = $em->getRepository('TMDProdBundle:EcommBl')->findNbTransportByBls($bls);
             foreach ($countTransportbyFile  as $bl)
             {
                 $filesBl[$bl['modexp']] = $bl[1];
             }
-
 
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
 
@@ -2948,11 +2766,11 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function calendarAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
         {
-
             $id = $request->get('idappli');
 
             $em = $this->getDoctrine()->getManager();
@@ -2961,18 +2779,16 @@ class ProdController extends Controller
 
 //            $tab = array(["title" =>"New Event","start" =>"2017-11-24","end" =>"2017-11-26","allDay" => 0 ]);
 
-
-
             return new JsonResponse( $test );
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+
     public function calendarDepotAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
         {
-
             $id = $request->get('idappli');
 
             $em = $this->getDoctrine()->getManager();
@@ -2980,8 +2796,6 @@ class ProdController extends Controller
             $test = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlDepotByDate($id);
 
 //            $tab = array(["title" =>"New Event","start" =>"2017-11-24","end" =>"2017-11-26","allDay" => 0 ]);
-
-
 
             return new JsonResponse( $test );
         };
@@ -2995,33 +2809,18 @@ class ProdController extends Controller
             $numBl = $request->get('numBl');
             $em = $this->getDoctrine()->getManager();
 
-
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileBl($numBl);
 
-
-
-
-
-
-
-
-
-
-
-
-
             return new JsonResponse($allBlByOpe);
-
-
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 
     public function donneAllTransportAction(Request $request)
     {
         if ($request->isXmlHttpRequest())
         {
-
             $em = $this->getDoctrine()->getManager();
 
             $allTransport= $em->getRepository('TMDAppliBundle:EcommTransport')->findallTransport();
@@ -3039,4 +2838,5 @@ class ProdController extends Controller
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
+
 }

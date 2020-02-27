@@ -39,21 +39,6 @@ class EcommCompte
      * })
      */
     private $idclient;
-//
-//    /**
-//     * @ORM\OneToMany(targetEntity="TMD\AppliBundle\Entity\EcommCompteTransport", mappedBy="idcompte")
-//     */
-//    private $CompteTransports;
-//
-//    /**
-//     * EcommCompte constructor.
-//     * @param $CompteTransport
-//     */
-//    public function __construct()
-//    {
-//        $this->CompteTransports = new ArrayCollection();
-//    }
-
 
     /**
      * @return string
@@ -95,28 +80,4 @@ class EcommCompte
         return $this->idcompte;
     }
 
-
-
-
-//    public function addCompteTransport(EcommCompteTransport $transport)
-//    {
-//        $this->CompteTransports[] = $transport;
-//        $transport->setIdcompte($this);
-//        return $this;
-//    }
-//
-//    public function removeCompteTransport(EcommCompteTransport $transport)
-//    {
-//        $this->CompteTransports->removeElement($transport);
-//    }
-//
-//    public function getCompteTransport()
-//    {
-//        return $this->CompteTransports;
-//    }
-
-
-
-
 }
-

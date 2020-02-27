@@ -9,12 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  * EcommStatut
  *
  * @ORM\Table(name="ecomm_statut")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="TMD\ProdBundle\Repository\EcommStatutRepository", readOnly=false)
  */
 class EcommStatut
 {
-
-
 
     /**
      * @var integer
@@ -71,6 +69,7 @@ class EcommStatut
         return $this;
     }
 
+
     /**
      * Get abregestatut
      *
@@ -94,6 +93,7 @@ class EcommStatut
 
         return $this;
     }
+
 
     /**
      * Get statut
@@ -119,6 +119,7 @@ class EcommStatut
         return $this;
     }
 
+
     /**
      * Get coulstatut
      *
@@ -128,4 +129,5 @@ class EcommStatut
     {
         return $this->coulstatut;
     }
+
 }

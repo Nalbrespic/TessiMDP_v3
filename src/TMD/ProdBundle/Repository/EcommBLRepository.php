@@ -50,10 +50,6 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('st2', 10)
             ->andWhere('file.idappli IN (:ope)')
             ->setParameter('ope',$ope)
-//            ->addSelect('bl.bl')
-//            ->addSelect('count(bl.numligne)')
-//            ->addSelect('site.abregesiteprod')
-//            ->groupBy('tr.idfile')
             ->getQuery()
             ->getResult()
             ;
@@ -71,32 +67,11 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('date',$date.'%')
             ->andWhere('file.idappli IN (:ope)')
             ->setParameter('ope',$ope)
-//            ->addSelect('bl.bl')
-//            ->addSelect('count(bl.numligne)')
-//            ->addSelect('site.abregesiteprod')
-//            ->groupBy('tr.idfile')
             ->getQuery()
             ->getResult()
             ;
     }
 
-
-//    public function findDateMinProdByFile( $files)
-//    {
-//        return $this
-//            ->createQueryBuilder('bl')
-//            ->where('bl.idfile IN (:id)')
-//            ->setParameter('id', $files)
-//            ->andwhere('bl.dateProduction > :dat')
-//            ->setParameter('dat', '0000-00-00 00:00:00')
-//            ->select('(bl.idfile) as idfile')
-//            ->addSelect('min(bl.dateProduction as minDate')
-//            ->groupBy('bl.idfile')
-//            ->getQuery()
-//            ->getResult()
-//
-//            ;
-//    }
 
     public function findNbBlByFileProd( $files)
     {
@@ -119,6 +94,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findAllBlByDateProduction($date)
     {
         return $this
@@ -129,6 +105,7 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+
 
     public function findAllClientByDateProduction($date)
     {
@@ -145,6 +122,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findAllAppliByDateProduction($date)
     {
         return $this
@@ -160,6 +138,7 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+
 
     public function findNbBlProduitsByDate($idappli)
     {
@@ -181,6 +160,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findNbBlDepotByDate($idappli)
     {
         return $this
@@ -200,6 +180,7 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+
 
     public function findAllBlByBLS($idBLs)
     {
@@ -243,14 +224,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
             ->addSelect('count(cmd.numbl) as nbCmd')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByFile($idfile)
     {
@@ -302,14 +282,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('bl.modexp')
             ->addSelect('bl.dateProduction')
             ->addSelect('bl.nColis')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByFileArticle($idfile)
     {
@@ -352,8 +331,6 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('file.nbpages')
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
-//            ->addSelect('sum(cmd.quantite) as quantite')
-//            ->addSelect('count(cmd.numbl) as nbCmd')
             ->addSelect('IDENTITY(tr.idStatut) as trStatut')
             ->addSelect('tr.json')
             ->addSelect('bl.modexp')
@@ -368,6 +345,7 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByDateProdByAppli($idAppli, $DateProd)
     {
@@ -410,14 +388,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
             ->addSelect('statut.statut as trStatut ')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByDateDepotByAppli($idAppli, $DateProd)
     {
@@ -460,14 +437,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
             ->addSelect('st.statut as trStatut')
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function nbPresseByDateDepotByAppli($idAppli, $DateProd)
     {
@@ -483,14 +459,12 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('trans', 'PRESS')
             ->andWhere('tr.dateDepot LIKE :dat')
             ->setParameter('dat', $DateProd.'%')
-//            ->andWhere('bl.modexp = :exp')
-//            ->setParameter('exp', 'PRESS')
             ->Select('count(bl.idbl)')
-
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findNbTransportByFile($idfile)
     {
@@ -511,6 +485,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findNbTransportByBls($bls)
     {
         return $this
@@ -529,6 +504,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findDistinctTransportByBls($bls)
     {
         return $this
@@ -544,6 +520,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findDistinctTransportByFile($idFiles)
     {
         return $this
@@ -558,6 +535,7 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+
 
     public function findOperationsCourantes($result)
     {
@@ -583,6 +561,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findOperationsVeille($date, $idBL)
     {
         return $this
@@ -598,7 +577,6 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('bl.dateProduction LIKE :id')
             ->setParameter('id', '%'.$date.'%')
             ->select('app.appliname')
-//            ->addSelect('app.appliImage')
             ->addSelect('app.idappli')
             ->addSelect('cli.nomclient')
             ->addSelect('SUBSTRING(bl.dateProduction, 1, 10)')
@@ -624,6 +602,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findOperationsDuJour($idBL)
     {
         $date = date("Y-m-d");
@@ -640,7 +619,6 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('bl.dateProduction LIKE :id')
             ->setParameter('id', '%'.$date.'%')
             ->select('app.appliname')
-//            ->addSelect('app.appliImage')
             ->addSelect('app.idappli')
             ->addSelect('cli.nomclient')
             ->addSelect('SUBSTRING(bl.dateProduction, 1, 10)')
@@ -654,6 +632,7 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+
 
     public function findAllBlByCmdandCodeArticle($code,$idClient, $idope)
     {
@@ -696,15 +675,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
             ->addSelect('cmd.numTrack')
-
-//            ->andWhere('cmd.flagart = (:qt)')
-//            ->setParameter('qt', 0)
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByCmdModifb($cmd, $idClient, $idope)
     {
@@ -733,6 +710,7 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByCmdModiff($cmd, $idClient, $idope)
     {
@@ -777,20 +755,19 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('ope', $idope)
             ->andwhere('bl.dateProduction = :dat')
             ->setParameter('dat', '0000-00-00 00:00:00')
-
             ->addSelect('tr.destinataire')
             ->addSelect('tr.destCp')
             ->addSelect('file.filename')
             ->addSelect('bl.nColis')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.dateDepot')
-//
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('file.filename')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlByCmdModiffaUpdateDepot($cmd,$idClient, $idope)
     {
@@ -814,13 +791,13 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('bl.nColis')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.dateDepot')
-//
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('file.filename')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function donneCmdCoriolisWithNumRef($numRef, $idApp)
     {
@@ -873,6 +850,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function donneCmdCoriolis($idApplication)
     {
         return $this
@@ -892,6 +870,8 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
+
     public function donneBlCoriolis($idApplication)
     {
         return $this
@@ -912,6 +892,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function syntheseMoisArtCokeFlagZero($date)
     {
         return $this
@@ -922,16 +903,8 @@ class EcommBLRepository extends EntityRepository
             ->innerJoin('tr.idfile', 'file')
             ->where('bl.dateProduction  LIKE :date')
             ->setParameter('date', '%'.$date.'%')
-//            ->andWhere('cmd.flagart = (:id)')
-//            ->setParameter('id', 0)
             ->andWhere('file.idappli = (:idA)')
             ->setParameter('idA', 416)
-//            ->andWhere('cmd.libelle NOT LIKE :rec')
-//            ->setParameter('rec', '%cla%' )
-//            ->andWhere('cmd.libelle NOT LIKE :rec1')
-//            ->setParameter('rec1', '%offret Plan de Pari%' )
-//            ->andWhere('cmd.libelle NOT LIKE :rec2')
-//            ->setParameter('rec2', '%offret Caroussel Pari%' )
             ->select('ligne.numbl')
             ->addSelect('sum(cmd.quantite)')
             ->addSelect('cmd.flagart')
@@ -942,6 +915,7 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
 
     public function syntheseMoisCoriolis1($date)
     {
@@ -958,13 +932,13 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('cmd.type LIKE :typ')
             ->setParameter('typ', '%E%')
             ->select('count(cmd.numbl) as cn')
-//            ->addSelect('cmd.type')
             ->groupBy('ligne.numbl')
             ->having('cn > 0 and cn < 5')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function syntheseMoisCoriolis2($date)
     {
@@ -981,13 +955,13 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('cmd.type LIKE :typ')
             ->setParameter('typ', '%E%')
             ->select('count(cmd.numbl) as cn')
-//            ->addSelect('cmd.type')
             ->groupBy('ligne.numbl')
             ->having('cn > 4 and cn < 11')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function syntheseMoisCoriolis3($date)
     {
@@ -1004,13 +978,13 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('cmd.type LIKE :typ')
             ->setParameter('typ', '%E%')
             ->select('count(cmd.numbl) as cn')
-//            ->addSelect('cmd.type')
             ->groupBy('ligne.numbl')
             ->having('cn > 10 and cn < 31')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function syntheseMoisCoriolis4($date)
     {
@@ -1027,13 +1001,13 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('cmd.type LIKE :typ')
             ->setParameter('typ', '%E%')
             ->select('count(cmd.numbl) as cn')
-//            ->addSelect('cmd.type')
             ->groupBy('ligne.numbl')
             ->having('cn > 30')
             ->getQuery()
             ->getArrayResult()
             ;
     }
+
 
     public function syntheseMoisArtCokePSG($date)
     {
@@ -1057,6 +1031,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function syntheseMoisArtCokeCollector($date)
     {
         return $this
@@ -1079,6 +1054,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findAllBlForBordereau()
     {
         $date = date("Y-m-d");
@@ -1099,6 +1075,7 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
+
 
     public function findAllBlForBordereauTrack()
     {
@@ -1137,6 +1114,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
+
     public function findnbKubTotal($idStatut)
     {
         $idFichier = 5580;
@@ -1151,6 +1129,7 @@ class EcommBLRepository extends EntityRepository
         return $results;
     }
 
+
     public function findnbKubTotalJ($idStatut, $jour)
     {
         $idFichier = 5580;
@@ -1164,6 +1143,7 @@ class EcommBLRepository extends EntityRepository
         $results = $query->getArrayResult();
         return $results;
     }
+
 
     public function findnbKubbyHour($idStatut, $dateJour, $dateInterro)
     {
@@ -1183,6 +1163,7 @@ class EcommBLRepository extends EntityRepository
         return $results;
     }
 
+
     public function findnbElecteurTotal($idStatut)
     {
         $idFichier = 5580;
@@ -1196,6 +1177,7 @@ class EcommBLRepository extends EntityRepository
         $results = $query->getArrayResult();
         return $results;
     }
+
 
     public function findnbElecteurTotalJ($idStatut, $jour)
     {
@@ -1213,7 +1195,6 @@ class EcommBLRepository extends EntityRepository
         $results = $query->getArrayResult();
         return $results;
     }
-
 
 
     public function findnbElecteurbyHour($idStatut, $dateJour, $dateInterro)

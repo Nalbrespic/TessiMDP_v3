@@ -25,29 +25,6 @@ tmd_prod_suiviCourant:
     requirements:
         page: \d*
 
-#tmd_prod_test:
-#    path: /test/{idFile}
-#    defaults:
-#        _controller: TMDProdBundle:Prod:test
-#
-#tmd_prod_search:
-#    path:     /search
-#    defaults:
-#        _controller: TMDProdBundle:Prod:search
-#
-#tmd_prod_searchdate:
-#    path:     /searchdate/{date1}
-#    defaults:
-#        _controller: TMDProdBundle:Prod:searchdate
-#        date1: 0
-
-#tmd_prod_mymodule:
-#    path:   /search/{sf_format}
-#    defaults:
-#        _controller: TMDProdBundle:Prod:mymodule
-#    requirements:
-#        format: xml
-
 tmd_prod_donneBlNonProd:
     path: /blNonProd
     defaults:
@@ -210,3 +187,19 @@ tmd_prod_donneTransport:
     path: /donneAllTransport
     defaults:
         _controller: TMDProdBundle:Prod:donneAllTransport
+
+tmd_prod_pnd:
+    path:     /pnd/{idClient}/{idOpe}
+    defaults:
+        _controller: TMDProdBundle:Pnd:index
+        message:  ''
+
+tmd_prod_pnd_download:
+    path:     /pnd/{idClient}/{idOpe}/download
+    defaults:
+        _controller: TMDProdBundle:Pnd:download
+
+tmd_prod_pnd_save:
+    path:     /pnd/{idClient}/{idOpe}/save
+    defaults:
+        _controller: TMDProdBundle:Pnd:save

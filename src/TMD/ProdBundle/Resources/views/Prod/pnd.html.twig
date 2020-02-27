@@ -1,0 +1,72 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    PND - Production
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="titreFenetre">
+                <h3> PND </h3>
+            </div>
+        </div>
+    </div>
+
+    {% if idOpe is defined %}
+        {% if  idOpe == operation[0].idappli %}
+            {% set ClientSelected =  operation[0].idclient.nomClient  %}
+            {% set OpeSelected =  operation[0].appliname  %}
+        {% endif %}
+    {% endif %}
+    <div class="row">
+            <div class="col-md-5">
+                <div class="row">
+                    {% if idOperation is defined %}
+                        {% if  idOperation == operation[0].idappli %}
+                            <div class="col-md-5">
+                                <p style="font-size: 1.4em;" id="nomClientR">{{ ClientSelected }}</p>
+                                <p style="font-size: 1.1em;" id="nomOperationR">{{ OpeSelected }}</p>
+                            </div>
+                            <div  class="col-md-4  center-block img-responsive"  style="text-align: -moz-center;">
+                                <div style="max-width: 130px;">
+                                    {% if operation['appliImage'] is defined and operation['appliImage'] != null %}
+                                        <img  class="img-responsive" src="data:image/jpg;base64,{{ operation['appliImage'] }}" style="padding: 0px;">
+                                    {% else %}
+                                        <img   class="img-responsive" src="{{ asset('Images/logo.png') }}" style="padding: 0px;filter: grayscale(86%);opacity: 0.3;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+    </div>
+
+    <div class="row">
+        <br/>
+        <p>{{ message }}</p>
+        <br/>
+
+        <ol>
+            <h4> <li> Extraire les articles des commandes en statut PND </li> </h4>
+            <div class="row">
+                <a href="{{ path('tmd_prod_pnd_download',  {'idClient': idClient , 'idOpe': idOpe}) }}" class="btn btn-default"> Téléchargement </a>
+            </div>
+            <br/><br/>
+
+            <h4> <li> Vérifier le fichier extrait </li> </h4>
+            <p>avant de cliquer sur le bouton suivant, vérifiez bien le contenu du fichier, les commandes passeront ensuite en statut "PND traité" et ne seront plus téléchargeables.</p>
+            <br/><br/>
+
+            <h4> <li> Marquer les PND comme traités (pour ne pas les retélécharger) </li> </h4>
+            <div class="row">
+                <a href="{{ path('tmd_prod_pnd_save',  {'idClient': idClient , 'idOpe': idOpe}) }}" class="btn btn-default"> Mémoriser </a>
+            </div>
+            <br/><br/>
+
+        </ol>
+    </div>
+
+{% endblock %}
