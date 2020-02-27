@@ -51,15 +51,18 @@ rm -Rf app/cache/{dev,prod}
 ```
 
 
-qualification environment configuration
+development / qualification environment configuration
 ---------------------------------------
 with SF profiling (ie. debug bar) enabled  
 - edit ```web/app.php``` :  
 ```$kernel = new AppKernel('dev', true);```   
-- edit ```app/config/config_dev.yml``` :  
+- (only for qualification) edit ```app/config/config_dev.yml``` :  
 ```database_name: ecommerce```
 - then exec :  
 ```rm -Rf app/cache/{dev,prod}/```
+  
+qualif runs like dev , but on production database.
+dev uses 'preprod' database.
 
 
 empty preprod
