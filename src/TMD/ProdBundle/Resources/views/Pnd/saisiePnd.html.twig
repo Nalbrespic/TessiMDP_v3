@@ -23,8 +23,16 @@
                     <p>PND # {{ numCmd }} enregistré.</p>
                 {% endif %}
                 <div class="form-group">
-                    <label for="entered_bl">N° BL</label>
-                    <input name="numCmd" type="text" style="width: 150px;" class="form-control"  id="entered_bl" placeholder="cmd n°" autofocus>
+                    <label for="abregeStatut">Statut</label>
+                    <select class="form-control" name="abregeStatut">
+                        {%  for statut_pnd in statuts_pnd %}
+                            <option value="{{ statut_pnd.abregeStatut }}">{{ statut_pnd.statut }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="numCmd">N° BL</label>
+                    <input name="numCmd" type="text" style="width: 150px;" class="form-control"  id="numCmd" placeholder="cmd n°" autofocus>
                 </div>
             </div>
         </form>

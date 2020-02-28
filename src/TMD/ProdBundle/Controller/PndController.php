@@ -19,19 +19,28 @@ class PndController extends Controller
      */
     public function saisiePndAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+
+        $statuts_pnd_abreges = ["PND_A", "PND_B", "PND_C", "PND_D", "PND_E"]; // liste des status PND
+        $statuts_pnd = [];
+        // récupération des entités
+        foreach ($statuts_pnd_abreges as $statut_pnd_abrege) {
+            $statuts_pnd[] =  $em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($statut_pnd_abrege);
+        }
+
         if ($request->getMethod() === 'POST') {
             $numCmd = $request->request->get('numCmd');
-            if (!empty($numCmd)) {
-                $em = $this->getDoctrine()->getManager();
-
+            $abregeStatut = $request->request->get('abregeStatut');
+            if (!empty($numCmd) && !empty($abregeStatut)) {
                 // marquer la commande (tracking) en statut PND (avec historisation)
                 $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
                 if ( $tracking !== null ) {
                     $sm = $this->get('tmd_statut');
-                    $sm->changeStatut($tracking, "NPAI", "Saisie PND", $this->getUser());
+                    $sm->changeStatut($tracking, $abregeStatut, "Saisie PND", $this->getUser());
 
                     return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
                         'numCmd' => $numCmd,
+                        'statuts_pnd' => $statuts_pnd,
                     ));
                 }
             }
@@ -39,6 +48,7 @@ class PndController extends Controller
 
         return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
             'numCmd' => null,
+            'statuts_pnd' => $statuts_pnd,
         ));
     }
 
