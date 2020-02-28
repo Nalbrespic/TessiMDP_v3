@@ -11,6 +11,9 @@ use XLSXWriter;
 class PndController extends Controller
 {
 
+    const STATUTS_PND_ABREGES = ["PND_A", "PND_B", "PND_C", "PND_D", "PND_E"]; // liste des abrégés de status PND
+
+
     /**
      * écran de saisie des PND d'une opération
      * @param Request $request
@@ -21,10 +24,9 @@ class PndController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $statuts_pnd_abreges = ["PND_A", "PND_B", "PND_C", "PND_D", "PND_E"]; // liste des status PND
         $statuts_pnd = [];
-        // récupération des entités
-        foreach ($statuts_pnd_abreges as $statut_pnd_abrege) {
+        // récupération des de statuts PND
+        foreach (self::STATUTS_PND_ABREGES as $statut_pnd_abrege) {
             $statuts_pnd[] =  $em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($statut_pnd_abrege);
         }
 
@@ -94,24 +96,30 @@ class PndController extends Controller
         $em = $this->getDoctrine()->getManager();
         $session = $request->getSession();
 
+        $pnds = [];
+        foreach (self::STATUTS_PND_ABREGES as $pnd) {
+            $pnds [] = "'" . $pnd . "'";
+        }
+
         $sql = '
-            SELECT T.numLigne, A.AppliName, T.`num_cmde_client`, T.`refClient`, T.exp_ref, T.`date_cmde`, C.codeArticle, C.libelle, C.quantite
+            SELECT T.numLigne, A.AppliName, T.`num_cmde_client`, T.`refClient`, T.exp_ref, T.`date_cmde`, C.codeArticle, C.libelle, C.quantite, S.statut
             FROM `ecomm_tracking` T
                 , ecomm_lignes L
                 , ecomm_cmdep C
                 , ecomm_appli A
                 , ecomm_files F
+                , ecomm_statut S
             WHERE  A.idAppli = :idOpe
-                AND T.idStatut = :idStatut
+                AND S.abregeStatut IN ('.implode(", ", $pnds).')
                 AND T.numLigne = L.numLigne
                 AND C.numBL = L.numBL
                 AND F.idAppli = A.idAppli
                 AND T.idFile = F.idFile
+                AND T.idStatut = S.idStatut
             GROUP BY C.numero
         ';
         $statement = $em->getConnection()->prepare($sql);
         $statement->bindValue('idOpe', $idOpe);
-        $statement->bindValue('idStatut', 7); // PND
 
         $statement->execute();
         $data = $statement->fetchAll();
@@ -129,6 +137,7 @@ class PndController extends Controller
                 'codeArticle' => $row ['codeArticle'],
                 'libelle' => $row ['libelle'],
                 'quantite' => $row ['quantite'],
+                'statut' => $row ['statut'],
             ];
         }
         $numLignes = array_unique($numLignes);
@@ -146,6 +155,7 @@ class PndController extends Controller
             'codeArticle' => 'string',
             'libelle' => 'string',
             'quantite' => 'string',
+            'statut' => 'string',
         ];
         $writer = new XLSXWriter();
         $writer->writeSheet($content,'extraction', $header);
