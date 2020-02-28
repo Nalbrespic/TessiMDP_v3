@@ -11,31 +11,25 @@ use XLSXWriter;
 class PndController extends Controller
 {
 
+    /**
+     * écran de saisie des PND d'une opération
+     * @param Request $request
+     * @return Response
+     * @throws \Exception
+     */
     public function saisiePndAction(Request $request)
     {
-        $numCmd = null;
         if ($request->getMethod() === 'POST') {
             $numCmd = $request->request->get('numCmd');
             if (!empty($numCmd)) {
                 $em = $this->getDoctrine()->getManager();
-                $idStatutPnd = $em->getRepository('TMDProdBundle:EcommStatut')->find(7); // statut PND
 
-                // marquer la commande (tracking) en statut PND
+                // marquer la commande (tracking) en statut PND (avec historisation)
                 $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
-                if ( $tracking !== null) {
-                    $tracking->setIdStatut($idStatutPnd);
+                if ( $tracking !== null ) {
+                    $sm = $this->get('tmd_statut');
+                    $sm->changeStatut($tracking, "NPAI", "Saisie PND", $this->getUser());
 
-                    // historiser le statut
-                    $user = $this->getUser();
-                    $jouristo = new EcommHistoStatut();
-                    $jouristo->setDatestatut(new \DateTime());
-                    $jouristo->setIdstatut($idStatutPnd->getIdStatut());
-                    $jouristo->setObservation("Saisie PND");
-                    $jouristo->setNumbl($numCmd);
-                    $jouristo->setIduser($user->getId());
-                    $em->persist($jouristo);
-
-                    $em->flush();
                     return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
                         'numCmd' => $numCmd,
                     ));
@@ -84,6 +78,7 @@ class PndController extends Controller
      * @param $idClient
      * @param $idOpe
      * @return Response
+     * @throws \Exception
      */
     public function downloadAction(Request $request, $idClient, $idOpe) {
         $em = $this->getDoctrine()->getManager();

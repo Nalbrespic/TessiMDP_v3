@@ -65,8 +65,8 @@ qualif runs like dev , but on production database.
 dev uses 'preprod' database.
 
 
-empty preprod
--------------
+empty preprod DB
+----------------
 ```shell script
 echo "SET FOREIGN_KEY_CHECKS = 0;" > ./temp.sql
 mysqldump --add-drop-table --no-data -h 172.17.82.194 -u Tessi_Admin -p ecommerce_preprod | grep 'DROP TABLE' >> ./temp.sql # extract drop queries
