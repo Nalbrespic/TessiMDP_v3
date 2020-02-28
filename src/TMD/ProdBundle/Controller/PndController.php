@@ -22,24 +22,29 @@ class PndController extends Controller
 
                 // marquer la commande (tracking) en statut PND
                 $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(['expRef' => $numCmd]);
-                $tracking->setIdStatut($idStatutPnd);
+                if ( $tracking !== null) {
+                    $tracking->setIdStatut($idStatutPnd);
 
-                // historiser le statut
-                $user = $this->getUser();
-                $jouristo = new EcommHistoStatut();
-                $jouristo->setDatestatut(new \DateTime());
-                $jouristo->setIdstatut($idStatutPnd->getIdStatut());
-                $jouristo->setObservation("Saisie PND");
-                $jouristo->setNumbl($numCmd);
-                $jouristo->setIduser($user->getId());
-                $em->persist($jouristo);
+                    // historiser le statut
+                    $user = $this->getUser();
+                    $jouristo = new EcommHistoStatut();
+                    $jouristo->setDatestatut(new \DateTime());
+                    $jouristo->setIdstatut($idStatutPnd->getIdStatut());
+                    $jouristo->setObservation("Saisie PND");
+                    $jouristo->setNumbl($numCmd);
+                    $jouristo->setIduser($user->getId());
+                    $em->persist($jouristo);
 
-                $em->flush();
+                    $em->flush();
+                    return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
+                        'numCmd' => $numCmd,
+                    ));
+                }
             }
         }
 
         return $this->render('TMDProdBundle:Pnd:saisiePnd.html.twig', array(
-            'numCmd' => $numCmd,
+            'numCmd' => null,
         ));
     }
 
@@ -85,7 +90,7 @@ class PndController extends Controller
         $session = $request->getSession();
 
         $sql = '
-            SELECT T.numLigne, A.AppliName, T.`num_cmde_client`, T.`refClient`, T.exp_ref, T.`date_cmde`, C.codeArticle, C.libelle
+            SELECT T.numLigne, A.AppliName, T.`num_cmde_client`, T.`refClient`, T.exp_ref, T.`date_cmde`, C.codeArticle, C.libelle, C.quantite
             FROM `ecomm_tracking` T
                 , ecomm_lignes L
                 , ecomm_cmdep C
@@ -118,6 +123,7 @@ class PndController extends Controller
                 'date_cmde' => $row ['date_cmde'],
                 'codeArticle' => $row ['codeArticle'],
                 'libelle' => $row ['libelle'],
+                'quantite' => $row ['quantite'],
             ];
         }
         $numLignes = array_unique($numLignes);
@@ -134,6 +140,7 @@ class PndController extends Controller
             'date_cmde' => 'string',
             'codeArticle' => 'string',
             'libelle' => 'string',
+            'quantite' => 'string',
         ];
         $writer = new XLSXWriter();
         $writer->writeSheet($content,'extraction', $header);
