@@ -2,10 +2,13 @@
 
 namespace TMD\ConfigBundle\Controller;
 
+use http\Env\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use TMD\ConfigBundle\Entity\News;
 use TMD\ConfigBundle\Form\NewsType;
+use TMD\ProdBundle\Entity\EcommTracking;
+use TMD\ProdBundle\Form\EcommTrackingType;
 use TMD\UserBundle\Entity\User;
 use TMD\UserBundle\Form\UserType;
 
@@ -73,6 +76,55 @@ class GestionController extends Controller
         }
         return $this->render('TMDConfigBundle:gestion:addNew.html.twig', array(
             'form'  => $form->createView()
+        ));
+    }
+
+    public function gestioncmdAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $clients = $em->getRepository('TMDProdBundle:Client')->findBy(array(),
+            array('nomclient' => 'ASC')
+        );
+
+        return $this->render('TMDConfigBundle:gestion:gestionCmde.html.twig', array(
+            'clients' => $clients
+        ));
+    }
+
+    public function gestioncmdClientAction(Request $request)
+    {
+
+        $idClient = $request->get('idClient');
+        dump($idClient);
+        $em = $this->getDoctrine()->getManager();
+        $clients = $em->getRepository('TMDProdBundle:Client')->findBy( array(),
+            array('nomclient' => 'ASC')
+        );
+        $client = $em->getRepository('TMDProdBundle:Client')->findBy(
+            array('idclient'=> $idClient
+            ));
+        $listtrackings = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByIdclient($idClient);
+        $trackings = $this->get('knp_paginator')->paginate($listtrackings,
+            $request->query->get('page',1), 25);
+
+
+
+        return $this->render('TMDConfigBundle:gestion:gestionCmde.html.twig', array(
+            'clients' =>$clients,
+            'client' =>$client[0],
+            'idClient' => $idClient,
+            'trackings' => $trackings
+        ));
+    }
+
+    public function editTracking(EcommTracking $tracking){
+
+        $form = $this->createForm(EcommTrackingType::class, $tracking);
+
+        dump($form->createView());
+        return $this->render('TMDConfigBundle:gestion:gestionCmde.html.twig', array(
+            'tracking' => $tracking,
+            'form' => $form->createView()
         ));
     }
 }

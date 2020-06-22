@@ -7,3 +7,17 @@ tmd_config_addnews:
     defaults:
         _controller: TMDConfigBundle:Gestion:addnew
 
+tmd_config_gestioncmd:
+    path: /gestioncmd/client/
+    defaults:
+        _controller: TMDConfigBundle:Gestion:gestioncmd
+
+tmd_config_gestioncmdClient:
+    path: /gestioncmd/client/{idClient}
+    defaults:
+        _controller: TMDConfigBundle:Gestion:gestioncmdClient
+
+tmd_config_editTracking:
+    path: /tracking/{id}
+    defaults:
+        _controller: TMDConfigBundle:Gestion:editTracking

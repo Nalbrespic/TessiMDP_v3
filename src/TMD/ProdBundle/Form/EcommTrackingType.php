@@ -66,6 +66,7 @@ class EcommTrackingType extends AbstractType
                 'empty_data' => " ",
                 'label' => 'Mail'
             ));
+
 //            ->add('expCompte')
 //            ->add('expRef')
 //            ->add('codeAgenceTransp')
@@ -119,7 +120,7 @@ class EcommTrackingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'TMD\ProdBundle\Entity\EcommTracking'
+            'data_class' => EcommTracking::class,
         ));
     }
 

@@ -23,6 +23,28 @@ class EcommTrackingRepository extends EntityRepository
             ;
 
     }
+    public function trackingByIdclient($idClient)
+    {
+
+        return $this
+            ->createQueryBuilder('t')
+            ->innerJoin('t.idclient' ,'cl')
+            ->where('cl.idclient IN (:id)')
+            ->setParameter('id', $idClient)
+            ->select('cl.nomclient ')
+            ->innerJoin('t.idStatut' ,'st')
+            ->addSelect('st.idStatut')
+            ->addSelect('st.statut')
+            ->orderBy('cl.nomclient' , 'ASC')
+            ->addSelect('cl.idclient')
+            ->addSelect('t.numligne')
+            ->addSelect('t.numCmdeClient')
+            ->addSelect('t.refclient')
+            ->addSelect('t.dateCmde')
+            ->orderBy('t.dateCmde' , 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+    }
 
 
     public function findNbRetentionByFile( $files)

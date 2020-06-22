@@ -27,7 +27,7 @@
 
 
 <div class="container-fluid" style="position: relative; width: 99%;">
-    <div class="row">
+    <div class="row bandeau">
         {#<div id="header" class="jumbotron" style="margin-top: 9px;background-color: #f4f2f7;height: 103px;margin-left: 14px;margin-right: 14px;">#}
             {#<a href="{{ path('tmd_core_homepage') }}"><img id="imgHeader" src="{{ asset('Images/logo.png') }}" style="float: left;"></a>#}
             {#<h1 id="texteHeadertessi" style="color: #514958"><span style="font-family: Colaborate">tessi</span> <span style="font-family: ColaborateThin; font-size: 0.6em;"> customer marketing </span></h1>#}
@@ -87,7 +87,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
 
 
-                <ul class="nav navbar-nav navbar-right" style="font-family:ColaborateReg;" >
+                <ul class="nav navbar-nav navbar-right barreConnexion" style="font-family:ColaborateReg;" >
                     {% if app.user.username is defined %}
                         <li style="color: #FFFFFF;">Bonjour <span style="font-size: 1.1em;color: #FFFFFF;"> {{ app.user.username }} -</span></li>
                         <li><a href="{{ path('logout') }}" style="padding: inherit;padding-left:12px;font-size: 0.9em;margin-top: 2px;color: #FFFFFF;">Deconnexion</a></li>
@@ -96,10 +96,10 @@
                     {% endif %}
                     {% if is_granted('ROLE_SUPER_PROD') %}
                         <li class="dropdown" >
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="padding: inherit;padding-left:12px;margin-top: 2px;font-size: 0.9em;color: #FFFFFF;">Configuration <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="padding: inherit;padding-left:12px;margin-top: 2px;font-size: 0.9em;color: #FFFFFF;">Configuration </a>
                             <ul class="dropdown-menu" style="color: #FFFFFF;">
-                                <li><a href="{{ path('tmd_config_addnews') }}">Ajout de News</a></li>
-                                {% if is_granted('ROLE_ADMIN') %}<li><a href="{{ path('tmd_config_homepage') }}">Gestion utilisateurs</a></li>{% endif %}
+                                <li class="dropdown-item"><a href="{{ path('tmd_config_addnews') }}">Ajout de News</a></li>
+                                {% if is_granted('ROLE_ADMIN') %}<li class="dropdown-item"><a href="{{ path('tmd_config_homepage') }}">Gestion utilisateurs</a></li>{% endif %}
                                 {#<li role="separator" class="divider"></li>#}
                                 {#<li><a href="#">Separated link</a></li>#}
                             </ul>
@@ -173,6 +173,7 @@
                                     <ul class="lz-menu nav menu " id="zindexmenu-1" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 12px;margin-left: 4px;box-shadow: 4px 2px 7px #504A62;margin-bottom: 7px;z-index: -10;">
                                         <li ><a style="padding-top: 13px;" href="http://tmdsws801/portail/interface_enregistrement/index.php" target="_blank">Suivi de production</a></li>
                                         {% if is_granted('ROLE_ADMIN') %}<li ><a href="{{ path('tmd_prod_addApplication') }}">Opération</a></li>{% endif %}
+                                        <li><a href="{{ path('tmd_config_gestioncmd') }}" >Gestion Commandes</a></li>
                                         <li><a href="http://tmdsws801/portail/fiche_de_suivi/modif.php" target="_blank" >Gérer ATC/fichiers</a></li>
                                         <li ><a href="http://tmdsws801/portail/completer_enregistrement/index.php" target="_blank">Saisie production</a></li>
                                         <li ><a href="http://tmdsws801/portail/contenants/contenants_index.php" target="_blank">Cartons</a></li>
