@@ -23,6 +23,21 @@ class EcommTrackingRepository extends EntityRepository
             ;
 
     }
+
+    public function trackingByNumligne($numligne){
+        return $this
+            ->createQueryBuilder('t')
+            ->where('t.numligne IN (:numligne)')
+            ->setParameter('numligne', $numligne)
+            ->innerJoin('t.idStatut' ,'st')
+            ->addSelect('st.idStatut')
+            ->innerJoin('t.idclient', 'cl')
+            ->addSelect('cl.idclient')
+
+            ->getQuery();
+            ->getResult();
+    }
+
     public function trackingByIdclient($idClient)
     {
 
@@ -32,6 +47,7 @@ class EcommTrackingRepository extends EntityRepository
             ->where('cl.idclient IN (:id)')
             ->setParameter('id', $idClient)
             ->select('cl.nomclient ')
+            ->addSelect('cl.idclient')
             ->innerJoin('t.idStatut' ,'st')
             ->addSelect('st.idStatut')
             ->addSelect('st.statut')

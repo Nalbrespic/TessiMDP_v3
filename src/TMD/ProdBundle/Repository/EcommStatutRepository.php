@@ -17,4 +17,12 @@ class EcommStatutRepository extends EntityRepository
         return $this->findOneBy(["abregestatut" => $abrege]);
     }
 
+    public function findAllStatuts(){
+        return $this
+        ->createQueryBuilder('s')
+        ->select('s.statut')
+        ->getQuery()
+        ->getArrayResult();
+    }
+
 }

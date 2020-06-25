@@ -71,7 +71,7 @@
                             <thead>
                             <tr>
                                 <th>Numéro de commande</th>
-                                <th></th>
+                                <th>Etat de la commande</th>
                                 <th></th>
                                 <th></th>
 
@@ -81,15 +81,16 @@
                             {% for tracking in trackings %}
                                 <tr>
                                     <td>{{ tracking.refclient }}</td>
+                                    <td>{{ tracking.statut }}</td>
                                     <td class="collonneButton">
                                         <button type="button" class="btn btn-primary boutons buttonView" data-toggle="modal" data-target="#viewModal{{ tracking.numligne }}">
                                             voir
                                        </button>
                                     </td>
                                     <td class="collonneButton">
-                                        <a href="{{ path('tmd_config_editTracking', {'id': tracking.refclient}) }}"> <button type="button" class="btn btn-primary boutons buttonModif" data-toggle="modal" data-target="#modifModal{{ tracking.numligne }}">
+                                      <a type="button"  href="{{ path('tmd_config_editTracking', {'id': tracking.numligne}) }}" class="btn btn-primary boutons buttonModif" >
                                             Modifier
-                                        </button></a>
+                                        </a>
                                     </td>
                                     <td class="collonneButton">
                                         <button type="button" class="btn btn-danger boutons buttondelete" data-toggle="modal" data-target="#deleteModal{{ tracking.numligne }}">
@@ -140,7 +141,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-7">
-                                                            {{ form(form)}}
+{#                                                            {% include ('editTracking.html.twig')  %}#}
                                                         </div>
                                                     </div>
                                            </div>
