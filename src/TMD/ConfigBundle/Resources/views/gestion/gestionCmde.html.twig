@@ -88,7 +88,7 @@
                                        </button>
                                     </td>
                                     <td class="collonneButton">
-                                      <a type="button"  href="{{ path('tmd_config_editTracking', {'id': tracking.numligne}) }}" class="btn btn-primary boutons buttonModif" >
+                                      <a type="button"  href="{{ path('tmd_config_editTracking', {'numligne': tracking.numligne}) }}" class="btn btn-primary boutons buttonModif" >
                                             Modifier
                                         </a>
                                     </td>
@@ -123,29 +123,23 @@
                                     </div>
                                 </div>
                                 <!--- Modal Modifier -->
-                                <div class="modal fade popup" id="modifModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{ tracking.numligne }}" aria-hidden="true">
+                                <div class="modal fade popup " id="deleteModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ tracking.numligne }}" aria-hidden="true">
                                     <div class="modal-dialog">
-                                        <div class="modal-content">
+                                        <div class="modal-content deleteModal">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel{{ tracking.numligne }}">Modifier la Commande n°{{ tracking.refclient }}</h5>
+                                                <h5 class="modal-title modal-title-deleteModal" id="deleteModalLabel{{ tracking.numligne }}">Attention</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
                                             <div class="modal-body">
+                                                    <div class="titreFenetre">
+                                                        <h3>Voulez vous vraiment annuler la commande ?</h3>
+                                                    </div>
 
-                                                    <div class="col-md-5">
-                                                        <div class="titreFenetre">
-                                                            <h3>Modification d'une commande</h3>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-7">
-{#                                                            {% include ('editTracking.html.twig')  %}#}
-                                                        </div>
-                                                    </div>
                                            </div>
                                             <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary">Oui</button>
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
 
                                             </div>

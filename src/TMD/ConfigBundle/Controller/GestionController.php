@@ -7,14 +7,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 use http\Env\Response;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use TMD\ConfigBundle\Entity\News;
 use TMD\ConfigBundle\Form\NewsType;
+use TMD\ProdBundle\Entity\Client;
 use TMD\ProdBundle\Entity\EcommStatut;
 use TMD\ProdBundle\Entity\EcommTracking;
 use TMD\ProdBundle\Form\EcommTrackingType;
@@ -115,6 +115,7 @@ class GestionController extends Controller
         $trackings = $this->get('knp_paginator')->paginate($listtrackings,
             $request->query->get('page', 1), 25);
 
+        dump($trackings);
 
         return $this->render('TMDConfigBundle:gestion:gestionCmde.html.twig', array(
             'clients' => $clients,
@@ -128,62 +129,53 @@ class GestionController extends Controller
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function editTrackingAction(Request $request)
+    public function editTrackingAction( Request $request)
     {
-        $numligne = $request->get('id');
+        $numligne = $request->get('numligne');
+        dump($numligne);
         $em = $this->getDoctrine()->getManager();
         $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numligne);
+        $tracking = $tracking['0']['0'];
 
+       $form = $this->createFormBuilder($tracking)
 
-       $form = $this->get('form.factory')->createBuilder(EcommTrackingType::class, $tracking)
-
-            ->getForm();
+           ->add('refClient', TextType::class, [
+               'attr' => array('readonly' => true ),
+               'label' => 'Mdofier le statut de la commande'
+           ])
+           ->add('idStatut',EntityType::class, [
+               'class' => EcommStatut::class,
+               'choice_label' => 'statut'
+           ])
+           ->add('save', SubmitType::class, [
+               'label'=> 'Modifier le statut'
+           ])
+           ->getForm();
 
         dump($request);
         dump($tracking);
         dump($form);
+        $form->handleRequest($request);
+        $idClient = $tracking->getIdclient()->getIdclient();
+
         if ($request->isMethod('POST')){
-            $form->handleRequest($request);
 
-            if ($form->isValid()){
-                $em = $this->getDoctrine()->getManager();
 
+            if ($form->isValid() && $form->isSubmitted()){
+
+                dump('modif ok');
                 $em->flush();
 
-                $request->getSession()->getFlashBag()->add('notice', 'modif effectuée');
-//                return $this->redirectToRoute('tmd_config_gestioncmdClient', array('idClient'=>$tracking['0']['idclient']));
+
+                return $this->redirectToRoute('tmd_config_gestioncmdClient',[
+                    'idClient'=> $idClient
+                ]);
             }
 
         }
 
-//        $form = $this->createFormBuilder($tracking)
-//            ->setMethod('POST')
-//            ->add('idStatut', EntityType::class, [
-//
-//                'class' => EcommStatut::class,
-//                'choice_label' => 'statut'
-//            ])
-//            ->add('refClient')
-//            ->add('Modifier', SubmitType::class)
-//            ->getForm();
-//
-//
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            dump($form);
-//            dump($form->getData()['idStatut']->getIdStatut());
-//            dump($tracking);
-////            $tracking['0']['idStatut']->set($form->getData()['idStatut']->getIdStatut());
-//            $em->flush();
-////            return $this->redirect($this->generateUrl('tmd_config_gestioncmdClient', [
-////                'idClient' => $tracking['0']['idclient']
-////            ]));
-//        }
-
-
         return $this->render('TMDConfigBundle:gestion:editTracking.html.twig', array(
-            'tracking' => $tracking['0'],
+            'tracking' => $tracking,
             'form' => $form->createView()
         ));
     }

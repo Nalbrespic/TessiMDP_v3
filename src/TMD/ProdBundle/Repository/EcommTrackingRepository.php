@@ -34,7 +34,7 @@ class EcommTrackingRepository extends EntityRepository
             ->innerJoin('t.idclient', 'cl')
             ->addSelect('cl.idclient')
 
-            ->getQuery();
+            ->getQuery()
             ->getResult();
     }
 
@@ -46,18 +46,16 @@ class EcommTrackingRepository extends EntityRepository
             ->innerJoin('t.idclient' ,'cl')
             ->where('cl.idclient IN (:id)')
             ->setParameter('id', $idClient)
-            ->select('cl.nomclient ')
+            ->select('cl.nomclient')
             ->addSelect('cl.idclient')
             ->innerJoin('t.idStatut' ,'st')
             ->addSelect('st.idStatut')
             ->addSelect('st.statut')
-            ->orderBy('cl.nomclient' , 'ASC')
-            ->addSelect('cl.idclient')
             ->addSelect('t.numligne')
             ->addSelect('t.numCmdeClient')
             ->addSelect('t.refclient')
+            ->orderBy('t.refclient', 'DESC')
             ->addSelect('t.dateCmde')
-            ->orderBy('t.dateCmde' , 'DESC')
             ->getQuery()
             ->getArrayResult();
     }

@@ -18,6 +18,7 @@ tmd_config_gestioncmdClient:
         _controller: TMDConfigBundle:Gestion:gestioncmdClient
 
 tmd_config_editTracking:
-    path: /tracking/{id}
+    path: /tracking/{numligne}
     defaults:
         _controller: TMDConfigBundle:Gestion:editTracking
+
