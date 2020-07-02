@@ -3,24 +3,24 @@
 
 
 {% block body %}
-    {% block stylesheets %}
+{#    {% block stylesheets %}#}
 
-        {#<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">#}
-        {#<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">#}
-        <link rel="stylesheet" href="{{ asset('jquery-ui-1.12.1/jquery-ui.theme.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('bootstrap-4.5.0/css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('bootstrap-4.5.0/js/bootstrap.min.js') }}">
+{#        #}{#<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">#}
+{#        #}{#<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">#}
+{#        <link rel="stylesheet" href="{{ asset('jquery-ui-1.12.1/jquery-ui.theme.min.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('bootstrap-4.5.0/css/bootstrap.min.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('bootstrap-4.5.0/js/bootstrap.min.js') }}">#}
 
-        <link rel="stylesheet" href="{{ asset('css/fullcalendar.css') }}">
-        <link rel="stylesheet" href="{{ asset('Multi-level-Vertical-Accordion/src/lazeemenu.css') }}">
-        <link rel="stylesheet" href="{{ asset('style.css') }}">
-        <link rel="stylesheet" href="{{ asset('newstyle.css') }}">
-        <link rel="stylesheet" href="{{ asset('rangeDatePicker/jquery-date-range-picker-master/dist/daterangepicker.css') }}">
-        <link rel="stylesheet" href="{{ asset('datepicker.css') }}">
-        <link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">
+{#        <link rel="stylesheet" href="{{ asset('css/fullcalendar.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('Multi-level-Vertical-Accordion/src/lazeemenu.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('style.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('newstyle.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('rangeDatePicker/jquery-date-range-picker-master/dist/daterangepicker.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('datepicker.css') }}">#}
+{#        <link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">#}
 
-    {% endblock %}
+{#    {% endblock %}#}
     <div class="row title">
 
         <div class="titreFenetre">
@@ -43,10 +43,23 @@
         </div>
         {%  if idClient is defined  %}
 
-            <div class="row">
-                <div class="panel panel-default tableautrackings"style="width: 800px; margin-left: 15px;">
-                    <!-- Default panel contents -->
-                    <div class="panel-heading">Commandes en cours pour {{ client.nomclient }}</div>
+        <div class="row">
+            <div class="col-md-7">
+                <label>Choix de l'opération</label>
+                <select class="form-control">
+                    {% for ope in listOpe %}
+                        {% dump(ope) %}
+                     <option value="{{ path('tmd_config_gestionclientOpe', {'idClient': idClient, 'idappli': ope.idappli.idappli}) }}">{{ ope.appliname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        {% endif %}
+
+{#            <div class="row">#}
+{#                <div class="panel panel-default tableautrackings"style="width: 800px; margin-left: 15px;">#}
+{#                    <!-- Default panel contents -->#}
+{#                    <div class="panel-heading">Commandes en cours pour {{ client.nomclient }}</div>#}
 
 {#                    {% for tracking in trackings %}#}
 {#                        <row class="lignetracking">#}
@@ -67,97 +80,97 @@
 
 {#                        </row>#}
 
-                        <table class="table tableautrackings">
-                            <thead>
-                            <tr>
-                                <th>Numéro de commande</th>
-                                <th>Etat de la commande</th>
-                                <th></th>
-                                <th></th>
+{#                        <table class="table tableautrackings">#}
+{#                            <thead>#}
+{#                            <tr>#}
+{#                                <th>Numéro de commande</th>#}
+{#                                <th>Etat de la commande</th>#}
+{#                                <th></th>#}
+{#                                <th></th>#}
 
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for tracking in trackings %}
-                                <tr>
-                                    <td>{{ tracking.refclient }}</td>
-                                    <td>{{ tracking.statut }}</td>
-                                    <td class="collonneButton">
-                                        <button type="button" class="btn btn-primary boutons buttonView" data-toggle="modal" data-target="#viewModal{{ tracking.numligne }}">
-                                            voir
-                                       </button>
-                                    </td>
-                                    <td class="collonneButton">
-                                      <a type="button"  href="{{ path('tmd_config_editTracking', {'numligne': tracking.numligne}) }}" class="btn btn-primary boutons buttonModif" >
-                                            Modifier
-                                        </a>
-                                    </td>
-                                    <td class="collonneButton">
-                                        <button type="button" class="btn btn-danger boutons buttondelete" data-toggle="modal" data-target="#deleteModal{{ tracking.numligne }}">
-                                            Annuler
-                                        </button>
-                                    </td>
-                                    <td>
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody>#}
+{#                            {% for tracking in trackings %}#}
+{#                                <tr>#}
+{#                                    <td>{{ tracking.refclient }}</td>#}
+{#                                    <td>{{ tracking.statut }}</td>#}
+{#                                    <td class="collonneButton">#}
+{#                                        <button type="button" class="btn btn-primary boutons buttonView" data-toggle="modal" data-target="#viewModal{{ tracking.numligne }}">#}
+{#                                            voir#}
+{#                                       </button>#}
+{#                                    </td>#}
+{#                                    <td class="collonneButton">#}
+{#                                      <a type="button"  href="{{ path('tmd_config_editTracking', {'numligne': tracking.numligne}) }}" class="btn btn-primary boutons buttonModif" >#}
+{#                                            Modifier#}
+{#                                        </a>#}
+{#                                    </td>#}
+{#                                    <td class="collonneButton">#}
+{#                                        <button type="button" class="btn btn-danger boutons buttondelete" data-toggle="modal" data-target="#deleteModal{{ tracking.numligne }}">#}
+{#                                            Annuler#}
+{#                                        </button>#}
+{#                                    </td>#}
+{#                                    <td>#}
 
-                                    </td>
-                                </tr>
-                                <!--- Modal Voir -->
-                                <div class="modal fade popup" id="viewModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel{{ tracking.numligne }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="viewModalLabel{{ tracking.numligne }}">Commande n°{{ tracking.refclient }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Date de la commande: {% if tracking.dateCmde.date != 0 %}{{ tracking.dateCmde.date | date('d/m/Y') }} {% else %} -- {%  endif %}</p>
-                                                <p>Etat de la commande : {{ tracking.statut }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+{#                                    </td>#}
+{#                                </tr>#}
+{#                                <!--- Modal Voir -->#}
+{#                                <div class="modal fade popup" id="viewModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel{{ tracking.numligne }}" aria-hidden="true">#}
+{#                                    <div class="modal-dialog">#}
+{#                                        <div class="modal-content">#}
+{#                                            <div class="modal-header">#}
+{#                                                <h5 class="modal-title" id="viewModalLabel{{ tracking.numligne }}">Commande n°{{ tracking.refclient }}</h5>#}
+{#                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+{#                                                    <span aria-hidden="true">&times;</span>#}
+{#                                                </button>#}
+{#                                            </div>#}
+{#                                            <div class="modal-body">#}
+{#                                                <p>Date de la commande: {% if tracking.dateCmde.date != 0 %}{{ tracking.dateCmde.date | date('d/m/Y') }} {% else %} -- {%  endif %}</p>#}
+{#                                                <p>Etat de la commande : {{ tracking.statut }}</p>#}
+{#                                            </div>#}
+{#                                            <div class="modal-footer">#}
+{#                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>#}
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--- Modal Modifier -->
-                                <div class="modal fade popup " id="deleteModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ tracking.numligne }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content deleteModal">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title modal-title-deleteModal" id="deleteModalLabel{{ tracking.numligne }}">Attention</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                    <div class="titreFenetre">
-                                                        <h3>Voulez vous vraiment annuler la commande ?</h3>
-                                                    </div>
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <!--- Modal Modifier -->#}
+{#                                <div class="modal fade popup " id="deleteModal{{ tracking.numligne }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ tracking.numligne }}" aria-hidden="true">#}
+{#                                    <div class="modal-dialog">#}
+{#                                        <div class="modal-content deleteModal">#}
+{#                                            <div class="modal-header">#}
+{#                                                <h5 class="modal-title modal-title-deleteModal" id="deleteModalLabel{{ tracking.numligne }}">Attention</h5>#}
+{#                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+{#                                                    <span aria-hidden="true">&times;</span>#}
+{#                                                </button>#}
+{#                                            </div>#}
+{#                                            <div class="modal-body">#}
+{#                                                    <div class="titreFenetre">#}
+{#                                                        <h3>Voulez vous vraiment annuler la commande ?</h3>#}
+{#                                                    </div>#}
 
-                                           </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-primary">Oui</button>
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+{#                                           </div>#}
+{#                                            <div class="modal-footer">#}
+{#                                                <button type="button" class="btn btn-primary">Oui</button>#}
+{#                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>#}
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <div class="Page navigation example d-flex justify-content-center">{{ knp_pagination_render(trackings) }}</div>
-
-
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+{#                            </tbody>#}
+{#                        </table>#}
+{#                        <div class="Page navigation example d-flex justify-content-center">{{ knp_pagination_render(trackings) }}</div>#}
 
 
-                </div>
-            </div>
-        {%  endif  %}
-    </div>
+
+
+{#                </div>#}
+{#            </div>#}
+{#        {%  endif  %}#}
+{#    </div>#}
 
 
 {#    <div class="collapse" id="collapseExample{{ tracking.numligne }}">#}
@@ -166,7 +179,7 @@
 
 
 {#        </div>#}
-{#    </div>#}
+    </div>
 
 {%  endblock %}
 {% block javascript %}

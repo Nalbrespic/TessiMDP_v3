@@ -17,8 +17,13 @@ tmd_config_gestioncmdClient:
     defaults:
         _controller: TMDConfigBundle:Gestion:gestioncmdClient
 
+tmd_config_gestionclientOpe:
+    path: /gestioncmd/client/{idClient}/op/{idappli}
+    defaults:
+        _controller: TMDConfigBundle:Gestion:gestionClientOpe
+
 tmd_config_editTracking:
-    path: /tracking/{numligne}
+    path: /edit/tracking
     defaults:
         _controller: TMDConfigBundle:Gestion:editTracking
 

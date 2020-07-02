@@ -111,20 +111,33 @@ class GestionController extends Controller
         $client = $em->getRepository('TMDProdBundle:Client')->findBy(
             array('idclient' => $idClient
             ));
-        $listtrackings = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByIdclient($idClient);
-        $trackings = $this->get('knp_paginator')->paginate($listtrackings,
-            $request->query->get('page', 1), 25);
+//        $listtrackings = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByIdclient($idClient);
+//        $trackings = $this->get('knp_paginator')->paginate($listtrackings,
+//            $request->query->get('page', 1), 25);
+        $listOp = $em->getRepository('TMDProdBundle:EcommAppli')->findBy(
+            array('idclient'=>$idClient)
+        );
 
-        dump($trackings);
+        dump($listOp);
 
         return $this->render('TMDConfigBundle:gestion:gestionCmde.html.twig', array(
             'clients' => $clients,
             'client' => $client[0],
             'idClient' => $idClient,
-            'trackings' => $trackings
+            'listOpe' => $listOp
         ));
     }
 
+    /**
+     * @param Request $request
+     */
+    public function gestionClientOpeAction(Request $request)
+    {
+        $idClient = $request->get('idClient');
+        $idappli = $request->get('idappli');
+        dump($idClient);
+        dump($idappli);
+    }
     /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
