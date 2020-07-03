@@ -2539,6 +2539,29 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function donneTrackingByNumblAction (Request $request){
+        $numbl = $request->get('numbl');
+        $em = $this->getDoctrine()->getManager();
+        $numligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($numbl);
+        dump($numligne);
+        $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingByBl($numbl);
+
+        $trackingArray = array();
+        foreach ($tracking as $key => $item){
+            $trackingArray[$key] = $item;
+        }
+
+        $numligneArray = array();
+        foreach ($numligne as $key => $item) {
+            $numligneArray[$key] = $item;
+        }
+
+        $response = array('tracking'=> $trackingArray, 'numligne'=>$numligneArray);
+
+        return new JsonResponse($response);
+
+    }
+
 
     public function donneRuptureByFileAction(Request $request)
     {

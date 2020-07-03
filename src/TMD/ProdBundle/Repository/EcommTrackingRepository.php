@@ -247,4 +247,13 @@ class EcommTrackingRepository extends EntityRepository
             ;
     }
 
+    public function findTrackingByBl($numbl){
+        return $this
+            ->createQueryBuilder('tr')
+            ->where('tr.expRef = :numbl')
+            ->setParameter('numbl', $numbl)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
 }
