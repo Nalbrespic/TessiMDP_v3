@@ -271,20 +271,28 @@
             </div>
 
     </div>
-    <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel" style="color: #c82333">Attention</h4>
-                </div>
-                <div class="modal-body">
-                    Souhaitez-vous vraiment annuler la commande ?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">non</button>
-                    <button type="button" class="btn btn-danger">oui</button>
-                </div>
+    <div id="modalDelete" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalDeleteContenu" class="ModalCarte-title"></h4>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modalDeleteAnnule" type="button" class="btn btn-default" >Annuler</button>
+                <button id="modalDeleteConfirme"type="button" class="btn btn-danger">Confirmer</button>
+            </div>
+        </div>
+    </div>
+    <div id="modalDelete2" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalDeleteContenu2" class="ModalCarte-title"></h4>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modalDeleteConfirme2"type="button" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
@@ -1761,11 +1769,14 @@
         function tabTrackings(obj, len, titre, afficheTout, html)
         {
             console.log('object reçu: ',obj);
+            console.log('titre', titre);
+            console.log('html', html);
+            console;log('afficheTout', afficheTout);
             html += '<div class="fondBlanc " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
 
             html += '<div style="overflow: auto;"><table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.2em;"><tr style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62"><td>Date fichier</td><td>N° BL</td><td>RefClient</td><td>Exp_ref</td><td>num_cmde_client</td>' +
             '<td>date Cmd</td><td>Destinataire</td><td style="padding: 0 50px 0 50px;">rue</td><td>ad2</td><td>ad3</td><td>ad4</td><td>ad5</td><td>ad6</td><td>dest_cp</td><td>dest_ville</td>' +
-            '<td>dest_pays</td><td >telephone</td><td>dateDepot</td><td>n° Tracking</td><td>dateProd</td><td>ModExp</td><td>Assurance</td><td>Poids (gr)</td><td>statut</td><td>Qté</td><td>NumTrack</td><td>Date statut</td><td>Statut_livraison</td><td>Nb pages</td><td>Annuler</td></tr>';
+            '<td>dest_pays</td><td >telephone</td><td>dateDepot</td><td>n° Tracking</td><td>dateProd</td><td>ModExp</td><td>Assurance</td><td>Poids (gr)</td><td>statut</td><td>Qté</td><td>NumTrack</td><td>Date statut</td><td>Statut_livraison</td><td>Nb pages</td><td>Annuler la commande</td></tr>';
 
             for (var i = 0; i < len; i++) {
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
@@ -1890,7 +1901,7 @@
                     html += '<td>'+obj[i]['statut']['libelle'] + '</td>';
                 }
                 html +=  '<td>'+obj[i]['nbpages']+ '</td>';
-                if( (obj[i]['trStatut']) == "Rupture stock"){
+                if( (obj[i]['trStatut']) == "Rupture stock") {
 
                     html += '<td><button onclick="AnnulTracking('+obj[i]['numbl']+')" style="background: none; border:none" type="button"><span class="glyphicon glyphicon-remove" style="color: #D34026"></span></button></td>';
                 }
@@ -1911,26 +1922,57 @@
     </script>
 <script>
     function AnnulTracking(numbl) {
-        console.log('mon bl', numbl);
-        $.ajax({
-            url:"{{ path('tmd_prod_donneTrackingByNumbl') }}",
-            type: "POST",
-            data: {numbl: numbl},
-            dataType: "json",
-            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-            complete: function (data) {
-                var json = data.responseText;
-                var obj = JSON.parse(json);
-                var len = obj['tracking'].length;
-                var tracking = obj['tracking']['0'];
-                console.log('mon objet', obj);
-                console.log('mon tracking', tracking);
-                $('#myModalDelete').modal('show')
+        var modal = document.getElementById('modalDelete');
+        var modalAnnule = document.getElementById('modalDeleteAnnule');
+        var modalConfirme = document.getElementById('modalDeleteConfirme');
+//
+        $("#modalDeleteContenu").html("Confirmez vous l'annulation de la commande <span style='font-size: 1.2em;'>"+numbl+"</span> ?");
 
+        modal.style.display = "block";
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+            if (event.target === modalAnnule) {
+
+                modal.style.display = "none";
+            }
+            if (event.target === modalConfirme) {
+
+                $.ajax({
+                    url: "{{ path('tmd_prod_annuleTracking') }}",
+                    type: "POST",
+                    data: {numbl:  numbl},
+                    dataType: "html",
+                    contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                    complete: function (data) {
+                        modal.style.display = "none";
+                        console.log('controller ok')
+
+                        var modal2 = document.getElementById('modalDelete2');
+                        var modalConfirme2 = document.getElementById('modalDeleteConfirme2');
+                        $("#modalDeleteContenu2").html("La commande n°"+numbl+" a bien été annulée");
+                        modal2.style.display = "block";
+                        window.onclick = function (event) {
+                            if (event.target === modal2) {
+                                modal2.style.display = "none";
+                                document.location.reload(true);
+                            }
+                            if (event.target === modalConfirme2) {
+                                modal2.style.display = "none";
+                                document.location.reload(true);
+                            }
+                        }
+
+                    }
+
+
+
+                })
 
             }
 
-        });
+        }
 
     }
 

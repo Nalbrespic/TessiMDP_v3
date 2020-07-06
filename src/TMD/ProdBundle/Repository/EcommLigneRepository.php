@@ -804,7 +804,7 @@ class EcommLigneRepository extends EntityRepository
         ->where('ligne.numbl = :numbl')
         ->setParameter('numbl', $numbl)
         ->getQuery()
-        ->getArrayResult();
+        ->getResult();
     }
 
 }
