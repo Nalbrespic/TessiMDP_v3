@@ -797,4 +797,14 @@ class EcommLigneRepository extends EntityRepository
             ;
     }
 
+    public function findBlNumligne($numbl){
+
+        return $this
+        ->createQueryBuilder('ligne')
+        ->where('ligne.numbl = :numbl')
+        ->setParameter('numbl', $numbl)
+        ->getQuery()
+        ->getResult();
+    }
+
 }

@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
 use TMD\ProdBundle\Entity\EcommAppli;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
+use TMD\ProdBundle\Entity\EcommStatut;
 use TMD\ProdBundle\Form\EcommAppliType;
 use XLSXWriter;
 
@@ -2537,6 +2539,43 @@ class ProdController extends Controller
 
         };
         return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function annuleTrackingAction (Request $request){
+        $numbl = $request->get('numbl');
+        dump($numbl);
+        $em = $this->getDoctrine()->getManager();
+
+        $ligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($numbl);
+        $numLigne = $ligne[0]->getNumligne()->getNumligne();
+        $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
+        dump($tracking[0][0]);
+        $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
+        $abregeStatut = $statut->getAbregestatut();
+        $observation="commande annulée par opérateur";
+        $sm = $this->get('tmd_statut');
+
+        $sm->changeStatut($tracking[0][0],$abregeStatut,$observation, $this->getUser());
+//
+//        $tracking[0][0]->setIdStatut($statut);
+//
+//        $histoStatut = new EcommStatut();
+//        $histoStatut->setDatestatut(new \DateTime());
+//        $histoStatut->getIdStatut($statut->getIdStatut());
+//        $histoStatut->setObservation("Commande annulée par opérateur");
+//        $histoStatut->setNumbl($numbl);
+//        $histoStatut->setIduser($user->getId());
+//        $this->em->persist($histoStatut);
+//
+//        $em->flush();
+
+//
+
+
+        $response = array('ligne'=> $ligne, 'tracking'=>$tracking);
+
+        return new JsonResponse($response);
+
     }
 
 

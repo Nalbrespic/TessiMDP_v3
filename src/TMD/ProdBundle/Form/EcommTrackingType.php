@@ -8,7 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use TMD\ProdBundle\Entity\EcommTracking;
 use TMD\ProdBundle\Repository\ClientRepository;
+use function Matrix\add;
 
 class EcommTrackingType extends AbstractType
 {
@@ -65,7 +67,16 @@ class EcommTrackingType extends AbstractType
                 'required' => false,
                 'empty_data' => " ",
                 'label' => 'Mail'
-            ));
+            ))
+            ->add('idStatut', EntityType::class, array(
+                'class' => EcommTracking::class,
+                'choice_label' => 'statut'
+            ))
+            ->add('save', SubmitType::class, array(
+                'label' => 'Modifier'
+    ))
+            ->getForm();
+
 //            ->add('expCompte')
 //            ->add('expRef')
 //            ->add('codeAgenceTransp')
@@ -119,7 +130,7 @@ class EcommTrackingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'TMD\ProdBundle\Entity\EcommTracking'
+            'data_class' => EcommTracking::class
         ));
     }
 
