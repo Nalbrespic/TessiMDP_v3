@@ -1,0 +1,102 @@
+.bandeau{
+    display: inherit;
+}
+body{
+    font-size: 14px;
+}
+
+#zindexmenu-1 {
+    line-height: 28px;
+}
+.barreConnexion{
+    display: inline-block;
+    margin-top: -28px;
+
+}
+.connexion{
+    justify-content: end;
+}
+
+.title{
+    display: block;
+}
+
+.tableautrackings{
+    margin-top: 30px;
+}
+
+.collonneButton{
+    text-align: center;
+}
+
+.boutons{
+    font-size: 14px;
+    width: 80px;
+    margin-right: 10px;
+
+}
+.buttonView {
+    background-color: #28274D;
+    border: none;
+}
+.buttonModif{
+    background-color: #28274D;
+    color: white;
+    border: none;
+}
+.blockbutton{
+    display: flex;
+    justify-content: end;
+    margin-top: 10px;
+}
+.fade:not(.show){
+    opacity: 1;
+}
+.modal{
+    z-index: 10000;
+
+}
+.modal-backdrop.fade {
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.modal-backdrop.in {
+    opacity: 0.3;
+    filter: alpha(opacity=50);
+}
+.modal-dialog{
+    margin-top:25rem;
+    max-width: 800px;
+}
+.modal-title-deleteModal{
+    background-color: #c82333;
+    color: white;
+}
+.deleteModal{
+
+  border: 2px solid #c82333;
+}
+div.titreFenetre > h3{
+    color: white;
+    border-bottom: none;
+}
+
+.lignetracking{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: #f4eeee 1px solid;
+}
+
+.reftracking{
+    padding-left: 20px;
+
+}
+#myModalDelete{
+    z-index: 100000;
+}
+.footerCopyright{
+   margin-top: 500px;
+
+}

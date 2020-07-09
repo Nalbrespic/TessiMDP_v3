@@ -13,7 +13,7 @@
         <th colspan="3" style="text-align: center;padding-bottom: 0px;">Fichiers réceptionnés</th>
         <th colspan="{{ nbColonne +4 }}" style="text-align: center;padding-bottom: 0px;">Production</th>
         <th style="text-align: center;padding-bottom: 0px;">Sites</th>
-        <th style="text-align: center;padding-bottom: 0px;" colspan="{{ TypeTransport|length }}">Transport</th>
+        <th style="text-align: center;padding-bottom: 0px;" colspan="{{ TypeTransport|length+1 }}">Transport</th>
     </tr>
     <tr style="background-color: #DFD8DF;border-bottom: 2px solid #504A62;font-size: .9em;">
         <th style="text-align: center;padding-bottom: 0px;">Date Fichier</th>
@@ -200,7 +200,11 @@
             {#old#}
 
             {#old#}{#{{ nbBlbyfile[file['idfile']]['nbBl'] }}#}
-            {%  if  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbTrByFile[file['idfile']]  == nbBlByFileProd[file['idfile']]['totProd']   %}
+        {% if nbTrByFile[file['idfile']] == nbdeleteBL and nbBlByFileProd[file['idfile']]['totProd'] is not defined %}
+            <td colspan="2" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;position: relative;">{{ nbTrByFile[file['idfile']] }}</div></td>
+            <td></td>
+
+            {%  elseif  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbTrByFile[file['idfile']]  == nbBlByFileProd[file['idfile']]['totProd']   %}
                 <td colspan="2" style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;position: relative;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
                  <td></td>
             {%  elseif  nbBlByFileProd[file['idfile']]['totProd'] is defined and nbBlByFileProd[file['idfile']]['totProd'] > nbTrByFile[file['idfile']] and nbBlByFileProd[file['idfile']]['totProd'] - nbBlbyfile[file['idfile']]['nbBl']  == 0 %}
@@ -212,6 +216,7 @@
                 <td  style="vertical-align: inherit;"><div style="background-color: #b3d6c2;font-size: 1.2em;">{{ nbBlByFileProd[file['idfile']]['totProd'] }}</div></td>
                 <td></td>
             {% else %}
+
                 {#{% if nbBlbyfile[file['idfile']]['nbBl'] is defined %}#}
                     {#{% if nbTrByFile[file['idfile']] != nbBlbyfile[file['idfile']]['nbBl'] %}#}
                         {#<td style="vertical-align: inherit;font-size: 1.2em;">{{ nbTrByFile[file['idfile']] }}</td>#}
