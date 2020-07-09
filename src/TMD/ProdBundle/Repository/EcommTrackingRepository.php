@@ -24,6 +24,42 @@ class EcommTrackingRepository extends EntityRepository
 
     }
 
+    public function trackingByNumligne($numligne){
+        return $this
+            ->createQueryBuilder('t')
+            ->where('t.numligne IN (:numligne)')
+            ->setParameter('numligne', $numligne)
+            ->innerJoin('t.idStatut' ,'st')
+            ->addSelect('st.idStatut')
+            ->innerJoin('t.idclient', 'cl')
+            ->addSelect('cl.idclient')
+
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function trackingByIdclient($idClient)
+    {
+
+        return $this
+            ->createQueryBuilder('t')
+            ->innerJoin('t.idclient' ,'cl')
+            ->where('cl.idclient IN (:id)')
+            ->setParameter('id', $idClient)
+            ->select('cl.nomclient')
+            ->addSelect('cl.idclient')
+            ->innerJoin('t.idStatut' ,'st')
+            ->addSelect('st.idStatut')
+            ->addSelect('st.statut')
+            ->addSelect('t.numligne')
+            ->addSelect('t.numCmdeClient')
+            ->addSelect('t.refclient')
+            ->orderBy('t.refclient', 'DESC')
+            ->addSelect('t.dateCmde')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
 
     public function findNbRetentionByFile( $files)
     {
@@ -209,6 +245,17 @@ class EcommTrackingRepository extends EntityRepository
             ->getQuery()
             ->getResult()
             ;
+    }
+
+    public function findTrackingByBl($numbl){
+        return $this
+            ->createQueryBuilder('tr')
+            ->where('tr.expRef = :numbl')
+            ->setParameter('numbl', $numbl)
+            ->innerJoin('tr.idStatut', 'st')
+            ->select('st.idStatut')
+            ->getQuery()
+            ->getResult();
     }
 
 }

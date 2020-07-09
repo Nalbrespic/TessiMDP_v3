@@ -34,7 +34,8 @@ class AppKernel extends Kernel
             new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
             new TMD\StatBundle\TMDStatBundle(),
             new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
-            new TMD\MinosBundle\TMDMinosBundle()
+            new TMD\MinosBundle\TMDMinosBundle(),
+            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

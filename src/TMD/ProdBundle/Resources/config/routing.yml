@@ -61,6 +61,11 @@ tmd_prod_donneTrackingsByFile:
         _controller: TMDProdBundle:Prod:donneTrackingsByFile
     methods: [POST]
 
+tmd_prod_annuleTracking:
+    path: /annuleTracking
+    defaults:
+        _controller: TMDProdBundle:Prod:annuleTracking
+    methods: [POST]
 
 
 tmd_prod_exportTrackings:
