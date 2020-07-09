@@ -1899,10 +1899,10 @@
                     html += '<td>'+obj[i]['statut']['libelle'] + '</td>';
                 }
                 html +=  '<td>'+obj[i]['nbpages']+ '</td>';
-                if( (obj[i]['trStatut']) == "Rupture stock") {
+
 
                     html += '{% if is_granted("ROLE_ATC") %}<td><button onclick="AnnulTracking('+obj[i]['numbl']+')" style="background: none; border:none" type="button"><span class="glyphicon glyphicon-remove" style="color: #D34026"></span></button></td>{% endif %}';
-                }
+
                 console.log('objet en cours: ', obj[i]);
             }
 
