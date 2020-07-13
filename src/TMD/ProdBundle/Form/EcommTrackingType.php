@@ -67,15 +67,8 @@ class EcommTrackingType extends AbstractType
                 'required' => false,
                 'empty_data' => " ",
                 'label' => 'Mail'
-            ))
-            ->add('idStatut', EntityType::class, array(
-                'class' => EcommTracking::class,
-                'choice_label' => 'statut'
-            ))
-            ->add('save', SubmitType::class, array(
-                'label' => 'Modifier'
-    ))
-            ->getForm();
+            ));
+
 
 //            ->add('expCompte')
 //            ->add('expRef')
