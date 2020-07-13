@@ -43,6 +43,7 @@ class DefaultController extends Controller
 
             try {
                 $bl = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $numCmd));
+                $numLigne = $bl->getBl()->getNumLigne();
             }
             catch (Exception $e) {
                 echo 'Exception reçue : ', $e->getMessage(), "\n";
@@ -50,7 +51,7 @@ class DefaultController extends Controller
             }
 
             //est ce que le BL n'est pas en statut annulé ??'
-            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('expRef' => $numCmd));
+            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('numligne' => $numLigne));
             $statutAnnule = $em->getRepository('TMDProdBundle:EcommStatut')->findOneBy(array('idStatut' => 9));
 
             if ($bl != null and $tracking->getIdStatut() == $statutAnnule) {
