@@ -2850,8 +2850,9 @@ class ProdController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileBl($numBl);
+            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingByBl($numBl);
 
-            return new JsonResponse($allBlByOpe);
+            return new JsonResponse(array($allBlByOpe, $tracking));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
