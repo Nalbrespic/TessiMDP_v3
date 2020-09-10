@@ -988,13 +988,14 @@
                         console.log("le tracking: ", tracking);
                         if ( len != 0) {
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
-                            var title = '<h4>Détails de la commande</h4>';
+                            var title = '<h4>Détails de la commande n°'+tracking[0]['expRef']+'</h4>';
 
-                            var html = '<div class="tracking"><div><p style="font-size: 1.2em;">Numéro BL: '+tracking[0]['expRef']+'</p></div><div class="col-6"><p>Nom et prénom du destinataire : '+tracking[0]['destinataire']+'</p></></div>';
+                            var html = '<div class="col-6"><p>Nom et prénom du destinataire : '+tracking[0]['destinataire']+'</p></div>';
+                            html += '<div class="blockAdress"><p style="font-weight: bold;font-size: 1.2em;">Adresse de livraison:</p><p>'+tracking[0]['destRue']+'<p>'+tracking[0]['destAd2']+'</p><p>'+tracking[0]['destCp']+' '+tracking[0]['destVille']+'</p></div>';
 
-                            html += '<div class="listArticles"><p style="font-size: 1.6em;">Articles de la commande: </p>';
+                            html += '<div class="listArticles"><p style="font-size: 1.2em;">Articles de la commande: </p>';
 
-                            html += ('<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;font-size: 1.2em;"><tr style="font-weight: bold;font-size: 1.2em;"><td>Code article</td><td>Libellé article</td><td>Quantité</td></tr>');
+                            html += ('<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;"><tr><td>Code article</td><td>Libellé article</td><td>Quantité</td></tr>');
                             for (var i = 0; i < len; i++) {
                                 if (!articles[i]['flagart'] ) {
                                     html += '<tr><td>' + articles[i]['codearticle'] + '</td><td>' + articles[i]['libelle'] + '</td><td>' + articles[i]['quantite'] + '</td></tr>';
