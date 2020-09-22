@@ -31,14 +31,14 @@ class StatutManager
     public function changeStatut(EcommTracking $tracking, string $agregeStatut, string $statutObservation, UserInterface $user) {
         // get status
         $statut = $this->em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($agregeStatut);
-
+        dump($statut->getIdStatut());
         // change status himself
         $tracking->setIdStatut($statut);
 
         // record status history
         $histoStatut = new EcommHistoStatut();
         $histoStatut->setDatestatut(new \DateTime());
-        $histoStatut->setIdstatut($statut->getIdStatut());
+        $histoStatut->setIdstatut($statut);
         $histoStatut->setObservation($statutObservation);
         $histoStatut->setNumbl($tracking->getExpRef());
         $histoStatut->setIduser($user->getId());

@@ -33,7 +33,7 @@ class EcommStatut
     /**
      * @var string
      *
-     * @ORM\Column(name="statut", type="string", length=20, nullable=false)
+     * @ORM\Column(name="statut", type="string", length=255, nullable=false)
      */
     private $statut;
 

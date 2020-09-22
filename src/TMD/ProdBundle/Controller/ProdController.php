@@ -2551,10 +2551,11 @@ class ProdController extends Controller
         $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
         dump($tracking[0][0]);
         $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
+        dump($statut);
         $abregeStatut = $statut->getAbregestatut();
         $observation="commande annulée par opérateur";
         $sm = $this->get('tmd_statut');
-
+        dump($statut->getIdStatut());
         $sm->changeStatut($tracking[0][0],$abregeStatut,$observation, $this->getUser());
 //
 //        $tracking[0][0]->setIdStatut($statut);
