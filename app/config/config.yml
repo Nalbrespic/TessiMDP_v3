@@ -95,11 +95,11 @@ doctrine:
                     TMDAppliBundle:  ~
                     TMDProdBundle:  ~
                     TMDUserBundle:  ~
-                    TMDCoriolisBundle: ~
+#                    TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
-                    TMDZplBundle: ~
-                    TmsLogisticBundle: ~
-                    TMDStatBundle: ~
+#                    TMDZplBundle: ~
+#                    TmsLogisticBundle: ~
+#                    TMDStatBundle: ~
             colisprive:
                 connection: colisprive
                 mappings:
