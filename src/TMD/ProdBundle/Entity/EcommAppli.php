@@ -74,7 +74,7 @@ class EcommAppli
     /**
      * @var string
      *
-     * @ORM\Column(name="codeAppli", type="string", length=20, nullable=true)
+     * @ORM\Column(name="codeAppli", type="string", length=255, nullable=true)
      */
     private $codeappli;
 

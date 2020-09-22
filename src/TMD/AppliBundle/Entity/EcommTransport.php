@@ -16,7 +16,7 @@ class EcommTransport
     /**
      * @var string
      *
-     * @ORM\Column(name="codeTransport", type="string", length=15, nullable=false)
+     * @ORM\Column(name="codeTransport", type="string", length=255, nullable=false)
      */
     private $codetransport;
 
