@@ -252,10 +252,19 @@ class EcommTrackingRepository extends EntityRepository
             ->createQueryBuilder('tr')
             ->where('tr.expRef = :numbl')
             ->setParameter('numbl', $numbl)
-            ->innerJoin('tr.idStatut', 'st')
-            ->select('st.idStatut')
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
     }
 
+    public function findStatutByBl($numbl){
+        return $this
+            ->createQueryBuilder('tr')
+            ->innerJoin('tr.idStatut', 'st')
+            ->where('tr.expRef = :numbl')
+            ->setParameter('numbl', $numbl)
+            ->select('st.idStatut')
+            ->addSelect('st.statut')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

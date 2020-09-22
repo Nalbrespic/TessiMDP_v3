@@ -21,8 +21,10 @@ class EcommHistoStatut
 
     /**
      * @var integer
-     *
-     * @ORM\Column(name="idStatut", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="EcommStatut")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idStatut", referencedColumnName="idStatut")
+     * })
      */
     private $idstatut;
 

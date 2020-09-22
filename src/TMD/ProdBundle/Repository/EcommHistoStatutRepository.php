@@ -4,6 +4,7 @@ namespace TMD\ProdBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+
 /**
  * EcommHistoStatutRepository
  *
@@ -20,7 +21,7 @@ class EcommHistoStatutRepository extends EntityRepository
             ->setParameter('id', $bl)
             ->orderBy('histo.datestatut','DESC')
             ->getQuery()
-            ->getResult()
+            ->getArrayResult()
 
             ;
     }
@@ -34,6 +35,23 @@ class EcommHistoStatutRepository extends EntityRepository
             ->andWhere('histo.idstatut = (:st)')
             ->setParameter('st', -1)
             ->orderBy('histo.datestatut','DESC')
+            ->getQuery()
+            ->getArrayResult()
+
+            ;
+    }
+    public function donneHistoByBlASC($bl)
+    {
+        return $this
+            ->createQueryBuilder('histo')
+            ->innerJoin('histo.idstatut', 'st')
+            ->where('histo.numbl = :id')
+            ->setParameter('id', $bl)
+            ->orderBy('histo.datestatut','ASC')
+            ->select('st.idStatut')
+            ->addselect('st.statut')
+            ->addselect('histo.datestatut')
+            ->addSelect('histo.observation')
             ->getQuery()
             ->getArrayResult()
 

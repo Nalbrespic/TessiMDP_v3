@@ -12,13 +12,22 @@
         {{ message }}
     </div>
 {% endfor %}
-<div id="myModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div style="text-align: right;"><a href="#"><span class="closeArticle">&times;</span></a></div>
-        <div id="modalArticleContenu">Some text in the Modal..</div>
-    </div>
-</div>
+<div id="myModal" class="modal fade bs-example-modal-lg" >
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="closeArticle" aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalArticleTitle">Title</h4>
+             </div>
+
+            <div class="modal-body" id="modalArticleContenu">Some text in the Modal..</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="closeArticle">Fermer</span></button>
+            </div>
+         </div>
+
+ </div>
     <div class="row" >
         {%  if files is defined %}<div class="col-md-5">{% else %}<div class="col-md-7">{% endif %}
             <div class="row">
