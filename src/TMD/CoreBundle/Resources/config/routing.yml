@@ -32,3 +32,14 @@ tmd_core_rectificationWS:
         _controller: TMDCoreBundle:Core:rectificationWS
         idOpe: 0
         current: 0
+
+tmd_core_impressionSearch:
+    path: /reimpressionEtikt/
+    defaults:
+        _controller: TMDCoreBundle:Core:impressionSearch
+
+tmd_core_reimpressionEtikt:
+    path: /reimpressionEtikt/imprim
+    defaults:
+        _controller: TMDCoreBundle:Core:reimpressionEtikt
+    methods: [POST]

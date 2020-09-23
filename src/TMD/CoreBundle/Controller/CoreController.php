@@ -222,4 +222,22 @@ class CoreController extends Controller
         return $this->redirectToRoute('tmd_core_homepage');
     }
 
+
+
+    public function reimpressionEtiktAction(Request $request){
+
+        if ($request->isXmlHttpRequest()) {
+
+            $numTracking = $request->get('numTracking');
+            dump($numTracking);
+            $em = $this->getDoctrine()->getManager();
+
+            $Cmde = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('nColis' => $numTracking));
+            dump($Cmde);
+            $Bl = $Cmde->getBl()->getNumbl();
+            dump($Bl);
+
+            return new JsonResponse(array($Bl));
+        }
+    }
 }

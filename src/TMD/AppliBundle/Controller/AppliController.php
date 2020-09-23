@@ -414,6 +414,7 @@ class AppliController extends Controller
         $em = $this->getDoctrine()->getManager();
         $button = true;
 
+
         if ($etat != 'nc' and $etat != '3' ) {
             if ($etat != '9'){
                 $Cmd = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
@@ -499,6 +500,7 @@ class AppliController extends Controller
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
                 $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
+                dump($jouristo);
 
                 if ($etat === '1') {
                     $messageApresScan = "Commande N° " . $bl . " déjà produite !";
