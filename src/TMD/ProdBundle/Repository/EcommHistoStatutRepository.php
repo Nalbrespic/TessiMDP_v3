@@ -17,9 +17,17 @@ class EcommHistoStatutRepository extends EntityRepository
     {
         return $this
             ->createQueryBuilder('histo')
+            ->innerJoin('histo.idstatut', 'st')
             ->where('histo.numbl = :id')
             ->setParameter('id', $bl)
             ->orderBy('histo.datestatut','DESC')
+            ->select('st.idStatut')
+            ->addSelect('st.statut')
+            ->addselect('histo.numbl')
+            ->addSelect('histo.datestatut')
+            ->addSelect('histo.iduser')
+            ->addSelect('histo.observation')
+
             ->getQuery()
             ->getArrayResult()
 
@@ -33,7 +41,7 @@ class EcommHistoStatutRepository extends EntityRepository
             ->where('histo.numbl = :id')
             ->setParameter('id', $bl)
             ->andWhere('histo.idstatut = (:st)')
-            ->setParameter('st', -1)
+            ->setParameter('st', 99)
             ->orderBy('histo.datestatut','DESC')
             ->getQuery()
             ->getArrayResult()
