@@ -109,6 +109,7 @@ class CoreController extends Controller
         $form = $this->get('form.factory')->create(EcommLignesType::class, $trackingsErreurWS[$current]);
 
         $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlbuerrorWS($trackingsErreurWS[$current]->getNumbl());
+
         if ($histo ==  null){
             $histoL ='Pas de motif d\'erreur';
         }else{

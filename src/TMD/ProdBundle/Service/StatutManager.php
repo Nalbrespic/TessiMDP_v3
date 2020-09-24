@@ -38,7 +38,7 @@ class StatutManager
         // record status history
         $histoStatut = new EcommHistoStatut();
         $histoStatut->setDatestatut(new \DateTime());
-        $histoStatut->setIdstatut($statut);
+        $histoStatut->setIdstatut($statut->getIdStatut());
         $histoStatut->setObservation($statutObservation);
         $histoStatut->setNumbl($tracking->getExpRef());
         $histoStatut->setIduser($user->getId());
