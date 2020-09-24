@@ -20,11 +20,9 @@ class EcommHistoStatut
     private $numbl;
 
     /**
-     * @var EcommStatut
-     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommStatut")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idStatut", referencedColumnName="idStatut")
-     * })
+     * @var integer
+     *
+     * @ORM\Column(name="idStatut", type="integer", nullable=false)
      */
     private $idstatut;
 
@@ -75,7 +73,7 @@ class EcommHistoStatut
     }
 
     /**
-     * @return EcommStatut
+     * @return integer
      */
     public function getIdstatut()
     {
@@ -83,7 +81,7 @@ class EcommHistoStatut
     }
 
     /**
-     * @param EcommStatut
+     * @param integer
      */
     public function setIdstatut($idstatut)
     {

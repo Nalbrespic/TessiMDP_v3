@@ -2854,8 +2854,20 @@ class ProdController extends Controller
             $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingByBl($numBl);
             $statut = $em->getRepository('TMDProdBundle:EcommTracking')->findStatutByBl($numBl);
             $histStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($numBl);
-            dump($histStatut);
-            return new JsonResponse(array($allBlByOpe, $tracking, $statut, $histStatut));
+            $historiqueStat =[];
+            for ($i=0; $i < count($histStatut); $i++){
+
+                $historiqueStat[$i]['idstatut'] = $histStatut[$i]['idstatut'];
+                $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut'])->getStatut();
+                $historiqueStat[$i]['observation'] = $histStatut[$i]['observation'];
+                $historiqueStat[$i]['datestatut'] = $histStatut[$i]['datestatut'];
+
+
+
+        }
+
+            dump($historiqueStat);
+            return new JsonResponse(array($allBlByOpe, $tracking, $statut, $historiqueStat));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
