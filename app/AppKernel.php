@@ -35,12 +35,13 @@ class AppKernel extends Kernel
             new TMD\StatBundle\TMDStatBundle(),
             new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
             new TMD\MinosBundle\TMDMinosBundle(),
-            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle()
+            new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
+            new Symfony\Bundle\DebugBundle\DebugBundle(),
+            new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
-            $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
-            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
+
             $bundles[] = new \Symfony\Bundle\MakerBundle\MakerBundle();
         }
 

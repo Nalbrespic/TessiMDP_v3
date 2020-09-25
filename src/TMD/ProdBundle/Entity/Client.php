@@ -106,7 +106,27 @@ class Client
      */
     private $idclient;
 
+    /**
+     * @var integer
+     * @ORM\Column(name="idClientMinos", type="smallint", nullable=false)
+     */
+    private $idclientminos;
 
+    /**
+     * @return int
+     */
+    public function getIdclientminos(): int
+    {
+        return $this->idclientminos;
+    }
+
+    /**
+     * @param int $idclientminos
+     */
+    public function setIdclientminos(int $idclientminos)
+    {
+        $this->idclientminos = $idclientminos;
+    }
 
 
 

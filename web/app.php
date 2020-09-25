@@ -4,7 +4,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 require __DIR__.'/../app/autoload.php';
 
-$kernel = new AppKernel('prod', false);
+$kernel = new AppKernel('prod', true);
 $kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 
