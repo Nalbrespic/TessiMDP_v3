@@ -808,21 +808,24 @@ class ProdController extends Controller
 
                                     ]);
         }
-
+        $dateFiles = new DateTime();
+        $dateExtract = $dateFiles->format('Ymd_His');
         $titre= '';
+
         if ($prod == '1') {
-            $titre= '_attenteProd';
+            $titre= '_attenteProd-';
         }else if ($prod == '0') {
             $titre= '_all';
         }else if ($prod == '2') {
-            $titre= '_produits';
+            $titre= '_produits-';
         }
         else if ($prod == '3') {
-            $titre= '_enRupture';
+            $titre= '_enRupture-';
         }else {
-            $titre= '_annule';
+            $titre= '_annule-';
 
         }
+        $titre = $titre.$dateExtract;
 
         if (!isset($tabBlComplet[0])){
             $tabBlComplet[0]['appliname'] = 'pas de fichiers';
