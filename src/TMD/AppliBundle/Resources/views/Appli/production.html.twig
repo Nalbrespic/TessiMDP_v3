@@ -233,7 +233,7 @@
                                 {% for his in histo  %}
                                     <tr>
                                         <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.datestatut|date("d/m/Y H:i") }}</td>
-                                        <td style="padding-bottom: 3px;padding-top: 3px;{% if his.idStatut =='2'%}background-color: #BFD626{% endif %}">{{ his.idStatut }}</td>
+                                        <td style="padding-bottom: 3px;padding-top: 3px;{% if his.idstatut =='2'%}background-color: #BFD626{% endif %}">{{ his.idstatut }}</td>
                                         <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.iduser }}</td>
                                         <td style="padding-bottom: 3px;padding-top: 3px;">{{ his.observation }}</td>
                                     </tr>
