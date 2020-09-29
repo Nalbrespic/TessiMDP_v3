@@ -2898,4 +2898,15 @@ class ProdController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
+    public function SearchRuptAction( Request $request){
+
+        $idOpe = $request->get('idope');
+
+        $em = $this->getDoctrine()->getManager();
+        $TrackingRupt = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByOpe($idOpe);
+        dump($TrackingRupt);
+        return new JsonResponse(array($TrackingRupt));
+
+    }
+
 }

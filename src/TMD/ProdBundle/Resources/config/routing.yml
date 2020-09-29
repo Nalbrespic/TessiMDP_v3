@@ -214,3 +214,8 @@ tmd_prod_pnd_save:
     path:     /pnd/{idClient}/{idOpe}/save
     defaults:
         _controller: TMDProdBundle:Pnd:save
+
+tmd_prod_rechercheRupt:
+    path: /RechercheRupture
+    defaults:
+        _controller: TMDProdBundle:Prod:SearchRupt
