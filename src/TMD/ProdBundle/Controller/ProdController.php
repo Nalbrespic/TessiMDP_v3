@@ -2521,22 +2521,27 @@ class ProdController extends Controller
                     $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
                 }
             }
-
+            dump($statuts);
+            dump($allBlByOpe);
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
+                $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $histoStatut;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $histoStatut;
                 }
 //                $statutLibelle = $this->container->get('tmd_getInfo');
 //                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
-
+            dump($tabBlComplet);
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
             return new JsonResponse($reponse);
 

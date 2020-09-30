@@ -988,12 +988,13 @@
                         var statut = obj[2][0];
                         var histoStatut = obj[3];
                         var historiquesStat = obj[4];
+                        var nbstatut = histoStatut.length
                         var len = obj.length;
                         console.log("les articles: ",articles);
                         console.log("le tracking: ", tracking);
                         console.log("le statut: ", statut);
-                        console.log('historique: ', historiquesStat);
                         console.log('historique: ', histoStatut);
+
                         if ( len != 0) {
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
                             var title = '<h4>Détails de la commande n°' + tracking[0]['expRef'] + '</h4>';
@@ -1015,7 +1016,14 @@
                             html += '</table></div>';
                             html += '<div class="row"> <div class="col-md-6"><h5>Date de dépôt</h5><p>'+ moment(tracking[0]["date"]).format('LL') +'</p></div>'
 
-                            html += '<div class="col-md-6"><h5>Statut de la commande</h5><p>'+ statut.statut +'</p></div></div>'
+                            html += '<div class="col-md-6"><h5>Statut de la commande</h5>';
+
+                            if (histoStatut[nbstatut-1].idstatut == 1) {
+                               html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div></div>';
+                            } else {
+                               html += '<p>'+ histoStatut[nbstatut-1].statut +'</p></div></div>';
+                            }
+
 
                             html += '<div><h5>Historique de la commande</h5></div>'
 
@@ -1023,11 +1031,11 @@
                                 '            <div class="swiper-container text-center">' +
                                 '<div class="swiper-wrapper"><div class="swiper-slide"> '
                             histoStatut.forEach(function(item) {
-                                console.log('date: ',item.datestatut.date);
+                                console.log ('un statut: ',item)
                             html += '<div class="swiper-wrapper"><div class="swiper-slide">' +
                                 '                      <div class="timestamp"><span class="date">'+ moment(item.datestatut.date).format('LLL') +'</span></div>'
 
-                                if (item.idStatut == 1) {
+                                if (item.idstatut == 1) {
                                     html += '<div class="status"><span style="display: inline-block">' + item.observation + '</span></div>' +
                                         '  </div>'
                                 } else {
@@ -1820,13 +1828,17 @@
         {
             console.log('object reçu: ',obj);
 
+
             html += '<div class="fondBlanc " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
 
             html += '<div style="overflow: auto;"><table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.5em;"><tr style="font-weight: bold;border-bottom: 2px solid #504A62"><td>Date fichier</td><td>N° BL</td><td>RefClient</td><td>Exp_ref</td><td>num_cmde_client</td>' +
                 '<td>date Cmd</td><td>Destinataire</td><td>dateDepot</td><td>n° Tracking</td><td>dateProd</td><td>ModExp</td><td>Statut</td>' +
-                '<td>Détails</td>{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td> Annuler la commande</td>{% endif %} </tr>';
+                '<td>statut livraison</td><td>Détails</td>{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td> Annuler la commande</td>{% endif %} </tr>';
 
             for (var i = 0; i < len; i++) {
+                var histoStatut = obj[i]['histoStatut'];
+                var lastStatut = histoStatut[histoStatut.length -1];
+                console.log('dernier statut: ', lastStatut);
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
                 if ( i > 15){
                     html+= 'style = "display: none;"';
@@ -1921,8 +1933,21 @@
                 {
                     html += '<td>' + obj[i]['modexp'] + '</td>';
                 }
+                console.log(lastStatut.idstatut);
+                if (lastStatut.idstatut == 1) {
+                    html+= '<td>' + lastStatut.observation + '</td>';
+                } else
+                {
+                    html+= '<td>' + lastStatut.observation + '</td>';
+                }
 
-                html+= '<td>' + obj[i]['trStatut'] + '</td>';
+
+                if ( ( obj[i]['statut']['libelle']) === ""){
+                    html += '<td>non communiqué</td>';
+                }
+                else{
+                    html += '<td>'+obj[i]['statut']['libelle'] + '</td>';
+                }
 
                 html += '<td><a id="'+obj[i]['numbl']+'" onclick="afficherArticle('+obj[i]['numbl']+')" href="#'+obj[i]['numbl']+'"><span class="glyphicon glyphicon-eye-open"></span></a></td>'
 
