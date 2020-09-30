@@ -219,3 +219,8 @@ tmd_prod_rechercheRupt:
     path: /RechercheRupture
     defaults:
         _controller: TMDProdBundle:Prod:SearchRupt
+
+tmd_prod_annulTrackingAll:
+    path: /annulTrackingAll
+    defaults:
+        _controller: TMDProdBundle:Prod:AnnulTrackingAll

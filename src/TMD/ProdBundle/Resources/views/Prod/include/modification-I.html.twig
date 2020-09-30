@@ -18,11 +18,12 @@
     </div>
 
 </div>
-<div class="row">
-    <div class="col-md-12" style="margin-top: -12px;">
-        <div id="resultatRecherche2" style="text-align: initial;border: inherit;background-color: white;font-family: initial;font-size: 0.7em;margin-top: 10px;">
+<div >
+        <div class="alert-success" role="alert" style="display: none" id="annulSucces">Annulation effectuée avec succès !</div>
+        <div id="resultatRecherche2" class="row" style="text-align: initial;border: inherit;background-color: white;font-family: initial;font-size: 0.7em;margin-top: 10px;">
         </div>
-    </div>
+
+
 </div>
 
 
@@ -61,12 +62,11 @@
                             var html = "";
 
 
-                            html += '<div class="fondBlanc2 " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">' + titre + ' </p><hr class="menutr">';
+                            html += '<div class="col-md-8 fondBlanc2 " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">' + titre + ' </p><hr class="menutr">';
 
-                            html += '<div ><div class="row"><div class="col-md-12 " style="width: 60%;">' +
-                                '<table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.2em; font-family: inherit; text-align: center;">' +
+                            html += '<table class="table table-hover table-bordered pad" style="z-index: 1;font-size: 1.2em; font-family: inherit; text-align: center;">' +
                                 '<thead style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62; text-align: center;">' +
-                                '<th style="width: 30px;text-align: center;vertical-align: middle;"><input type="checkbox" id="alltracking"></th><th style="width: 50px;text-align: center;vertical-align: middle;">N° BL</th>' +
+                                '<th style="width: 30px;text-align: center;vertical-align: middle;"><input type="checkbox" id="alltracking" onclick="checkAll()"></th><th style="width: 50px;text-align: center;vertical-align: middle;">N° BL</th>' +
                                 '<th style="width: 100px;text-align: center;vertical-align: middle;">Destinataire</th>' +
                                 '<th style="width: 200px;text-align: center;vertical-align: middle;">ville de Destination</th>' +
                                 '<th style="text-align: center;vertical-align: middle;">n°Commande</th><th style="text-align: center;vertical-align: middle;">Date de la commande</th>' +
@@ -84,6 +84,10 @@
                                     '<span class="glyphicon glyphicon-eye-open"></span></a></td></tr>';
                                 nbrSelect = nbrSelect + 1
                             }
+                                html += '</table></div> ' +
+                                    '<div class="col-md-4" style="margin-top: 100px">' +
+                                    '        <button class="btn" id="AnnulTrackingSelect" onclick="annulGroupTracking()">Annuler les tracking selectionner</button>\n' +
+                                    '</div>'
 
                             html += '<div class="col-md-2 topExport" style="position: fixed;bottom:2em;right: 0;">\n' +
                                 '    <p  id="exportTracking"></p>\n' +
@@ -99,21 +103,52 @@
         }
 </script>
         <script>
-        $('input:checkbox[name = selectTracking]').change(function(){
 
-            var nbrSelect = parseInt($('#nbrSelect2').html());
-            var listTracking = [];
-            for (var i = 1; i < nbrSelect+1; i++)
-            {
+    function checkAll() {
+        var checkbox = document.querySelectorAll(".blAnnuler");
+        checkbox.forEach(function (check) {
+            check.checked = check.checked ? false : true;
+        })
 
-                    $('#trackSelect2'.concat(i)).prop('checked', true);
-                    listTracking.push($('#idTracking'.concat(i)).html())
+    }
+    function annulGroupTracking() {
+        var checkbox = document.querySelectorAll('.blAnnuler');
+        var i=0
+        var listTracking = [];
+        var succes = document.getElementById('annulSucces');
 
 
+        checkbox.forEach(function (check) {
+            if (check.checked){
+                listTracking[i] = check.value;
+                i++
             }
-            console.log('listTracking: ',listTracking);
+        })
 
-            })
+         if (listTracking != null){
+             $.ajax({
+                 url: "{{ path('tmd_prod_annulTrackingAll') }}",
+                 type: "POST",
+                 data: {listtracking: listTracking },
+                 dataType: "html",
+                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                 complete: function (data) {
+                     console.log('données envoyées !')
+                     searchRupt()
+                     succes.style.display = "";
+                     setTimeout(function () {
+                        succes.style.display ="none";
+                     }, 5000)
+                 }
+
+             })
+         }
+
+
+        }
+
+
+
             </script>
     <script>
 

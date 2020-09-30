@@ -2909,4 +2909,26 @@ class ProdController extends Controller
 
     }
 
+    public function AnnulTrackingAllAction (Request $request){
+        $listTracking = $request->get('listtracking');
+        dump($listTracking);
+
+        $em = $this->getDoctrine()->getManager();
+        foreach ($listTracking as $bl) {
+            $ligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($bl);
+            $numLigne = $ligne[0]->getNumligne()->getNumligne();
+            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
+            dump($tracking[0][0]);
+            $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
+            dump($statut);
+            $abregeStatut = $statut->getAbregestatut();
+            $observation = "commande annulée par opérateur";
+            $sm = $this->get('tmd_statut');
+            dump($statut->getIdStatut());
+            $sm->changeStatut($tracking[0][0], $abregeStatut, $observation, $this->getUser());
+        }
+
+         return new Response('changement effectué',200);
+    }
+
 }
