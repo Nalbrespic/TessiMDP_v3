@@ -21,4 +21,13 @@ class TrackingsRepository extends EntityRepository
         ;
     }
 
+    public function findStatutByNumligne($numligne)
+    {
+
+        $query = $this->_em->createQuery('SELECT tr.numbl, st.libelle FROM TMDDpdBundle:Trackings tr INNER JOIN TMDDpdBundle:Colisstatut st WITH tr.statut = st.statut WHERE tr.numligne ='.$numligne);
+        $results = $query->getResult();
+        return $results;
+        ;
+    }
+
 }

@@ -987,13 +987,14 @@
                         var tracking = obj[1];
                         var statut = obj[2][0];
                         var histoStatut = obj[3];
-                        var historiquesStat = obj[4];
+                        var statutLivr = obj[4];
                         var nbstatut = histoStatut.length
                         var len = obj.length;
                         console.log("les articles: ",articles);
                         console.log("le tracking: ", tracking);
                         console.log("le statut: ", statut);
                         console.log('historique: ', histoStatut);
+                        console.log('statut de livraison', statutLivr);
 
                         if ( len != 0) {
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
@@ -1014,18 +1015,26 @@
 
 
                             html += '</table></div>';
-                            html += '<div class="row"> <div class="col-md-6"><h5>Date de dépôt</h5><p>'+ moment(tracking[0]["date"]).format('LL') +'</p></div>'
+                            html += '<div class="row"> ' +
+                                '<div class="col-md-4"><h5>Date de dépôt</h5><p>'+ moment(tracking[0]["date"]).format('LL') +'</p></div>'
 
-                            html += '<div class="col-md-6"><h5>Statut de la commande</h5>';
-
+                            html += '<div class="col-md-4"><h5>Statut de la commande</h5>';
                             if (histoStatut[nbstatut-1].idstatut == 1) {
-                               html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div></div>';
+                                html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div>';
                             } else {
-                               html += '<p>'+ histoStatut[nbstatut-1].statut +'</p></div></div>';
+                                html += '<p>'+ histoStatut[nbstatut-1].statut +'</p></div>';
                             }
 
+                            if (statutLivr != ""){
+                                html += '<div class="col-md-4"><h5>Statut de la livraison</h5><p>'+ statutLivr +'</p></div>'
+                            } else {
+                                html += '<div class="col-md-4"><h5>Statut de la livraison</h5><p>non communiqué</p></div>'
+                            }
 
-                            html += '<div><h5>Historique de la commande</h5></div>'
+                            html += '</div>'
+
+
+                            html += '<div style="margin-top: 50px;"><h5>Historique de la commande</h5></div>'
 
                             html += ' <section class="time-line-box">' +
                                 '            <div class="swiper-container text-center">' +
@@ -1938,7 +1947,7 @@
                     html+= '<td>' + lastStatut.observation + '</td>';
                 } else
                 {
-                    html+= '<td>' + lastStatut.observation + '</td>';
+                    html+= '<td>' + lastStatut.statut + '</td>';
                 }
 
 
