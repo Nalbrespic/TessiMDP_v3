@@ -32,7 +32,7 @@ framework:
 #        cookie_lifetime: 28800
     fragments: ~
     http_method_override: true
-    profiler: { only_exceptions: false }
+#    profiler: { only_exceptions: false }
 
 # Twig Configuration
 twig:
@@ -114,9 +114,9 @@ doctrine:
 #                mappings:
 #                    TMDMinosBundle: ~
 
-#Profiler
-web_profiler:
-    toolbar: true
+##Profiler
+#web_profiler:
+#    toolbar: true
 
 # FOSRest Configuration
 fos_rest:
