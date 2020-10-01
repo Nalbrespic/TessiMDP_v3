@@ -2285,7 +2285,7 @@ class ProdController extends Controller
             {
                 $tabSyntheseGeneralaProd += intval($tab['totProd']);
             }
-
+            dump($tabSyntheseGeneralaProd);
             //pagination
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
             if ($page > $nbPages) {
@@ -2965,4 +2965,14 @@ class ProdController extends Controller
          return new Response('changement effectué',200);
     }
 
+    public function SyntheseBlByDateProdAction(Request $request){
+        $idope = $request->get('idope');
+        $date = $request->get('date');
+
+        $em = $this->getDoctrine()->getManager();
+        $bls= $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisBl($date, $idope);
+        dump($bls);
+
+        return new JsonResponse($bls);
+    }
 }

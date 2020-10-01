@@ -224,3 +224,8 @@ tmd_prod_annulTrackingAll:
     path: /annulTrackingAll
     defaults:
         _controller: TMDProdBundle:Prod:AnnulTrackingAll
+
+tmd_prod_donneSyntheseBlByDateProd:
+    path: /SyntheseBlByDateProd
+    defaults:
+        _controller: TMDProdBundle:Prod:SyntheseBlByDateProd
