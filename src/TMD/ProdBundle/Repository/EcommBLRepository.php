@@ -1214,5 +1214,21 @@ class EcommBLRepository extends EntityRepository
         $results = $query->getArrayResult();
         return $results;
     }
+    public function syntheseMoisBl($date, $idope)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->innerJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->where('bl.dateProduction  LIKE :date')
+            ->setParameter('date', '%'.$date.'%')
+            ->andWhere('file.idappli = (:idA)')
+            ->setParameter('idA', $idope)
+            ->select('count(bl.bl) as cn')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
 }
