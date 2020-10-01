@@ -52,4 +52,16 @@ class EcommHistoStatutRepository extends EntityRepository
 
             ;
     }
+
+    public function lastHistoByBl($bl)
+    {
+        return $this
+            ->createQueryBuilder('histo')
+            ->where('histo.numbl = :id')
+            ->setParameter('id', $bl)
+            ->orderBy('histo.datestatut', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

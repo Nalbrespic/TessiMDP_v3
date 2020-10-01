@@ -1,95 +1,226 @@
 <div class="row">
     <div id="donneInfoDiv" class="col-md-12" style="{%  if blRetour is defined %}{% if blRetour is null %} display: none;{% endif %}{% endif %}background-color: #BFD626;width: 98%;margin-top: 2px;margin-left: 20px;height: 36px;margin-bottom: -12px;border-radius: 7px;" >
         <p id="donneInfo" style="margin-top: 7px;font-size: 1.1em;margin-left: 11px;">Le BL ou le fichier N°{%  if blRetour is defined %}{% if blRetour is not null %} {{ blRetour }} {% endif %}{% endif %} a été mis à jour ...</p>
-   </div>
+    </div>
 
     <div class="col-md-5" style="margin-top: 23px;">
         <div class="form-group">
             <label for="entered_search">Recherche par N°BL / Nom de fichier</label>
             <input  name="entered_search" onchange="modifAction()" type="text" style="width: 150px;" class="form-control"  id="entered_modif" >
+
+        </div>
+    </div>
+    <div class="col-md-5" style="margin-top: 23px;">
+        <div class="checkbox">
+            <label>
+                <input  onchange="searchRupt()" type="checkbox" id="searchRupt" name="selectTracking"> voir les commandes en rupture</label>
         </div>
     </div>
 
 </div>
-<div class="row">
-    <div class="col-md-12" style="margin-top: -12px;">
-    <div id="resultatRecherche2" style="text-align: initial;border: inherit;background-color: white;font-family: initial;font-size: 0.7em;margin-top: 10px;">
-    </div>
-    </div>
+<div >
+        <div class="alert-success" role="alert" style="display: none" id="annulSucces">Annulation effectuée avec succès !</div>
+        <div id="resultatRecherche2" class="row" style="text-align: initial;border: inherit;background-color: white;font-family: initial;font-size: 0.7em;margin-top: 10px;">
+        </div>
+
+
 </div>
+
 
 {% block javascriptsPlus %}
 
     <script type="text/javascript">
-        function modifAction(){
-            var cmd =  $('#entered_modif').val();
-            var idClient =  $('#idClient').text();
-            var idope =  $('#idOperation').text();
+
+
+
+        function searchRupt() {
+            var idClient = $('#idClient').text();
+            var idope = $('#idOperation').text();
             document.getElementById('donneInfoDiv').style.display = 'none';
+            var mycheck = document.getElementById('searchRupt');
 
-            $.ajax({
-                url: "{{ path('tmd_prod_rechercheModif') }}",
-                type: "POST",
-                data: {cmd:  cmd,idClient:  idClient,idope: idope },
-                dataType: "html",
-                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                complete: function (data) {
+            if (mycheck.checked == true) {
+                console.log("coché !!");
+                $.ajax({
+                    url: "{{ path('tmd_prod_rechercheRupt') }}",
+                    type: "POST",
+                    data: {idClient: idClient, idope: idope},
+                    dataType: "html",
+                    contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                    complete: function (data) {
 
-                    var json = data.responseText;
-                    var obj = JSON.parse(json);
-                    var len = obj['bl'].length + obj['file'].length
+                        var json = data.responseText;
+                        var obj = JSON.parse(json);
+                        var tabtrackings = obj[0]
+                        var len = tabtrackings.length;
+                        console.log(tabtrackings);
 
-                    if ( len !== 0) {
-
-
-                        var titre = "Resultats: ("+len+") pour la recherche: \""+cmd+'"';
-                        var html ="";
+                        if ( len !== 0) {
 
 
+                            var titre = "Resultats: " + len + " commandes avec articles en rupture";
+                            var html = "";
 
-                        html += '<div class="fondBlanc2 " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
 
-                        html += '<div ><div class="row"><div class="col-md-12 " style="width: 93%;"><table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.2em;"><tr style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62">' +
-                            '<td style="width: 10px;"></td><td style="width: 20px;">N° BL</td><td style="width: 100px;">Destinataire</td><td style="width: 200px;">nom fichier</td><td style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;"></td></tr>';
-                        for (var i = 0; i < obj['bl'].length; i++) {
+                            html += '<div class="col-md-8 fondBlanc2 " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">' + titre + ' </p><hr class="menutr">';
 
-                            html += '<tr id="'+ obj['bl'][i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
+                            html += '<table class="table table-hover table-bordered pad" style="z-index: 1;font-size: 1.2em; font-family: inherit; text-align: center;">' +
+                                '<thead style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62; text-align: center;">' +
+                                '<th style="width: 30px;text-align: center;vertical-align: middle;"><input type="checkbox" id="alltracking" onclick="checkAll()"></th><th style="width: 50px;text-align: center;vertical-align: middle;">N° BL</th>' +
+                                '<th style="width: 100px;text-align: center;vertical-align: middle;">Destinataire</th>' +
+                                '<th style="width: 200px;text-align: center;vertical-align: middle;">ville de Destination</th>' +
+                                '<th style="text-align: center;vertical-align: middle;">n°Commande</th><th style="text-align: center;vertical-align: middle;">Date de la commande</th>' +
+                                '<th style="text-align: center;vertical-align: middle;">Détails</th></thead>';
+                            var nbrSelect =0;
+                            for (var i=0; i<len; i++) {
+                                 var t= i+1;
+                                html += '<tr><td><input class="blAnnuler" type="checkbox" id="trackSelect'+ t +'" value="'+tabtrackings[i].expRef+'" ></td>' +
+                                    '<td id="idTracking'+ t +'">'+ tabtrackings[i].expRef +'</td>' +
+                                    '<td>'+ tabtrackings[i].destinataire+'</td>' +
+                                    '<td>'+ tabtrackings[i].destVille +'</td>' +
+                                    '<td>'+ tabtrackings[i].numCmdeClient+'</td>' +
+                                    '<td>'+ moment(tabtrackings[i].dateCmde.date).format('LL')+'</td>' +
+                                    '<td style="width: 80px;"><a id="'+tabtrackings[i].expRef+'" onclick="afficherArticle('+tabtrackings[i].expRef+')" href="#'+tabtrackings[i].expRef+'">' +
+                                    '<span class="glyphicon glyphicon-eye-open"></span></a></td></tr>';
+                                nbrSelect = nbrSelect + 1
+                            }
+                                html += '</table></div> ' +
+                                    '<div class="col-md-4" style="margin-top: 100px">' +
+                                    '        <button class="btn" id="AnnulTrackingSelect" onclick="annulGroupTracking()">Annuler les tracking selectionner</button>\n' +
+                                    '</div>'
 
-                            html+= '><td>';
+                            html += '<div class="col-md-2 topExport" style="position: fixed;bottom:2em;right: 0;">\n' +
+                                '    <p  id="exportTracking"></p>\n' +
+                                '    <span id="nbrSelect2" style="display: none;">'+nbrSelect+'</span>\n' +
+                                '</div>'
+
+                        }
+
+                        $("#resultatRecherche2").html(html);
+                        }
+                })
+            }
+        }
+</script>
+        <script>
+
+    function checkAll() {
+        var checkbox = document.querySelectorAll(".blAnnuler");
+        checkbox.forEach(function (check) {
+            check.checked = check.checked ? false : true;
+        })
+
+    }
+    function annulGroupTracking() {
+        var checkbox = document.querySelectorAll('.blAnnuler');
+        var i=0
+        var listTracking = [];
+        var succes = document.getElementById('annulSucces');
+
+
+        checkbox.forEach(function (check) {
+            if (check.checked){
+                listTracking[i] = check.value;
+                i++
+            }
+        })
+
+         if (listTracking != null){
+             $.ajax({
+                 url: "{{ path('tmd_prod_annulTrackingAll') }}",
+                 type: "POST",
+                 data: {listtracking: listTracking },
+                 dataType: "html",
+                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                 complete: function (data) {
+                     console.log('données envoyées !')
+                     searchRupt()
+                     succes.style.display = "";
+                     setTimeout(function () {
+                        succes.style.display ="none";
+                     }, 5000)
+                 }
+
+             })
+         }
+
+
+        }
+
+
+
+            </script>
+    <script>
+
+                function modifAction(){
+                    var cmd =  $('#entered_modif').val();
+                    var idClient =  $('#idClient').text();
+                    var idope =  $('#idOperation').text();
+                    document.getElementById('donneInfoDiv').style.display = 'none';
+
+                    $.ajax({
+                        url: "{{ path('tmd_prod_rechercheModif') }}",
+                        type: "POST",
+                        data: {cmd:  cmd,idClient:  idClient,idope: idope },
+                        dataType: "html",
+                        contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                        complete: function (data) {
+
+                            var json = data.responseText;
+                            var obj = JSON.parse(json);
+                            var len = obj['bl'].length + obj['file'].length
+
+                            if ( len !== 0) {
+
+
+                                var titre = "Resultats: ("+len+") pour la recherche: \""+cmd+'"';
+                                var html ="";
+
+
+
+                                html += '<div class="fondBlanc2 " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
+
+                                html += '<div ><div class="row"><div class="col-md-12 " style="width: 93%;"><table class="table table-hover table-bordered pad" style="margin-left: 40px;z-index: 1;font-size: 1.2em;"><tr style="font-weight: bold;font-size: 1.2em;border-bottom: 2px solid #504A62">' +
+                                    '<td style="width: 10px;"></td><td style="width: 20px;">N° BL</td><td style="width: 100px;">Destinataire</td><td style="width: 200px;">nom fichier</td><td style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;"></td></tr>';
+                                for (var i = 0; i < obj['bl'].length; i++) {
+
+                                    html += '<tr id="'+ obj['bl'][i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
+
+                                    html+= '><td>';
 //                            if (obj['bl'][i]['dateDepot']['date'].split(" ")[0] === '-0001-11-30' || obj['bl'][i]['dateProduction']['date'].split(" ")[0]  === '-0001-11-30'){
-                                html += '<div class="radio"><label><input type="radio" name="optionsRadios" onchange="validLigneBL('+ obj['bl'][i]['numbl'] +','+len+')" id="Radios'+ obj['bl'][i]['numbl'] +'" value="' +obj['bl'][i]['nColis']+'"></label>';
-                                html += '<div><span style="display: none;" id = "recupdateModifPrrod'+ obj['bl'][i]['numbl'] +'">'+obj['bl'][i][0]['dateProduction']['date'].split(" ")[0]+'</span></div>';
-                                html += '<div><span style="display: none;" id = "recupdateDepot'+ obj['bl'][i]['numbl'] +'">'+obj['bl'][i]['dateDepot']['date'].split(" ")[0]+'</span></div>';
+                                    html += '<div class="radio"><label><input type="radio" name="optionsRadios" onchange="validLigneBL('+ obj['bl'][i]['numbl'] +','+len+')" id="Radios'+ obj['bl'][i]['numbl'] +'" value="' +obj['bl'][i]['nColis']+'"></label>';
+                                    html += '<div><span style="display: none;" id = "recupdateModifPrrod'+ obj['bl'][i]['numbl'] +'">'+obj['bl'][i][0]['dateProduction']['date'].split(" ")[0]+'</span></div>';
+                                    html += '<div><span style="display: none;" id = "recupdateDepot'+ obj['bl'][i]['numbl'] +'">'+obj['bl'][i]['dateDepot']['date'].split(" ")[0]+'</span></div>';
 
 //                            }
 
-                            html+= '</div></td><td>' +obj['bl'][i]['numbl']+ '</td><td>' +obj['bl'][i]['destinataire']+ '</td><td>-</td><td style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;" ><div style="padding: 20px;" class ="supptdModif'+i+'" id="rempliTrackModif'+ obj['bl'][i]['numbl'] +'"></div></td>';
+                                    html+= '</div></td><td>' +obj['bl'][i]['numbl']+ '</td><td>' +obj['bl'][i]['destinataire']+ '</td><td>-</td><td style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;" ><div style="padding: 20px;" class ="supptdModif'+i+'" id="rempliTrackModif'+ obj['bl'][i]['numbl'] +'"></div></td>';
 
-                        }
-                        for (var i = 0; i < obj['file'].length; i++) {
+                                }
+                                for (var i = 0; i < obj['file'].length; i++) {
 
-                            html += '<tr id="'+ obj['file'][i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
+                                    html += '<tr id="'+ obj['file'][i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
 
-                            html+= '><td>';
-                            if ( obj['fileNoCompletedepot'][obj['file'][i][0]['idfile']] !== undefined || obj['fileNoCompletefab'][obj['file'][i][0]['idfile']] !== undefined ){
-                                html += '<div class="radio"><label><input type="radio" name="optionsRadios" onchange="validLigneFich('+ obj['file'][i][0]['idfile'] +','+len+')" id="Radios'+ obj['file'][i][0]['idfile'] +'" value="' +obj['file'][i][0]['idfile']+'"></label>';
+                                    html+= '><td>';
+                                    if ( obj['fileNoCompletedepot'][obj['file'][i][0]['idfile']] !== undefined || obj['fileNoCompletefab'][obj['file'][i][0]['idfile']] !== undefined ){
+                                        html += '<div class="radio"><label><input type="radio" name="optionsRadios" onchange="validLigneFich('+ obj['file'][i][0]['idfile'] +','+len+')" id="Radios'+ obj['file'][i][0]['idfile'] +'" value="' +obj['file'][i][0]['idfile']+'"></label>';
 
-                            }
-                            if ( obj['fileNoCompletedepot'][obj['file'][i][0]['idfile']] !== undefined ){
-                                html += '<div><span style="display: none;" id = "recupdateDepot2'+ obj['file'][i][0]['idfile'] +'">-0001-11-30</span></div>';
-                            }else{
-                                html += '<div><span style="display: none;" id = "recupdateDepot2'+ obj['file'][i][0]['idfile'] +'">'+obj['file'][i]['dateDepot']['date'].split(" ")[0]+'</span></div>';
-                            }
-                            if ( obj['fileNoCompletefab'][obj['file'][i][0]['idfile']] !== undefined ){
-                                html += '<div><span style="display: none;" id = "recupdateModifPrrod2'+ obj['file'][i][0]['idfile'] +'">-0001-11-30</span></div>';
-                            }else{
-                                html += '<div><span style="display: none;" id = "recupdateModifPrrod2'+ obj['file'][i][0]['idfile'] +'">'+obj['file'][i][0]['dateProduction']['date'].split(" ")[0]+'</span></div>';
-                            }
+                                    }
+                                    if ( obj['fileNoCompletedepot'][obj['file'][i][0]['idfile']] !== undefined ){
+                                        html += '<div><span style="display: none;" id = "recupdateDepot2'+ obj['file'][i][0]['idfile'] +'">-0001-11-30</span></div>';
+                                    }else{
+                                        html += '<div><span style="display: none;" id = "recupdateDepot2'+ obj['file'][i][0]['idfile'] +'">'+obj['file'][i]['dateDepot']['date'].split(" ")[0]+'</span></div>';
+                                    }
+                                    if ( obj['fileNoCompletefab'][obj['file'][i][0]['idfile']] !== undefined ){
+                                        html += '<div><span style="display: none;" id = "recupdateModifPrrod2'+ obj['file'][i][0]['idfile'] +'">-0001-11-30</span></div>';
+                                    }else{
+                                        html += '<div><span style="display: none;" id = "recupdateModifPrrod2'+ obj['file'][i][0]['idfile'] +'">'+obj['file'][i][0]['dateProduction']['date'].split(" ")[0]+'</span></div>';
+                                    }
 
-                                var lenfile = (obj['bl'].length)+i
-                            html+= '</div></td><td>-</td><td>-</td><td style="font-size: 1.1em;">' +obj['file'][i]['filename']+ '</td><td   style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;"><div class ="supptdModif'+lenfile+'" id="rempliTrackModif'+ obj['file'][i][0]['idfile'] +'"></div></td>';
+                                    var lenfile = (obj['bl'].length)+i
+                                    html+= '</div></td><td>-</td><td>-</td><td style="font-size: 1.1em;">' +obj['file'][i]['filename']+ '</td><td   style="border-bottom: 3px solid white;border-right: 3px solid white;border-top: 3px solid white;"><div class ="supptdModif'+lenfile+'" id="rempliTrackModif'+ obj['file'][i][0]['idfile'] +'"></div></td>';
 
-                        }
+                                }
 
 //                        html += '</tr></table></div><div class="col-md-5 col-md-offset-2" id="ttrempliTrackModif"></div></div>';
 
@@ -101,20 +232,20 @@
 
 
 
-                        $("#resultatRecherche2").html(html);
+                                $("#resultatRecherche2").html(html);
 //                        $("#resultatRecherche").show();
 
 
-                    }
-                    else{
-                        var htmlr = '<div class="fondBlanc"><p style="text-align: left;font-size: 1.6em;margin: 10px;">Pas de resultat pour la recherche: "'+cmd+'"</p>';
-                        $("#resultatRecherche2").html(htmlr);
-                    }
-                    document.getElementById("entered_cmd").value = "";
+                            }
+                            else{
+                                var htmlr = '<div class="fondBlanc"><p style="text-align: left;font-size: 1.6em;margin: 10px;">Pas de resultat pour la recherche: "'+cmd+'"</p>';
+                                $("#resultatRecherche2").html(htmlr);
+                            }
+                            document.getElementById("entered_cmd").value = "";
 
+                        }
+                    });
                 }
-            });
-        }
     </script>
 
 
@@ -133,10 +264,10 @@
             var valeur = document.getElementById('Radios'+ligne).value;
             valeur = valeur.toString();
             var html = '<div class="row" id="focusMod">'
-                    +'<div class="col-md-12">'
-                    +'<p id="erreurModift" style="font-size: 1.4em;width: 150px;text-align: left;color: red; display: none;">Remplir tous les champs !! </p>'
-                    +'</div>'
-                    +'</div>'
+                +'<div class="col-md-12">'
+                +'<p id="erreurModift" style="font-size: 1.4em;width: 150px;text-align: left;color: red; display: none;">Remplir tous les champs !! </p>'
+                +'</div>'
+                +'</div>'
 
             if ( valeur !== '0'){
                 html += '<div class="row"><div class="col-md-12"><p style="font-size: 1.4em;width: 150px;text-align: left;">Modification du tracking: </p></div>';
@@ -146,42 +277,42 @@
                 html +='<div class="col-md-12"><input type="text" class="form-control" id="trackingNew" placeholder="Tracking" style="width: 50%;margin-top: -5px;"></div></div>'
             }
             html += '<div class="row" style="margin-top: 9px;" >'
-                         +'<div class="col-md-6">'
-                            +'<div class="row">'
-                                +'<div class="col-md-12">'
-                                    +'<p style="font-size: 1.4em;width: 150px;text-align: left;">Date de Dépôt: </p>'
-                                +'</div>'
-                                +'<div class="col-md-12">'
-                                    +'<div class="input-group date" data-provide="datepicker" onchange="addDateProd('+ligne+')" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
-                                    +'<input id="modifDateDepot" type="text" class="form-control">'
-                                    +'<div class="input-group-addon">'
-                                +'<span class="glyphicon glyphicon-th a"></span>'
-                                +'</div>'
-                                +' </div>'
-                            +'</div>'
-                            +'</div>'
-                        +'</div>'
-                         +'<div class="col-md-6">'
-                            +'<div class="row">'
-                                +'<div class="col-md-12">'
-                                    +'<p style="font-size: 1.4em;width: 172px;text-align: left;">Date de production: </p>'
-                                +'</div>'
-                                +'<div class="col-md-12">'
-                                    +'<div class="input-group date" data-provide="datepicker" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
-                                    +'<input id="modifDateFab" type="text" class="form-control">'
-                                    +'<div class="input-group-addon">'
-                                +'<span class="glyphicon glyphicon-th b"></span>'
-                                +'</div>'
-                                +' </div>'
-                            +'</div>'
-                            +'</div>'
-                        +'</div>'
-                     +'</div>'
-                     +'<div class="row" style="margin-top: 13px;">'
-                         +'<div class="col-md-2" style="text-align: left;">'
-                                +'<button class="btn btn-default" onclick="modifDateTra('+ligne+')" >Valide</button>'
-                            +'</div>'
-                    +'</div>'
+                +'<div class="col-md-6">'
+                +'<div class="row">'
+                +'<div class="col-md-12">'
+                +'<p style="font-size: 1.4em;width: 150px;text-align: left;">Date de Dépôt: </p>'
+                +'</div>'
+                +'<div class="col-md-12">'
+                +'<div class="input-group date" data-provide="datepicker" onchange="addDateProd('+ligne+')" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
+                +'<input id="modifDateDepot" type="text" class="form-control">'
+                +'<div class="input-group-addon">'
+                +'<span class="glyphicon glyphicon-th a"></span>'
+                +'</div>'
+                +' </div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'<div class="col-md-6">'
+                +'<div class="row">'
+                +'<div class="col-md-12">'
+                +'<p style="font-size: 1.4em;width: 172px;text-align: left;">Date de production: </p>'
+                +'</div>'
+                +'<div class="col-md-12">'
+                +'<div class="input-group date" data-provide="datepicker" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
+                +'<input id="modifDateFab" type="text" class="form-control">'
+                +'<div class="input-group-addon">'
+                +'<span class="glyphicon glyphicon-th b"></span>'
+                +'</div>'
+                +' </div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'<div class="row" style="margin-top: 13px;">'
+                +'<div class="col-md-2" style="text-align: left;">'
+                +'<button class="btn btn-default" onclick="modifDateTra('+ligne+')" >Valide</button>'
+                +'</div>'
+                +'</div>'
 
 
 
@@ -211,48 +342,48 @@
 //              var valeur = document.getElementById('Radios'+file).value;
 //            valeur = valeur.toString();
             var html = '<div class="row">'
-                    +'<div class="col-md-12">'
-                    +'<p id="erreurModift" style="font-size: 1.4em;width: 150px;text-align: left;color: red; display: none;">Remplir tous les champs !! </p>'
-                    +'</div>'
-                    +'</div>'
+                +'<div class="col-md-12">'
+                +'<p id="erreurModift" style="font-size: 1.4em;width: 150px;text-align: left;color: red; display: none;">Remplir tous les champs !! </p>'
+                +'</div>'
+                +'</div>'
 
             html += '<div class="row" style="margin-top: 9px;" >'
-                         +'<div class="col-md-6">'
-                            +'<div class="row">'
-                                +'<div class="col-md-12">'
-                                    +'<p style="font-size: 1.4em;width: 150px;text-align: left;">Date de Dépôt: </p>'
-                                +'</div>'
-                                +'<div class="col-md-12">'
-                                    +'<div class="input-group date" data-provide="datepicker" onchange="addDateProd('+file+')" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
-                                    +'<input id="modifDateDepot" type="text" class="form-control">'
-                                    +'<div class="input-group-addon">'
-                                +'<span class="glyphicon glyphicon-th a"></span>'
-                                +'</div>'
-                                +' </div>'
-                            +'</div>'
-                            +'</div>'
-                        +'</div>'
-                         +'<div class="col-md-6">'
-                            +'<div class="row">'
-                                +'<div class="col-md-12">'
-                                    +'<p style="font-size: 1.4em;width: 172px;text-align: left;">Date de production: </p>'
-                                +'</div>'
-                                +'<div class="col-md-12">'
-                                    +'<div class="input-group date" data-provide="datepicker" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
-                                    +'<input id="modifDateFab" type="text" class="form-control">'
-                                    +'<div class="input-group-addon">'
-                                +'<span class="glyphicon glyphicon-th b"></span>'
-                                +'</div>'
-                                +' </div>'
-                            +'</div>'
-                            +'</div>'
-                        +'</div>'
-                     +'</div>'
-                     +'<div class="row" style="margin-top: 13px;">'
-                         +'<div class="col-md-2" style="text-align: left;">'
-                                +'<button class="btn btn-default" onclick="modifDateTraFich('+file+')" >Valide</button>'
-                            +'</div>'
-                    +'</div>'
+                +'<div class="col-md-6">'
+                +'<div class="row">'
+                +'<div class="col-md-12">'
+                +'<p style="font-size: 1.4em;width: 150px;text-align: left;">Date de Dépôt: </p>'
+                +'</div>'
+                +'<div class="col-md-12">'
+                +'<div class="input-group date" data-provide="datepicker" onchange="addDateProd('+file+')" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
+                +'<input id="modifDateDepot" type="text" class="form-control">'
+                +'<div class="input-group-addon">'
+                +'<span class="glyphicon glyphicon-th a"></span>'
+                +'</div>'
+                +' </div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'<div class="col-md-6">'
+                +'<div class="row">'
+                +'<div class="col-md-12">'
+                +'<p style="font-size: 1.4em;width: 172px;text-align: left;">Date de production: </p>'
+                +'</div>'
+                +'<div class="col-md-12">'
+                +'<div class="input-group date" data-provide="datepicker" data-date-format="dd/mm/yyyy" data-date-language="fr" data-date-autoclose="true" style="width: 70%;">'
+                +'<input id="modifDateFab" type="text" class="form-control">'
+                +'<div class="input-group-addon">'
+                +'<span class="glyphicon glyphicon-th b"></span>'
+                +'</div>'
+                +' </div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'</div>'
+                +'<div class="row" style="margin-top: 13px;">'
+                +'<div class="col-md-2" style="text-align: left;">'
+                +'<button class="btn btn-default" onclick="modifDateTraFich('+file+')" >Valide</button>'
+                +'</div>'
+                +'</div>'
 
 
 
@@ -313,7 +444,7 @@
                         temp = temp.replace('varidOpe', idopera);
                         temp = temp.replace('varbl', bl);
                         window.location.href = temp;
-                        }
+                    }
                 })
             }
             else {
@@ -366,16 +497,16 @@
     </script>
 
     <script>
-       function addDateProd(index) {
-           if ( $('#recupdateModifPrrod'+index).text() === '-0001-11-30') {
-               document.getElementById("modifDateFab").value = $('#modifDateDepot').val();
-           }
+        function addDateProd(index) {
+            if ( $('#recupdateModifPrrod'+index).text() === '-0001-11-30') {
+                document.getElementById("modifDateFab").value = $('#modifDateDepot').val();
+            }
 
-           if ( $('#recupdateModifPrrod2'+index).text() === '-0001-11-30') {
-               document.getElementById("modifDateFab").value = $('#modifDateDepot').val();
-           }
+            if ( $('#recupdateModifPrrod2'+index).text() === '-0001-11-30') {
+                document.getElementById("modifDateFab").value = $('#modifDateDepot').val();
+            }
 
-       }
+        }
     </script>
 
 

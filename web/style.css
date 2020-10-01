@@ -226,7 +226,6 @@ hr.menutr
 {
     background: url('Images/fondBlanc.png') repeat;
     border: 2px solid #504A62;
-    width: 100%;
     z-index: 100;
     /*overflow: auto;*/
 }

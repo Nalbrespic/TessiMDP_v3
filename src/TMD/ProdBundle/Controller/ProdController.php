@@ -2521,22 +2521,38 @@ class ProdController extends Controller
                     $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
                 }
             }
-
+            dump($statuts);
+            dump($allBlByOpe);
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
+                $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                $historiqueStat =[];
+                for ($i=0; $i < count($histoStatut); $i++){
+
+                    $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
+                    $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+
+
+
+                }
+
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
 //                $statutLibelle = $this->container->get('tmd_getInfo');
 //                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
-
+            dump($tabBlComplet);
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
             return new JsonResponse($reponse);
 
@@ -2852,6 +2868,8 @@ class ProdController extends Controller
         {
             $numBl = $request->get('numBl');
             $em = $this->getDoctrine()->getManager();
+            $emCP = $this->getDoctrine()->getManager('colisprive');
+            $emDpd = $this->getDoctrine()->getManager('dpd');
 
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileBl($numBl);
             $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingByBl($numBl);
@@ -2868,9 +2886,25 @@ class ProdController extends Controller
 
 
         }
+            // récupérer le statut de la livraison lorsqu'il est disponible:
+           $statutLiv = [];
+            $numLigne = $tracking[0]['numligne'];
+            dump($numLigne);
+         if ($tracking[0]['typeTransport'] == "CPRVE" OR $tracking[0]['typeTransport'] == "CPRV" OR $tracking[0]['typeTransport'] == "CPRVTC" OR $tracking[0]['typeTransport'] == "CPRVT")
+         {
+             $trackingCprve = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByNumligne($numLigne);
+             dump($trackingCprve);
+             $statutLiv = $trackingCprve[0]['libelle'];
+         } elseif ($tracking[0]['typeTransport'] == "DPD" OR $tracking[0]['typeTransport'] == "DPDPREDI" OR $tracking[0]['typeTransport'] == "DPDRELAIS" ){
 
-            dump($historiqueStat);
-            return new JsonResponse(array($allBlByOpe, $tracking, $statut, $historiqueStat));
+             $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByNumligne($numLigne);
+             $statutLiv = $trackingDpd[0]['libelle'];
+         } else {
+             $statutLiv = "";
+         }
+
+
+            return new JsonResponse(array($allBlByOpe, $tracking, $statut, $historiqueStat, $statutLiv));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
     }
@@ -2896,6 +2930,39 @@ class ProdController extends Controller
             return new JsonResponse(array($allTransport,$allTransporteur,$allTransporteurCompte,$allCompte,$allCLient));
         };
         return new Response("erreur: ce n'est pas du Json", 400);
+    }
+
+    public function SearchRuptAction( Request $request){
+
+        $idOpe = $request->get('idope');
+
+        $em = $this->getDoctrine()->getManager();
+        $TrackingRupt = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByOpe($idOpe);
+        dump($TrackingRupt);
+        return new JsonResponse(array($TrackingRupt));
+
+    }
+
+    public function AnnulTrackingAllAction (Request $request){
+        $listTracking = $request->get('listtracking');
+        dump($listTracking);
+
+        $em = $this->getDoctrine()->getManager();
+        foreach ($listTracking as $bl) {
+            $ligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($bl);
+            $numLigne = $ligne[0]->getNumligne()->getNumligne();
+            $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
+            dump($tracking[0][0]);
+            $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
+            dump($statut);
+            $abregeStatut = $statut->getAbregestatut();
+            $observation = "commande annulée par opérateur";
+            $sm = $this->get('tmd_statut');
+            dump($statut->getIdStatut());
+            $sm->changeStatut($tracking[0][0], $abregeStatut, $observation, $this->getUser());
+        }
+
+         return new Response('changement effectué',200);
     }
 
 }
