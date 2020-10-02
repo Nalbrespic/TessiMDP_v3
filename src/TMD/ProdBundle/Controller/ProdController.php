@@ -1739,14 +1739,29 @@ class ProdController extends Controller
 
             $tabBlComplet = array();
             foreach ($allBlByOpeByDate as $key=>$item){
+                $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                $historiqueStat =[];
+                for ($i=0; $i < count($histoStatut); $i++){
+
+                    $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
+                    $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+
+
+
+                }
+
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
             }
 
@@ -1814,14 +1829,29 @@ class ProdController extends Controller
 
             $tabBlComplet = array();
             foreach ($allBlByOpeByDate as $key=>$item){
+
+                    $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                    $historiqueStat =[];
+                    for ($i=0; $i < count($histoStatut); $i++){
+
+                        $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                        $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
+                        $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                        $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+
+
+
+                    }
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
             }
 
@@ -2799,6 +2829,7 @@ class ProdController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $nbBlByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBlByOpeByDateDepot( $date, $idAppli);
+            dump($nbBlByFile);
             $bls = array();
             foreach ($nbBlByFile as $f=>$k){
                 array_push($bls,intval($k->getBl()->getNumbl()) ) ;
@@ -2819,7 +2850,8 @@ class ProdController extends Controller
             {
                 $filesBl[$bl['modexp']] = $bl[1];
             }
-
+            dump($syntheseArticles);
+            dump($filesBl);
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
 
         };
