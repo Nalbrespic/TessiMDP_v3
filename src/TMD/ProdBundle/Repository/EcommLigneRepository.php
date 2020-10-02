@@ -302,7 +302,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('bl.dateProduction')
             ->addSelect('bl.nColis')
             ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('tr.numCmdeClient')
+            ->groupBy('tr.expRef')
             ->getQuery()
             ->getArrayResult()
             ;
