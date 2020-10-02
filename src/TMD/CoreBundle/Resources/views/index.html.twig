@@ -1845,9 +1845,12 @@
                 '<td>statut livraison</td><td>Détails</td>{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td> Annuler la commande</td>{% endif %} </tr>';
 
             for (var i = 0; i < len; i++) {
-                var histoStatut = obj[i]['histoStatut'];
-                var lastStatut = histoStatut[histoStatut.length -1];
-                console.log('dernier statut: ', lastStatut);
+                if (obj[i]['histoStatut'] != undefined) {
+                    var histoStatut = obj[i]['histoStatut'];
+                    var lastStatut = histoStatut[histoStatut.length - 1];
+                    console.log('dernier statut: ', lastStatut);
+                }
+
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
                 if ( i > 15){
                     html+= 'style = "display: none;"';
@@ -1942,14 +1945,18 @@
                 {
                     html += '<td>' + obj[i]['modexp'] + '</td>';
                 }
-                console.log(lastStatut.idstatut);
-                if (lastStatut.idstatut == 1) {
-                    html+= '<td>' + lastStatut.observation + '</td>';
-                } else
-                {
-                    html+= '<td>' + lastStatut.statut + '</td>';
-                }
 
+                if (lastStatut != undefined) {
+                    console.log(lastStatut.idstatut);
+                    if (lastStatut.idstatut == 1) {
+                        html += '<td>' + lastStatut.observation + '</td>';
+                    } else {
+                        html += '<td>' + lastStatut.statut + '</td>';
+                    }
+                }
+                else {
+                    html += '<td>'+ obj[i]['trStatut']+'</td>';
+                }
 
                 if ( ( obj[i]['statut']['libelle']) === ""){
                     html += '<td>non communiqué</td>';

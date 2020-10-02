@@ -209,10 +209,10 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         var idope = document.getElementById('idOperation').textContent;
-        var max = new Date();
+        var toDay = new Date();
         // var m = max.getMonth()+1;
         // max.setMonth(m);
-        var thismonth = moment(max).format('YYYY-MM');
+        var thismonth = moment(toDay).format('YYYY-MM');
 
         console.log('mois en cours',thismonth);
         $.ajax({
