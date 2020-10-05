@@ -1152,6 +1152,7 @@
                         }
 
                     }
+                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
 
                 }
@@ -1169,6 +1170,7 @@
                         }
 
                     }
+                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
                 }
                 if (this.value === '3')
@@ -1179,9 +1181,12 @@
                         $('#trackSelect'.concat(i)).prop('checked', true);
                         listFileTracking.push($('#idFileTracking'.concat(i)).html())
                     }
+                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                    exporter(listFileTracking);
                 }
 
+                var html = ' <th colspan="4" style="text-align: center;">nombre de fichiers séléctionnés: '+ listFileTracking.length +'</th>';
+                $('#resultSelect').html(html);
 
             });
 
@@ -1291,6 +1296,7 @@
                 if ($(this).is(':checked')) {
                     listFileTracking.push($(this).val());
                     exporter(listFileTracking);
+                    console.log(listFileTracking.length)
                 } else {
 
                         for (var k =0 ; k < listFileTracking.length ; k++)
