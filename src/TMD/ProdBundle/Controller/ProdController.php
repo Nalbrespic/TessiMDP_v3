@@ -2927,7 +2927,7 @@ class ProdController extends Controller
              $trackingCprve = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByNumligne($numLigne);
              dump($trackingCprve);
              if ($trackingCprve == []){
-                 $statutLiv = ""
+                 $statutLiv = "";
              } else {
              $statutLiv = $trackingCprve[0]['libelle'];}
          } elseif ($tracking[0]['typeTransport'] == "DPD" OR $tracking[0]['typeTransport'] == "DPDPREDI" OR $tracking[0]['typeTransport'] == "DPDRELAIS" ){
