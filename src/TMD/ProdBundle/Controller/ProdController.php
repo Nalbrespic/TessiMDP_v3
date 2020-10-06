@@ -2926,10 +2926,16 @@ class ProdController extends Controller
          {
              $trackingCprve = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByNumligne($numLigne);
              dump($trackingCprve);
-             $statutLiv = $trackingCprve[0]['libelle'];
+             if ($trackingCprve == []){
+                 $statutLiv = ""
+             } else {
+             $statutLiv = $trackingCprve[0]['libelle'];}
          } elseif ($tracking[0]['typeTransport'] == "DPD" OR $tracking[0]['typeTransport'] == "DPDPREDI" OR $tracking[0]['typeTransport'] == "DPDRELAIS" ){
 
              $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByNumligne($numLigne);
+             if ( $trackingDpd == []){
+                $statutLiv = "";
+             }
              $statutLiv = $trackingDpd[0]['libelle'];
          } else {
              $statutLiv = "";
