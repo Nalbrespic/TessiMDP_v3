@@ -1,0 +1,113 @@
+{% extends '@TMDCore/index.html.twig' %}
+
+{% block title %}
+Gestion transports
+{% endblock %}
+
+{% block body %}
+<h3 style="text-align: center;"> Gestion des transporteurs</h3>
+    <div class="container">
+        <div class="row" style="display:flex; margin-top: 50px;">
+            <div class="col-md-4" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px;">
+                <h5>Liste des tarifs par transporteur</h5>
+                <table class="table" style="border: 1px grey solid">
+                    <thead>
+                        <tr>
+                            <th>transporteur</th>
+                            <th>tranche de poids</th>
+                            <th>zone d'envoi</th>
+                            <th>tarif public</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="col-md-4" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">
+                <h5>Liste de tarif clients</h5>
+                <table class="table" style="border: 1px grey solid">
+                    <thead>
+                    <tr>
+                        <th>CLient</th>
+                        <th>transporteur</th>
+                        <th>Tranche de poids</th>
+                        <th>tarif client</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="col-md-3" style="margin-right: 10px;">
+                <div style="text-align: center; margin-top: 50px">
+                    <button class="btn btn-primary btn-block" onclick="ajoutTarifTransport()">Ajouter un tarif transporteur</button>
+                    <button class="btn btn-default btn-block"  onclick="ajoutTarifClient()">Ajouter un tarif client</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalTransport" style="display: none">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeTransport" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Modal title</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>One fine body&hellip;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default closeTransport" data-dismiss="modal">annuler</button>
+                        <button type="button" class="btn btn-primary">Ajouter le tarif transporteur</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalTransportClient" style="display: none">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">>&times;</span></button>
+                        <h4 class="modal-title">Modal title</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>One fine body&hellip;</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default " data-dismiss="modal">annuler</button>
+                        <button type="button" class="btn btn-primary">Ajouter le tarif client</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    </div>
+
+{% endblock %}
+{% block javascriptsPlus %}
+    <script>
+
+        let modal = document.getElementById('modalTransportClient');
+        let span = document.getElementsByClassName("closeTransport")[0];
+        let span2 = document.getElementsByClassName("closeTransport")[1];
+        window.onclick = function(event) {
+            console.log(event.target);
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        span2.onclick = function(){
+            modal.style.display = "none";
+        }
+
+        function ajoutTarifTransport(){
+
+            let modalTransport = document.getElementById('modalTransport');
+            modalTransport.style.display = "block";
+            console.log('Jai cliqué sur le bouton !!!');
+
+        }
+    </script>
+{% endblock %}

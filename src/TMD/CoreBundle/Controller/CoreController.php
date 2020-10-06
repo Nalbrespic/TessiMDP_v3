@@ -241,4 +241,7 @@ class CoreController extends Controller
             return new JsonResponse(array($Bl));
         }
     }
+    public function transportsAction(){
+        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig');
+    }
 }

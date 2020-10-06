@@ -43,3 +43,8 @@ tmd_core_reimpressionEtikt:
     defaults:
         _controller: TMDCoreBundle:Core:reimpressionEtikt
     methods: [POST]
+
+tmd_prod_transports:
+    path: /transport
+    defaults:
+        _controller: TMDCoreBundle:Core:transports
