@@ -43,3 +43,33 @@ tmd_core_reimpressionEtikt:
     defaults:
         _controller: TMDCoreBundle:Core:reimpressionEtikt
     methods: [POST]
+
+tmd_prod_transports:
+    path: /transport
+    defaults:
+        _controller: TMDCoreBundle:Core:transports
+
+tmd_core_transportForm:
+    path: /transportForm
+    defaults:
+        _controller: TMDCoreBundle:Core:transportForm
+
+tmd_core_transportFormSuite:
+    path: /transportFormSuite
+    defaults:
+        _controller: TMDCoreBundle:Core:transportFormSuite
+
+tmd_core_savetarifTr:
+    path: /saveTarif/
+    defaults:
+        _controller: TMDCoreBundle:Core:savetarifTr
+
+tmd_core_searchTransport:
+    path: /searchTransport
+    defaults:
+        _controller: TMDCoreBundle:Core:searchTransport
+
+tmd_core_saveTransportMasse:
+    path: /saveTarifMasse
+    defaults:
+        _controller: TMDCoreBundle:Core:saveTransportMasse

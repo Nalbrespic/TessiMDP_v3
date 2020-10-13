@@ -7,12 +7,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use TMD\AppliBundle\TMDAppliBundle;
+use TMD\CoreBundle\Entity\TransporteursTarif;
+use TMD\CoreBundle\TMDCoreBundle;
 use TMD\ProdBundle\Entity\EcommArticles;
 use TMD\ProdBundle\Entity\EcommCmdep;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
 use TMD\ProdBundle\Entity\EcommLignes;
 use TMD\ProdBundle\Form\EcommLignesType;
 use TMD\ProdBundle\Form\EcommTrackingType;
+use TMD\ProdBundle\TMDProdBundle;
 
 class CoreController extends Controller
 {
@@ -240,5 +244,152 @@ class CoreController extends Controller
 
             return new JsonResponse(array($Bl));
         }
+    }
+    public function transportsAction(){
+
+        $em = $this->getDoctrine()->getManager();
+
+        $listTarifValide = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findAllValide();
+
+
+        dump($listTarifValide);
+
+        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+            'listTarif' => $listTarifValide
+        ));
+    }
+
+    public function transportFormAction(){
+        $em = $this->getDoctrine()->getManager();
+
+        $transporteurs = $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
+        dump($transporteurs);
+         $typesTransport= $em->getRepository('TMDAppliBundle:EcommTransport')->findallTransport();
+        dump($typesTransport);
+        return new JsonResponse(array($transporteurs,$typesTransport));
+    }
+
+    public function transportFormSuiteAction(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+        $idTransporteur = $request->get('idTransporteur');
+        dump($idTransporteur);
+        $typeTransport = $em->getRepository('TMDAppliBundle:EcommTransport')->findByTransporteur($idTransporteur);
+        $zones = $em->getRepository('TMDCoreBundle:TransporteursZones')->zonesByTransporteurs($idTransporteur);
+        $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+         dump($typeTransport);
+         dump($zones);
+         dump($tranche);
+        return new JsonResponse(array($typeTransport, $zones, $tranche));
+    }
+
+    public function searchTransportAction(Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $idTransporteur = $request->get('idTransporteur');
+        $idTransport = $request->get('idTransport');
+        $zones = $em->getRepository('TMDCoreBundle:TransporteursZones')->zonesByTransporteurs($idTransport);
+        $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+
+        dump($zones);
+        dump($tranche);
+        return new JsonResponse(array($zones, $tranche));
+    }
+
+    public function savetarifTrAction(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+        $this->em = $em;
+        $idtransporteur = $request->get('transporteur');
+        $transporteur= $em->getRepository('TMDAppliBundle:EcommTransporteurs')->find($idtransporteur);
+        $idtypeTransport = $request->get('typeTransport');
+        $typeTransport = $em->getRepository('TMDAppliBundle:EcommTransport')->find($idtypeTransport);
+        $idzone = (int)$request->get('zone');
+        $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($idzone);
+        $tarif = (float)$request->get('tarif');
+        $idtranche = $request->get('tranche');
+        $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($idtranche);
+        dump($transporteur);
+        dump($tranche);
+        dump($zone);
+        dump($tarif);
+        dump($typeTransport);
+        $message = 'ajout effectué avec succès';
+
+        $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idtransporteur, $idtranche,$idzone, $idtypeTransport);
+        dump($ancienTarif);
+        if ($ancienTarif != [])
+        {
+            foreach ($ancienTarif as $onetarif){
+                $onetarif->setValide(0);
+            }
+
+        }
+
+        $tarifTransporteur = new TransporteursTarif();
+        $tarifTransporteur->setTypeTransport($typeTransport);
+        $tarifTransporteur->setTransporteur($transporteur);
+        $tarifTransporteur->setIdTransportTranches($tranche);
+        $tarifTransporteur->setidZone($zone);
+        $tarifTransporteur->setTarif($tarif);
+        $tarifTransporteur->setDateUpdate(new DateTime());
+        $tarifTransporteur->setValide(1);
+        $this->em->persist($tarifTransporteur);
+        $this->em->flush();
+
+        return new JsonResponse($message);
+    }
+
+    public function saveTransportMasseAction(Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $this->em = $em;
+        $idTransporteur = $request->get('idTransporteur');
+        $transporteur= $em->getRepository('TMDAppliBundle:EcommTransporteurs')->find($idTransporteur);
+        $idTransport = $request->get('idTransport');
+        $transport = $em->getRepository('TMDAppliBundle:EcommTransport')->find($idTransport);
+        $zones = $request->get('zones');
+        $tranches = $request->get('tranches');
+        $tarifs = $request->get('tarifs');
+        $tarifsTranche = array_chunk($tarifs, count($zones));
+        dump($tarifsTranche);
+        dump($idTransporteur);
+        dump($idTransport);
+        dump($zones);
+        dump($tranches);
+        dump($tarifs);
+
+       for ($i = 0; $i < count($tranches); $i++){
+           for ($t =0; $t<count($zones);$t++){
+               $tranche= $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($tranches[$i]['idTransportTranches']);
+               $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($zones[$t]['idTransporteursZones']);
+                $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
+                dump($tranche);
+                dump($zone);
+                dump($ancienTarif);
+                if ($ancienTarif != [])
+                {
+                    foreach ($ancienTarif as $onetarif){
+                        $onetarif->setValide(0);
+                    }
+
+                }
+
+                $tarifsTransporteur = new TransporteursTarif();
+                $tarifsTransporteur->setTransporteur($transporteur);
+                $tarifsTransporteur->setTypeTransport($transport);
+                $tarifsTransporteur->setIdTransportTranches($tranche);
+                $tarifsTransporteur->setTarif($tarifsTranche[$i][$t]);
+                $tarifsTransporteur->setidZone($zone);
+                $tarifsTransporteur->setDateUpdate(new DateTime());
+                $tarifsTransporteur->setValide(1);
+                $this->em->persist($tarifsTransporteur);
+                $this->em->flush();
+            }
+            }
+
+
+
+
+        $message = 'opération effectuée avec succès';
+        return new JsonResponse($message);
     }
 }

@@ -2516,6 +2516,7 @@ class ProdController extends Controller
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($id);
             $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileArray($id);
             $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
+            dump($articlesPersos);
             $articleArray = array();
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;
@@ -2557,14 +2558,20 @@ class ProdController extends Controller
             foreach ($allBlByOpe as $key=>$item){
                 $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
                 $historiqueStat =[];
-                for ($i=0; $i < count($histoStatut); $i++){
 
+                for ($i=0; $i < count($histoStatut); $i++) {
+                    if ($histoStatut != []){
                     $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
                     $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
                     $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
                     $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
 
+                } else {
 
+                    $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+                    }
 
                 }
 
@@ -3013,4 +3020,6 @@ class ProdController extends Controller
 
         return new JsonResponse($bls);
     }
+
+
 }

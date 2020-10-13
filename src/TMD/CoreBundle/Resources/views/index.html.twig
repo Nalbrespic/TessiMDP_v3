@@ -175,6 +175,7 @@
                                         <li ><a style="padding-top: 13px;" href="http://tmdsws801/portail/interface_enregistrement/index.php" target="_blank">Suivi de production</a></li>
                                         {% if is_granted('ROLE_ADMIN') %}<li ><a href="{{ path('tmd_prod_addApplication') }}">Opération</a></li>{% endif %}
                                         <li><a href="http://tmdsws801/portail/fiche_de_suivi/modif.php" target="_blank" >Gérer ATC/fichiers</a></li>
+                                        {% if is_granted('ROLE_ATC') %} <li><a href="{{ path('tmd_prod_transports') }}">Gestion Transports</a></li>{% endif %}
                                         <li ><a href="http://tmdsws801/portail/completer_enregistrement/index.php" target="_blank">Saisie production</a></li>
                                         <li ><a href="http://tmdsws801/portail/contenants/contenants_index.php" target="_blank">Cartons</a></li>
                                         <li ><a href="http://tmdsws801/portail/doublons/doublons_index.php" target="_blank">Doublons</a></li>

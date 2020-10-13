@@ -21,4 +21,14 @@ class EcommTransporteurRepository extends EntityRepository
 
         ;
 }
+
+public function findByLibelle($libelle){
+        return $this
+            ->createQueryBuilder('t')
+            ->where('t.libelletransporteur IN (:libelle)')
+            ->setParameter('libelle', $libelle)
+            ->getQuery()
+            ->getResult()
+            ;
+}
 }

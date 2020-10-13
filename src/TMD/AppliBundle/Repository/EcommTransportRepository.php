@@ -19,9 +19,21 @@ class EcommTransportRepository extends EntityRepository
             ->innerJoin('n.idtransporteur', 'tr')
             ->addSelect('tr.idtransporteur')
             ->addSelect('tr.libelletransporteur')
+            ->addSelect('n.codetransport')
+            ->addSelect('n.libelletransport')
             ->getQuery()
             ->getArrayResult()
 
             ;
+    }
+
+    public function findByTransporteur($idTransporteur){
+        return $this
+            ->createQueryBuilder('t')
+            ->innerJoin('t.idtransporteur', 'tr')
+            ->where('tr.idtransporteur IN (:idtransporteur)')
+            ->setParameter('idtransporteur', $idTransporteur)
+            ->getQuery()
+            ->getArrayResult();
     }
 }

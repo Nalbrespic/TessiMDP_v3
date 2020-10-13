@@ -142,7 +142,6 @@ class EcommCmdepRepository extends EntityRepository
             ->setParameter('id', $files)
             ->andWhere('cmd.flagart = 0')
             ->select('ligne.idfile')
-            ->select('ligne.idfile')
             ->addSelect('cmd.libelle')
             ->addSelect('ligne.numbl')
             ->addSelect('count(cmd.perso1)')

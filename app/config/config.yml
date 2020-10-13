@@ -94,6 +94,7 @@ doctrine:
                 connection: default
                 mappings:
                     TMDAppliBundle:  ~
+                    TMDCoreBundle: ~
                     TMDProdBundle:  ~
                     TMDUserBundle:  ~
 #                    TMDCoriolisBundle: ~
