@@ -2486,6 +2486,7 @@ class ProdController extends Controller
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($id);
             $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileArray($id);
             $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
+            dump($articlesPersos);
             $articleArray = array();
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;

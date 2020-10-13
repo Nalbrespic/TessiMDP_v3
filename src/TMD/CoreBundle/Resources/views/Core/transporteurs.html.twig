@@ -8,21 +8,33 @@ Gestion transports
 <h3 style="text-align: center;"> Gestion des transporteurs</h3>
     <div class="container">
         <div class="row" style="display:flex; margin-top: 50px;">
-            <div class="col-md-4" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px;">
+            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px;">
                 <h5>Liste des tarifs par transporteur</h5>
                 <table class="table" style="border: 1px grey solid">
                     <thead>
                         <tr>
                             <th>transporteur</th>
+                            <th>Type d'envoi</th>
                             <th>tranche de poids</th>
                             <th>zone d'envoi</th>
                             <th>tarif public</th>
                         </tr>
                     </thead>
+                    <tbody>
+                    {% for tarif in listTarif  %}
+                        <tr>
+                            <td>{{ tarif.libelletransporteur }}</td>
+                            <td>{{ tarif.codetransport }}</td>
+                            <td> jusqu'à {{ tarif.poidsMax }} g</td>
+                            <td>{{ tarif.zone }}</td>
+                            <td>{{ tarif.tarif }} €</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
                 </table>
             </div>
 
-            <div class="col-md-4" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">
+            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">
                 <h5>Liste de tarif clients</h5>
                 <table class="table" style="border: 1px grey solid">
                     <thead>
@@ -37,25 +49,26 @@ Gestion transports
             </div>
             <div class="col-md-3" style="margin-right: 10px;">
                 <div style="text-align: center; margin-top: 50px">
+                    <button class="btn btn-success btn-block" onclick="ajoutMasse()">Ajouter une grille tarifaire</button>
                     <button class="btn btn-primary btn-block" onclick="ajoutTarifTransport()">Ajouter un tarif transporteur</button>
                     <button class="btn btn-default btn-block"  onclick="ajoutTarifClient()">Ajouter un tarif client</button>
                 </div>
             </div>
         </div>
 
-        <div class="modal fade" tabindex="-1" role="dialog" id="modalTransport" style="display: none">
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalTransport" style="display: none; ">
             <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="width: 800px;">
                     <div class="modal-header">
-                        <button type="button" class="close closeTransport" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Modal title</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeTransport()">&times;</span></button>
+                        <h4 class="modal-title">Ajouter un tarif transport</h4>
                     </div>
-                    <div class="modal-body">
-                        <p>One fine body&hellip;</p>
+                    <div class="modal-body" id="modalTransportContent">
+
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default closeTransport" data-dismiss="modal">annuler</button>
-                        <button type="button" class="btn btn-primary">Ajouter le tarif transporteur</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeTransport()">annuler</button>
+                        <button type="button" class="btn btn-primary" onclick="envoiAjout()">Ajouter le tarif transporteur</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -66,48 +79,383 @@ Gestion transports
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">>&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeClient()">&times;</span></button>
                         <h4 class="modal-title">Modal title</h4>
                     </div>
-                    <div class="modal-body">
-                        <p>One fine body&hellip;</p>
+                    <div class="modal-body" >
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default " data-dismiss="modal">annuler</button>
-                        <button type="button" class="btn btn-primary">Ajouter le tarif client</button>
+                        <button type="button" class="btn btn-primary" onclick="closeClient()">Ajouter le tarif client</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalMasseTransporteurs" style="display: none">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="width: 800px; top:150px">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeMasse()">&times;</span></button>
+                        <h4 class="modal-title">Ajout d'une grille tarifaire</h4>
 
+                    </div>
+                    <div class="modal-body" id="modalMasseTransporteursContent" >
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default " data-dismiss="modal" onclick="closeMasse()">annuler</button>
+                        <button type="button" class="btn btn-primary" onclick="saveTarifsMasse()">Ajouter les tarifs transporteur</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </div>
 
 {% endblock %}
 {% block javascriptsPlus %}
     <script>
 
-        let modal = document.getElementById('modalTransportClient');
-        let span = document.getElementsByClassName("closeTransport")[0];
-        let span2 = document.getElementsByClassName("closeTransport")[1];
-        window.onclick = function(event) {
-            console.log(event.target);
-            if (event.target === modal) {
-                modal.style.display = "none";
+    function closeTransport(){
+        let modal = document.getElementById('modalTransport')
+         modal.style.display = "none";
+    }
+    function closeMasse(){
+        let modal = document.getElementById('modalMasseTransporteurs')
+        modal.style.display = "none";
+    }
+ function closeClient(){
+        let modal= document.getElementById('modalTransportClient')
+     modal.style.display = "none"
+ }
+
+    function ajoutTarifTransport(){
+
+        let modalTransport = document.getElementById('modalTransport');
+        let modalTransportContent = document.getElementById('modalTransportContent');
+
+        $.ajax({
+            url: "{{ path('tmd_core_transportForm') }}",
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete: function (data) {
+                var json = data.responseText;
+                var obj = JSON.parse(json);
+                console.log('objet reçu: ', obj);
+                var transporteurs = obj[0];
+                console.log('les transporteurs: ', transporteurs)
+                console.log(transporteurs.length);
+
+
+                let html = '<form>' +
+                    '  <div class="form-row">' +
+                    '    <div class="form-group col-md-6" style="padding-left: 0px;">' +
+                    '      <label for="nameTransporteur">Transporteur</label>' +
+                    '      <select  class="form-control custom-select" id="nameTransporteur" onchange="ajoutNameTransporteur()">';
+                for (var i = 0; i < transporteurs.length; i++) {
+                    html += '<option value="' + transporteurs[i].idtransporteur + '">' + transporteurs[i].libelletransporteur + '</option>';
+                }
+                html += '</select></div>';
+                html += '    <div class="form-group col-md-6">' +
+                    '      <label for="inputTypeTransport">type Transport</label>' +
+                    '      <select class="form-control custom-select" id="inputTypeTransport">'
+                html += '   </select> </div>' +
+                    '  </div>' +
+                        '<div class="form-row">'+
+                        '  <div class="form-group col-md-6" style="padding-left: 0px;">' +
+                        '    <label for="zone">Zone de destination</label>' +
+                        '    <select class="form-control custom-select" id="zoneDest">' +
+                        '  </select></div>' +
+                    '   <div class="form-group col-md-6">' +
+                        '    <label for="tranche">Tranche de poids</label>' +
+                        '    <select class="form-control custom-select" id="tranche">' +
+                    '   </select></div>' +
+                        '</div>'+
+                    '  <div class="form-group">' +
+                    '    <label for="tarifPublic">Tarif Public</label>' +
+                    '    <input type="text" class="form-control" id="tarifPublic">' +
+                    '  </div>'
+
+
+
+                modalTransportContent.innerHTML = html;
+                modalTransport.style.display = "block";
             }
-        }
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-        span2.onclick = function(){
-            modal.style.display = "none";
+        })
+    }
+
+        function  ajoutNameTransporteur() {
+
+
+            let inputTransporteur = document.getElementById('nameTransporteur');
+            var selectType = document.getElementById('inputTypeTransport');
+            var idTransporteur = inputTransporteur.value;
+            var selectZone = document.getElementById('zoneDest');
+            var selectTranche = document.getElementById('tranche');
+            console.log('valeur de idTransport: ', idTransporteur)
+
+            $.ajax({
+                url: "{{ path('tmd_core_transportFormSuite') }}",
+                type: "POST",
+                data: {idTransporteur: idTransporteur},
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete(data) {
+
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    console.log('object reçu: ', obj)
+                   var typeTransportByTransporteur = obj[0];
+                    var zones = obj[1];
+                    var tranches = obj[2];
+                    var html ="";
+                    var html2 ="";
+                    var html3 ="";
+                    console.log('type filtré: ', typeTransportByTransporteur);
+                    console.log('zones: ', zones);
+                    typeTransportByTransporteur.forEach(function (type) {
+                       html += '<option value="'+type.idtransport+'">'+ type.libelletransport +'</option>';
+                    })
+                    zones.forEach(function (zone) {
+                        html2 += '<option value="'+zone.idTransporteursZones+'">'+zone.zone+'</option>';
+                    })
+
+                    for (var i=0; i < tranches.length; i++) {
+                        html3 += '<option value="'+ tranches[i].idTransportTranches+ '">'
+                        if (i==0){
+                            html3 += 'de 0 à '+ tranches[i].poidsMax +' g</option>'
+                        } else {
+                            var pre = i-1;
+
+                            html3 += 'de '+ tranches[pre].poidsMax +' à '+ tranches[i].poidsMax +' g</option>'
+                        }
+                    }
+                    selectType.innerHTML = html;
+                    selectZone.innerHTML = html2;
+                    selectTranche.innerHTML = html3;
+
+                }
+            })
         }
 
-        function ajoutTarifTransport(){
+        function envoiAjout() {
+            var transporteur = document.getElementById('nameTransporteur').value;
+            var typeTransport = document.getElementById('inputTypeTransport').value;
+            var zone = document.getElementById('zoneDest').value;
+            var tarif = document.getElementById('tarifPublic').value;
+            var tranche = document.getElementById('tranche').value;
+            console.log('transporteur: ', transporteur);
+            console.log('type de transport: ', typeTransport);
+            console.log('zone: ', zone);
+            console.log('tranche: ', tranche);
+            console.log('tarif: ', tarif);
 
-            let modalTransport = document.getElementById('modalTransport');
-            modalTransport.style.display = "block";
-            console.log('Jai cliqué sur le bouton !!!');
 
+            $.ajax({
+                url: "{{ path('tmd_core_savetarifTr') }}",
+                type: "POST",
+                data: {transporteur: transporteur, typeTransport: typeTransport, zone: zone, tarif:tarif, tranche:tranche},
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    console.log('object reçu: ', obj)
+                    document.location.href="{{ path('tmd_prod_transports') }}"
+                }
+            })
         }
+
+function ajoutMasse() {
+
+        var modalMasse = document.getElementById('modalMasseTransporteurs');
+        var modalContent  = document.getElementById('modalMasseTransporteursContent');
+
+
+        $.ajax({
+            url: "{{ path('tmd_core_transportForm') }}",
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete: function (data) {
+                var json = data.responseText;
+                var obj = JSON.parse(json);
+                console.log('objet reçu: ', obj);
+                var transporteurs = obj[0];
+                console.log('les transporteurs: ', transporteurs)
+                console.log(transporteurs.length);
+
+               let html = '<div class="alert alert-success" role="alert" id="divMessage" style="display: none;"><input id="inputGost" style="display: none"></div><form>'+
+                        '<div class="form-row">' +
+                        '<div class="form-group col-md-4" style="padding-left: 0px;">' +
+                        '<label for="nameTransporteur">Transporteur</label>' +
+                        '<select  class="form-control custom-select" id="idTransporteurMasses" onchange="ajoutNameTransporteurMasse()">';
+                        for (var i = 0; i < transporteurs.length; i++) {
+                        html += '<option value="' + transporteurs[i].idtransporteur + '">' + transporteurs[i].libelletransporteur + '</option>';
+                        }
+                        html += '</select></div>';
+                        html +='<div class="form-group col-md-4" style="padding-left: 0px;">' +
+                        '<label for="inputTypeTransportMasse">Type de Transport</label>' +
+                        '<select class="form-control custom-select" id="inputTypeTransportMasse" onchange="searchZones()">' +
+                        '</select> </div>'+
+                                '<label>' +
+                            '            <input  id="date-range"  name="dateValidity" size="40" value="" style="width: 160px;">période de validité' +
+                            '        </label>'
+
+                                '<div class="row"><table class="table" id="tableauTranches"></table></div>';
+
+                modalContent.innerHTML = html;
+                modalMasse.style.display="block";
+
+                $('input[name="dateValidity"]').datepicker("getDate");
+
+            }
+
+
+
+})
+}
+
+    function ajoutNameTransporteurMasse() {
+
+        var idTransporteur = document.getElementById('idTransporteurMasses').value
+        console.log(idTransporteur)
+        let selectType = document.getElementById('inputTypeTransportMasse')
+
+        let tableau = document.getElementById('tableauTranches')
+        $.ajax({
+            url: "{{ path('tmd_core_transportFormSuite') }}",
+            type: "POST",
+            data: {idTransporteur: idTransporteur},
+            dataType: "html",
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete(data) {
+
+                var json = data.responseText;
+                var obj = JSON.parse(json);
+                console.log('object reçu: ', obj)
+                var typeTransportByTransporteur = obj[0];
+                let html = "";
+                typeTransportByTransporteur.forEach(function (type) {
+                    html += '<option value="' + type.idtransport + '">' + type.codetransport + '</option>';
+                })
+
+                selectType.innerHTML = html;
+            }})}
+
+    function searchZones(){
+        let idTransporteur = document.getElementById('idTransporteurMasses').value
+        let idTransport = document.getElementById('inputTypeTransportMasse').value
+        let tableau = document.getElementById('tableauTranches')
+
+                $.ajax({
+                    url: "{{ path('tmd_core_searchTransport') }}",
+                    type: 'POST',
+                    data: {idTransporteur: idTransporteur, idTransport: idTransport},
+                    dataType: "html",
+                    contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                    complete(data) {
+
+                        var json = data.responseText;
+                        var obj = JSON.parse(json);
+                        console.log('object reçu: ', obj)
+                        var zones = obj[0];
+                        var tranches = obj[1];
+                        let html3 = "";
+
+                   html3 += '<thead><tr><th>Tranche de poids</th>';
+                        zones.forEach(function (zone) {
+                            html3 +='<th style="width: 50px">Tarif '+ zone.zone+'</th>';
+                        })
+                    html3 += '</tr></thead><tbody>';
+                for (let i=0; i< tranches.length; i++) {
+                    if (i == 0)
+                    {
+                    html3 += '<tr style="line-height: 12px"><td style="width: 50px"> de 0 à '+tranches[i].poidsMax+' g</td>'
+
+                    } else
+                    {
+                        html3 += '<tr><td style="width: 50px"> de '+tranches[i-1].poidsMax+' à '+tranches[i].poidsMax+' g</td>'
+                    }
+                        for (let t=0; t< zones.length; t++){
+                                html3 += '<td style="width: 80px"><input type="text" class="custom-control-input" id="selectTarif'+i+t+'" style="width: 50px" value='+i+5.5+t+'></td>'
+
+                     }
+                        html3 += '</tr>'
+                    }
+                     html3 += '</table>'
+
+
+
+                tableau.innerHTML = html3;
+
+            }
+        })
+
+
+}
+    function attribuerFocus()
+    {
+        document.getElementById('idTransporteurMasses').focus();
+    }
+
+function saveTarifsMasse() {
+
+    let idTransporteur = document.getElementById('idTransporteurMasses').value
+    let idTransport = document.getElementById('inputTypeTransportMasse').value
+    let divmessage = document.getElementById('divMessage')
+        $.ajax({
+            url: "{{ path('tmd_core_searchTransport') }}",
+            type: 'POST',
+            data: {idTransporteur: idTransporteur, idTransport: idTransport},
+            dataType: "html",
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete(data) {
+
+                var json = data.responseText;
+                var obj = JSON.parse(json);
+                console.log('object reçu: ', obj)
+                var zones = obj[0];
+                var tranches = obj[1];
+                var tarifs = [];
+                for (let i=0; i<tranches.length; i++) {
+                    if (zones.length == 0) {
+                        tarifs.push(document.getElementById('selectTarif' + i).value)
+                    } else {
+                        for (let t = 0; t < zones.length; t++) {
+                            tarifs.push(document.getElementById('selectTarif' + i + t).value)
+                        }
+                    }
+                }
+                $.ajax({
+                    url: "{{ path('tmd_core_saveTransportMasse') }}",
+                    type: 'POST',
+                    data: {
+                        idTransporteur: idTransporteur,
+                        idTransport: idTransport,
+                        zones: zones,
+                        tranches: tranches,
+                        tarifs: tarifs
+                    },
+                    dataType: "html",
+                    contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                    complete(data) {
+                        var json = data.responseText;
+                        var obj = JSON.parse(json);
+                        console.log('objet reçu :', obj)
+                        let message = "Ajout de la grille tarifaire effectué avec succès !"
+                        divmessage.innerText = message;
+                        attribuerFocus()
+
+                        divmessage.style.display = "block"
+                    }
+                })
+
+                console.log('mes tarifs enregistrés: ', tarifs);
+            }
+    })
+
+
+}
     </script>
 {% endblock %}
