@@ -12,6 +12,8 @@ class ClientRepository extends EntityRepository
         return $this
             ->createQueryBuilder('c')
             ->orderBy('c.nomclient', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
         ;
     }
 

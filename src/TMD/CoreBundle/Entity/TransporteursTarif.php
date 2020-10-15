@@ -71,15 +71,49 @@ class TransporteursTarif
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="dateUpdate", type="datetime")
+     * @ORM\Column(name="dateDebut_valide", type="date")
      */
-    private $dateUpdate;
+    private $dateDebut;
+
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="valide", type="integer", length=1)
+     * @return \DateTime
      */
-    private $valide;
+    public function getDateDebut(): \DateTime
+    {
+        return $this->dateDebut;
+    }
+
+    /**
+     * @param \DateTime $dateDebut
+     */
+    public function setDateDebut(\DateTime $dateDebut)
+    {
+        $this->dateDebut = $dateDebut;
+    }
+
+    /**
+     * @param boolean
+     *
+     * @ORM\Column(name="isValid", type="boolean")
+     */
+    private $isValid;
+
+    /**
+     * @return mixed
+     */
+    public function getIsValid()
+    {
+        return $this->isValid;
+    }
+
+    /**
+     * @param mixed $isValid
+     */
+    public function setIsValid($isValid)
+    {
+        $this->isValid = $isValid;
+    }
+
     /**
      * @var string
      *
@@ -177,37 +211,6 @@ class TransporteursTarif
         $this->tarif = $tarif;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getDateUpdate(): \DateTime
-    {
-        return $this->dateUpdate;
-    }
-
-    /**
-     * @param \DateTime $dateUpdate
-     */
-    public function setDateUpdate(\DateTime $dateUpdate)
-    {
-        $this->dateUpdate = $dateUpdate;
-    }
-
-    /**
-     * @return int
-     */
-    public function getValide(): int
-    {
-        return $this->valide;
-    }
-
-    /**
-     * @param int $valide
-     */
-    public function setValide(int $valide)
-    {
-        $this->valide = $valide;
-    }
 
     /**
      * @return string

@@ -2,6 +2,7 @@
 
 namespace TMD\CoreBundle\Repository;
 
+use DateTime;
 use Doctrine\ORM\EntityRepository;
 
 
@@ -23,13 +24,14 @@ class TransporteursTarifRepository extends EntityRepository
             ->setParameter('tranche', $tranche)
             ->andWhere('z.idTransporteursZones IN (:zone)')
             ->setParameter('zone', $zone)
-            ->andWhere('tt.valide IN (:valide)')
+            ->andWhere('tt.isValid IN (:valide)')
             ->setParameter('valide', 1)
             ->getQuery()
             ->getResult();
     }
 
     public function findAllValide(){
+        $date = new DateTime();
         return $this
             ->createQueryBuilder('tt')
             ->innerJoin('tt.transporteur', 'tr')
@@ -41,10 +43,10 @@ class TransporteursTarifRepository extends EntityRepository
             ->addSelect('type.codetransport')
             ->addSelect('tranche.poidsMax')
             ->addSelect('z.zone')
-            ->where('tt.valide IN (:valide)')
-            ->setParameter('valide', 1)
-            ->orderBy('tr.libelletransporteur', 'ASC')
-             ->getQuery()
+            ->where('tt.dateDebut <= (:date)')
+            ->setParameter('date', $date)
+            ->orderBy('tt.dateDebut', 'DESC')
+            ->getQuery()
             ->getArrayResult();
 
     }

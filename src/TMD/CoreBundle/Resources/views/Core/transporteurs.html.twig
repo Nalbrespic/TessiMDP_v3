@@ -8,50 +8,64 @@ Gestion transports
 <h3 style="text-align: center;"> Gestion des transporteurs</h3>
     <div class="container">
         <div class="row" style="display:flex; margin-top: 50px;">
-            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px;">
+            <div class="col-md-8" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px; ">
                 <h5>Liste des tarifs par transporteur</h5>
-                <table class="table" style="border: 1px grey solid">
-                    <thead>
-                        <tr>
-                            <th>transporteur</th>
-                            <th>Type d'envoi</th>
-                            <th>tranche de poids</th>
-                            <th>zone d'envoi</th>
-                            <th>tarif public</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for tarif in listTarif  %}
-                        <tr>
-                            <td>{{ tarif.libelletransporteur }}</td>
-                            <td>{{ tarif.codetransport }}</td>
-                            <td> jusqu'à {{ tarif.poidsMax }} g</td>
-                            <td>{{ tarif.zone }}</td>
-                            <td>{{ tarif.tarif }} €</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                       <label for="selectTransporteur">Transporteur</label>
+                        <select  class="form-control custom-select" id="selectTransporteur" onchange="selectTransporteur()">
+                            <option value="">trier par transporteur</option>
+                            {%  for transporteur in listTransporteurs %}
+                            <option value="{{ transporteur.idtransporteur }}">{{ transporteur.libelletransporteur }}</option>
+
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div style="overflow:auto;height: 400px">
+                    <table class="table" style="border: 1px grey solid;" id="tableTransporteursTarif">
+                        <thead>
+                            <tr>
+                                <th>transporteur</th>
+                                <th>Type d'envoi</th>
+                                <th>tranche de poids</th>
+                                <th>zone d'envoi</th>
+                                <th>tarif public</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for tarif in listTarif  %}
+                            <tr>
+                                <td>{{ tarif.libelletransporteur }}</td>
+                                <td>{{ tarif.codetransport }}</td>
+                                <td> jusqu'à {{ tarif.poidsMax }} g</td>
+                                <td>{{ tarif.zone }}</td>
+                                <td>{{ tarif.tarif }} €</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">
-                <h5>Liste de tarif clients</h5>
-                <table class="table" style="border: 1px grey solid">
-                    <thead>
-                    <tr>
-                        <th>CLient</th>
-                        <th>transporteur</th>
-                        <th>Tranche de poids</th>
-                        <th>tarif client</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
+{#            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">#}
+{#                <h5>Liste de tarif clients</h5>#}
+{#                <table class="table" style="border: 1px grey solid">#}
+{#                    <thead>#}
+{#                    <tr>#}
+{#                        <th>CLient</th>#}
+{#                        <th>transporteur</th>#}
+{#                        <th>Tranche de poids</th>#}
+{#                        <th>tarif client</th>#}
+{#                    </tr>#}
+{#                    </thead>#}
+{#                </table>#}
+{#            </div>#}
             <div class="col-md-3" style="margin-right: 10px;">
                 <div style="text-align: center; margin-top: 50px">
                     <button class="btn btn-success btn-block" onclick="ajoutMasse()">Ajouter une grille tarifaire</button>
                     <button class="btn btn-primary btn-block" onclick="ajoutTarifTransport()">Ajouter un tarif transporteur</button>
-                    <button class="btn btn-default btn-block"  onclick="ajoutTarifClient()">Ajouter un tarif client</button>
+                    <button class="btn btn-default btn-block"  onclick="AjoutTarifClient()">Ajouter un tarif client</button>
                 </div>
             </div>
         </div>
@@ -77,17 +91,17 @@ Gestion transports
 
         <div class="modal fade" tabindex="-1" role="dialog" id="modalTransportClient" style="display: none">
             <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="width: 800px">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeClient()">&times;</span></button>
-                        <h4 class="modal-title">Modal title</h4>
+                        <h4 class="modal-title">Ajouter un tarif client</h4>
                     </div>
-                    <div class="modal-body" >
+                    <div class="modal-body" id="modalClientContent">
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default " data-dismiss="modal">annuler</button>
-                        <button type="button" class="btn btn-primary" onclick="closeClient()">Ajouter le tarif client</button>
+                        <button type="button" class="btn btn-default " data-dismiss="modal"onclick="closeClient()">annuler</button>
+                        <button type="button" class="btn btn-primary" onclick="TarifClient()">Ajouter le tarif client</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -124,6 +138,8 @@ Gestion transports
     function closeMasse(){
         let modal = document.getElementById('modalMasseTransporteurs')
         modal.style.display = "none";
+        document.location.href="{{ path('tmd_prod_transports') }}"
+
     }
  function closeClient(){
         let modal= document.getElementById('modalTransportClient')
@@ -289,7 +305,9 @@ function ajoutMasse() {
                         '<div class="form-row">' +
                         '<div class="form-group col-md-4" style="padding-left: 0px;">' +
                         '<label for="nameTransporteur">Transporteur</label>' +
-                        '<select  class="form-control custom-select" id="idTransporteurMasses" onchange="ajoutNameTransporteurMasse()">';
+                        '<select  class="form-control custom-select" id="idTransporteurMasses" onchange="ajoutNameTransporteurMasse()">'+
+                        '<option>Sélectionner le transporteur</option>'
+
                         for (var i = 0; i < transporteurs.length; i++) {
                         html += '<option value="' + transporteurs[i].idtransporteur + '">' + transporteurs[i].libelletransporteur + '</option>';
                         }
@@ -298,16 +316,17 @@ function ajoutMasse() {
                         '<label for="inputTypeTransportMasse">Type de Transport</label>' +
                         '<select class="form-control custom-select" id="inputTypeTransportMasse" onchange="searchZones()">' +
                         '</select> </div>'+
-                                '<label>' +
-                            '            <input  id="date-range"  name="dateValidity" size="40" value="" style="width: 160px;">période de validité' +
-                            '        </label>'
-
+                                '<label for="date-rangeValidity">Période de validité</label>' +
+                            '            <input  class="form-control" id="date-rangeValidity" name="dateValidity" size="40" value="" style="width: 160px;">'+
                                 '<div class="row"><table class="table" id="tableauTranches"></table></div>';
 
                 modalContent.innerHTML = html;
                 modalMasse.style.display="block";
 
-                $('input[name="dateValidity"]').datepicker("getDate");
+                $('input[name="dateValidity"]').datepicker({
+                    language: 'fr-FR'
+
+                });
 
             }
 
@@ -326,7 +345,7 @@ function ajoutMasse() {
         $.ajax({
             url: "{{ path('tmd_core_transportFormSuite') }}",
             type: "POST",
-            data: {idTransporteur: idTransporteur},
+            data: {idtransporteur: idTransporteur},
             dataType: "html",
             contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
             complete(data) {
@@ -336,6 +355,7 @@ function ajoutMasse() {
                 console.log('object reçu: ', obj)
                 var typeTransportByTransporteur = obj[0];
                 let html = "";
+                html += '<option>Selectionner le type de transport</option>'
                 typeTransportByTransporteur.forEach(function (type) {
                     html += '<option value="' + type.idtransport + '">' + type.codetransport + '</option>';
                 })
@@ -347,6 +367,7 @@ function ajoutMasse() {
         let idTransporteur = document.getElementById('idTransporteurMasses').value
         let idTransport = document.getElementById('inputTypeTransportMasse').value
         let tableau = document.getElementById('tableauTranches')
+
 
                 $.ajax({
                     url: "{{ path('tmd_core_searchTransport') }}",
@@ -378,7 +399,8 @@ function ajoutMasse() {
                         html3 += '<tr><td style="width: 50px"> de '+tranches[i-1].poidsMax+' à '+tranches[i].poidsMax+' g</td>'
                     }
                         for (let t=0; t< zones.length; t++){
-                                html3 += '<td style="width: 80px"><input type="text" class="custom-control-input" id="selectTarif'+i+t+'" style="width: 50px" value='+i+5.5+t+'></td>'
+                            let valueTr = parseInt(i) * 1.25 +1
+                                html3 += '<td style="width: 80px"><input type="text" class="custom-control-input" id="selectTarif'+i+t+'" style="width: 50px" value='+valueTr+'></td>'
 
                      }
                         html3 += '</tr>'
@@ -403,7 +425,12 @@ function saveTarifsMasse() {
 
     let idTransporteur = document.getElementById('idTransporteurMasses').value
     let idTransport = document.getElementById('inputTypeTransportMasse').value
+    var date = document.getElementById('date-rangeValidity').value
+
+
+    console.log("dates saisies: ",date)
     let divmessage = document.getElementById('divMessage')
+
         $.ajax({
             url: "{{ path('tmd_core_searchTransport') }}",
             type: 'POST',
@@ -435,7 +462,8 @@ function saveTarifsMasse() {
                         idTransport: idTransport,
                         zones: zones,
                         tranches: tranches,
-                        tarifs: tarifs
+                        tarifs: tarifs,
+                        date: date
                     },
                     dataType: "html",
                     contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
@@ -454,8 +482,100 @@ function saveTarifsMasse() {
                 console.log('mes tarifs enregistrés: ', tarifs);
             }
     })
-
-
 }
+
+function AjoutTarifClient(){
+        var modalClient = document.getElementById('modalTransportClient');
+        var modalClientContent  = document.getElementById('modalClientContent');
+
+
+        $.ajax({
+            url: "{{ path('tmd_core_transportForm') }}",
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete: function (data) {
+                var json = data.responseText;
+                var obj = JSON.parse(json);
+                console.log('objet reçu: ', obj);
+                var transporteurs = obj[0];
+                console.log('les transporteurs: ', transporteurs)
+                console.log(transporteurs.length);
+                let html = ""
+                html += '<form><div class="form-row">'+
+                        '<div class="form-group col-md-6"><label for="nameTranspo">Transporteur</label><select id="idtransporteurClient" class="form-control custom-select" onchange="ajoutNameTransporteurClient()">'
+                html += '<option>Sélectionner le transporteur</option>'
+                transporteurs.forEach(function (transporteur) {
+                        html += '<option value="'+transporteur.idtransporteur+'">'+transporteur.libelletransporteur+'</otpion>'
+                })
+                html += '</select></div>'
+                html += '<div class="form-group col-md-6"><label for="nameType">Type de transport</label><select id="typetransportClient" class="form-control custom-select" onchange="ajoutTypeTransport()"></select></div></div>'
+                html += '<div class="form-row" id="suiteForm" style="display: block"></div></form>'
+
+                modalClientContent.innerHTML = html
+                modalClient.style.display = "block"
+            }
+        })}
+
+        function ajoutNameTransporteurClient() {
+
+         let transporteur = document.getElementById('idtransporteurClient').value
+         let selectType = document.getElementById('typetransportClient')
+            $.ajax({
+                url: "{{ path('tmd_core_transportFormSuite') }}",
+                type: 'GET',
+                data: {idTransporteur: transporteur},
+                dataType: 'html',
+                ContentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    let json = data.responseText
+                    let obj = JSON.parse(json)
+                    console.log('objet reçu: ',obj)
+                    let typeTransports = obj[0]
+                    let html = ""
+                    html += '<option>Sélectionner le type de transport</option>'
+                    typeTransports.forEach(function (type) {
+                        html += '<option value="'+type.idtransport+'">'+type.codetransport+'</option>'+
+                            '</div>'
+                    })
+                    selectType.innerHTML = html
+
+
+                }
+            })
+
+        }
+
+        function ajoutTypeTransport() {
+            let suitForm = document.getElementById('suiteForm')
+        $.ajax({
+            url: "{{ path('tmd_core_searchClients') }}",
+            type: 'POST',
+            dataType: 'html',
+            contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+            complete: function (data) {
+                let json = data.responseText
+
+                let obj = JSON.parse(json)
+                let clients = obj[0]
+                console.log('objet reçu: ', clients)
+                let html = '<div class="form-group col-md-6"><label for="client">Client</label><select class="form-control custom-select"><option>Selectionner le client</option>'
+                clients.forEach(function (client) {
+                    html += '<option value="'+client.idclient+'">'+client.nomclient+'</option>'
+                })
+                 html += '</select></div><div class="form-group col-md-6" style="margin-top: 25px;">\n' +
+                     '    <label class="sr-only" for="exampleInputAmount">Remise</label>\n' +
+                     '    <div class="input-group">\n' +
+                     '<div class="input-group-addon">$</div>'+
+                     '      <input type="text" class="form-control" id="exampleInputAmount" placeholder="Remise">\n' +
+                     '      <div class="input-group-addon">%</div>\n' +
+                     '    </div>\n'
+
+
+                suitForm.innerHTML = html
+
+            }
+        })
+
+        }
     </script>
 {% endblock %}

@@ -73,3 +73,8 @@ tmd_core_saveTransportMasse:
     path: /saveTarifMasse
     defaults:
         _controller: TMDCoreBundle:Core:saveTransportMasse
+
+tmd_core_searchClients:
+    path: /searchClients
+    defaults:
+        _controller: TMDCoreBundle:Core:searchClients
