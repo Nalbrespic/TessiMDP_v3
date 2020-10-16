@@ -252,13 +252,19 @@ class CoreController extends Controller
 
         $listTarifValide = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findAllValide();
         $transporteurs = $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
+        $listTarifClient = $em->getRepository('TMDCoreBundle:TransporteursTarifClient')->findbyDate();
+        $clients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
         dump($listTarifValide);
         dump($transporteurs);
+        dump($listTarifClient);
+        dump($clients);
 
         return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
             'listTarif' => $listTarifValide,
-            'listTransporteurs' => $transporteurs
+            'listTransporteurs' => $transporteurs,
+            'listTarifClient'=> $listTarifClient,
+            'clients'=>$clients
         ));
     }
 
