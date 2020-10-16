@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use TMD\AppliBundle\TMDAppliBundle;
 use TMD\CoreBundle\Entity\TransporteursTarif;
+use TMD\CoreBundle\Entity\TransporteursTarifClient;
 use TMD\CoreBundle\TMDCoreBundle;
 use TMD\ProdBundle\Entity\EcommArticles;
 use TMD\ProdBundle\Entity\EcommCmdep;
@@ -405,5 +406,30 @@ class CoreController extends Controller
         dump($listClients);
 
         return new JsonResponse(array($listClients));
+    }
+
+    public function saveTarifClientAction(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+        $this->em = $em;
+        $idtransporteur = $request->get('idtransporteur');
+        $idTypeTransport = $request->get('idTypeTransport');
+        $tranport = $em->getRepository('TMDAppliBundle:EcommTransport')->find($idTypeTransport);
+        $idClient = $request->get('idclient');
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
+        dump($client);
+        $remise = $request->get('remise');
+        $date = $request->get('date');
+        $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
+
+        $tarifClient = new TransporteursTarifClient();
+        $tarifClient->setIdTransport($tranport);
+        $tarifClient->setIdClient($client);
+        $tarifClient->setRemise($remise);
+        $tarifClient->setDateUpdate($dateFormat);
+        $this->em->persist($tarifClient);
+        $this->em->flush();
+        $message = 'opération effectuée avec succès';
+        return new JsonResponse($message);
     }
 }

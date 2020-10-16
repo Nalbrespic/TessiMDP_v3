@@ -8,20 +8,26 @@ Gestion transports
 <h3 style="text-align: center;"> Gestion des transporteurs</h3>
     <div class="container">
         <div class="row" style="display:flex; margin-top: 50px;">
-            <div class="col-md-8" style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px; ">
+            <div class="col-md-8">
+                <div>
+                    <div class="btn btn-success" onclick="ajoutMasse()">Ajouter une grille tarifaire</div>
+                    <div class="btn btn-primary" onclick="ajoutTarifTransport()">Ajouter une grille tarifaire</div>
+                </div>
+            <div  style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px; margin-top: 20px; padding: 15px">
                 <h5>Liste des tarifs par transporteur</h5>
                 <div class="row">
                     <div class="form-group col-md-4">
                        <label for="selectTransporteur">Transporteur</label>
                         <select  class="form-control custom-select" id="selectTransporteur" onchange="selectTransporteur()">
-                            <option value="">trier par transporteur</option>
+                            <option value="allTransporteur">trier par transporteur</option>
                             {%  for transporteur in listTransporteurs %}
-                            <option value="{{ transporteur.idtransporteur }}">{{ transporteur.libelletransporteur }}</option>
+                            <option value="{{ transporteur.libelletransporteur }}">{{ transporteur.libelletransporteur }}</option>
 
                         {% endfor %}
                         </select>
                     </div>
                 </div>
+
                 <div style="overflow:auto;height: 400px">
                     <table class="table" style="border: 1px grey solid;" id="tableTransporteursTarif">
                         <thead>
@@ -35,7 +41,7 @@ Gestion transports
                         </thead>
                         <tbody>
                         {% for tarif in listTarif  %}
-                            <tr>
+                            <tr id="lignesTarifs">
                                 <td>{{ tarif.libelletransporteur }}</td>
                                 <td>{{ tarif.codetransport }}</td>
                                 <td> jusqu'à {{ tarif.poidsMax }} g</td>
@@ -47,26 +53,24 @@ Gestion transports
                     </table>
                 </div>
             </div>
-
-{#            <div class="col-md-5" style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;">#}
-{#                <h5>Liste de tarif clients</h5>#}
-{#                <table class="table" style="border: 1px grey solid">#}
-{#                    <thead>#}
-{#                    <tr>#}
-{#                        <th>CLient</th>#}
-{#                        <th>transporteur</th>#}
-{#                        <th>Tranche de poids</th>#}
-{#                        <th>tarif client</th>#}
-{#                    </tr>#}
-{#                    </thead>#}
-{#                </table>#}
-{#            </div>#}
-            <div class="col-md-3" style="margin-right: 10px;">
-                <div style="text-align: center; margin-top: 50px">
-                    <button class="btn btn-success btn-block" onclick="ajoutMasse()">Ajouter une grille tarifaire</button>
-                    <button class="btn btn-primary btn-block" onclick="ajoutTarifTransport()">Ajouter un tarif transporteur</button>
-                    <button class="btn btn-default btn-block"  onclick="AjoutTarifClient()">Ajouter un tarif client</button>
-                </div>
+            </div>
+            <div class="col-md-4">
+            <div style="margin-right: 10px;">
+                <button class="btn btn-default"  onclick="AjoutTarifClient()">Ajouter un tarif client</button>
+            </div>
+            <div style=" border: grey 2px solid; border-radius: 15px;margin-right: 15px;margin-top: 20px">
+                <h5>Liste de tarif clients</h5>
+                <table class="table" style="border: 1px grey solid">
+                    <thead>
+                    <tr>
+                        <th>CLient</th>
+                        <th>transporteur</th>
+                        <th>Tranche de poids</th>
+                        <th>tarif client</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
             </div>
         </div>
 
@@ -101,7 +105,7 @@ Gestion transports
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default " data-dismiss="modal"onclick="closeClient()">annuler</button>
-                        <button type="button" class="btn btn-primary" onclick="TarifClient()">Ajouter le tarif client</button>
+                        <button type="button" class="btn btn-primary" onclick="saveTarifClient()">Ajouter le tarif client</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -316,9 +320,9 @@ function ajoutMasse() {
                         '<label for="inputTypeTransportMasse">Type de Transport</label>' +
                         '<select class="form-control custom-select" id="inputTypeTransportMasse" onchange="searchZones()">' +
                         '</select> </div>'+
-                                '<label for="date-rangeValidity">Période de validité</label>' +
+                            '<label for="date-rangeValidity">Période de validité</label>' +
                             '            <input  class="form-control" id="date-rangeValidity" name="dateValidity" size="40" value="" style="width: 160px;">'+
-                                '<div class="row"><table class="table" id="tableauTranches"></table></div>';
+                            '<div class="row"><table class="table" id="tableauTranches"></table></div>';
 
                 modalContent.innerHTML = html;
                 modalMasse.style.display="block";
@@ -558,24 +562,77 @@ function AjoutTarifClient(){
                 let obj = JSON.parse(json)
                 let clients = obj[0]
                 console.log('objet reçu: ', clients)
-                let html = '<div class="form-group col-md-6"><label for="client">Client</label><select class="form-control custom-select"><option>Selectionner le client</option>'
+                let html = '<div class="form-group col-md-4"><label for="client">Client</label><select class="form-control custom-select" id="selectClient"><option>Selectionner le client</option>'
                 clients.forEach(function (client) {
                     html += '<option value="'+client.idclient+'">'+client.nomclient+'</option>'
                 })
-                 html += '</select></div><div class="form-group col-md-6" style="margin-top: 25px;">\n' +
-                     '    <label class="sr-only" for="exampleInputAmount">Remise</label>\n' +
+                 html += '</select></div><div class="form-group col-md-4"><label for="date-rangeValidity">Date de validité</label>' +
+                   '            <input  class="form-control" id="date-rangeValidityClient" name="dateValidityClient" size="40">' +
+                   '</div> <div class="form-group col-md-4" style="margin-top: 25px;">' +
+                     '    <label class="sr-only" for="remise">Remise</label>\n' +
                      '    <div class="input-group">\n' +
-                     '<div class="input-group-addon">$</div>'+
-                     '      <input type="text" class="form-control" id="exampleInputAmount" placeholder="Remise">\n' +
+                     '<div class="input-group-addon">Remise de</div>'+
+                     '      <input type="text" class="form-control" id="remise">\n' +
                      '      <div class="input-group-addon">%</div>\n' +
                      '    </div>\n'
 
 
-                suitForm.innerHTML = html
 
+                suitForm.innerHTML = html
+                $('input[name="dateValidityClient"]').datepicker({
+                    language: 'fr-FR'
+
+                });
             }
         })
 
+        }
+
+        function saveTarifClient() {
+            let idtransporteur = document.getElementById('idtransporteurClient').value
+            let idTypeTransport = document.getElementById('typetransportClient').value
+            let idclient = document.getElementById('selectClient').value
+            let remise = document.getElementById('remise').value
+            let date = document.getElementById('date-rangeValidityClient').value
+
+            $.ajax({
+                url: "{{ path('tmd_core_saveTarifClient') }}",
+                type: 'POST',
+                data: {idtransporteur: idtransporteur, idTypeTransport: idTypeTransport, idclient: idclient, remise:remise, date: date},
+                dataType: 'hmtl',
+                ContentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    let json = data.responseText
+                    let obj = JSON.parse(json)
+                    let message = obj
+                    console.log(message)
+                }
+            })
+        }
+
+        function selectTransporteur() {
+            var input, filter, table, tr, textValue;
+            input = document.getElementById('selectTransporteur')
+            filter = input.value.toUpperCase()
+            table = document.getElementById('tableTransporteursTarif')
+            tr = table.getElementsByTagName('tr')
+            console.log(filter)
+            for (i=0; i< tr.length; i++){
+                let td = tr[i].getElementsByTagName('td')[0];
+                if (td){
+                    textValue = td.textContent || td.innerText;
+                    if (filter == "ALLTRANSPORTEUR"){
+                        tr[i].style.display= ""
+                    } else {
+                        if (textValue.toUpperCase().indexOf(filter)>-1){
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+
+                }
+            }
         }
     </script>
 {% endblock %}

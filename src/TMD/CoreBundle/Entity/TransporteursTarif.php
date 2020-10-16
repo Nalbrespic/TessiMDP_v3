@@ -92,9 +92,9 @@ class TransporteursTarif
     }
 
     /**
-     * @param boolean
+     * @param integer
      *
-     * @ORM\Column(name="isValid", type="boolean")
+     * @ORM\Column(name="isValid", type="integer", length=1, nullable=true)
      */
     private $isValid;
 
