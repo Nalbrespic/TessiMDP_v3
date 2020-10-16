@@ -348,6 +348,9 @@ table.coriolis tr td{
     border: 1px solid #504A62;
 }
 
+body.modal-open .datepicker{
+    z-index: 1200 !important;
+}
 svg {
 
 }

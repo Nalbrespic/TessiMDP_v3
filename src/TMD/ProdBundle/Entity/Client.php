@@ -108,7 +108,7 @@ class Client
 
     /**
      * @var integer
-     * @ORM\Column(name="idClientMinos", type="smallint", nullable=false)
+     * @ORM\Column(name="idClientMinos", type="smallint", nullable=true)
      */
     private $idclientminos;
 
