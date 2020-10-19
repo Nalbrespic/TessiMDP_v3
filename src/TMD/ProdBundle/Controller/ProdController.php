@@ -4,6 +4,9 @@ namespace TMD\ProdBundle\Controller;
 
 use DateTime;
 
+use Dompdf\Dompdf;
+
+use Dompdf\Options;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -733,6 +736,7 @@ class ProdController extends Controller
 
         $tabBlComplet2 = array();
         foreach ($tabBlComplet as $k=>$v){
+            dump($v);
             if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
                 $v['statut']['dateStatut'] = '';
             }else{
@@ -1985,6 +1989,7 @@ class ProdController extends Controller
             }
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
 
+
             foreach ($nbBlByFile as $bl)
             {
                 $filesBl[$bl['idfile']]['nbBl'] = $bl[1];
@@ -2074,6 +2079,15 @@ class ProdController extends Controller
             ));
             }
 
+            $date = date('Y-m-d');
+            $minusMonth = strtotime($date."- 1 months");
+            $lastmonth = date("Y-m", $minusMonth);
+            dump($lastmonth);
+            $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+            dump($bl);
+            $nbBl = count($bl);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
+            dump($typeTransport);
             $blretour = null;
 
             return $this->render('TMDProdBundle:Prod:suiviProd.html.twig', array(
@@ -3013,13 +3027,41 @@ class ProdController extends Controller
     public function SyntheseBlByDateProdAction(Request $request){
         $idope = $request->get('idope');
         $date = $request->get('date');
-
+dump($date);
         $em = $this->getDoctrine()->getManager();
         $bls= $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisBl($date, $idope);
+
         dump($bls);
 
         return new JsonResponse($bls);
     }
+
+    public function generate_pdfAction($idClient, $idOpe){
+
+        $em = $this->getDoctrine()->getManager();
+        $options = new Options();
+        $options->set('defaultFont', 'Roboto');
+
+        $dompdf = new Dompdf($options);
+
+        $date = date('Y-m-d');
+        $minusMonth = strtotime($date."- 1 months");
+        $lastmonth = date("Y-m", $minusMonth);
+        dump($lastmonth);
+        $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+        dump($bl);
+        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig');
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        return new Response($dompdf->stream("test", [
+            'Attachment'=> true
+        ]));
+
+
+    }
+
 
 
 }
