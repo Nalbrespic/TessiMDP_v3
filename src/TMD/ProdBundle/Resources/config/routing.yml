@@ -234,3 +234,8 @@ tmd_prod_pdftest:
     path: /pdftest/{idClient}/{idOpe}
     defaults:
         _controller: TMDProdBundle:Prod:generate_pdf
+
+tmd_prod_visupdftest:
+    path: /visu_pdftest/{idClient}/{idOpe}
+    defaults:
+        _controller: TMDProdBundle:Prod:testgenrate_pdf

@@ -1248,5 +1248,108 @@ class EcommBLRepository extends EntityRepository
             ->getResult()
             ;
     }
+    public function findBlbycodeTransporteur($idAppli, $DateProd, $codetransport)
+    {
+       return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idStatut', 'statut')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('statut.idStatut != (:st)')
+            ->andWhere('statut.idStatut != (:st2)')
+            ->setParameter('st', 9)
+            ->setParameter('st2', 10)
+            ->andWhere('bl.dateProduction LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->andwhere('bl.modexp IN (:code)')
+            ->setParameter("code", $codetransport)
+            ->select('bl.idbl')
+            ->addSelect('ligne.poids')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+    public function findcountBlByPoids($idAppli, $DateProd, $codetransport, $poids){
 
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idStatut', 'statut')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('statut.idStatut != (:st)')
+            ->andWhere('statut.idStatut != (:st2)')
+            ->setParameter('st', 9)
+            ->setParameter('st2', 10)
+            ->andWhere('bl.dateProduction LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->andwhere('bl.modexp IN (:code)')
+            ->setParameter("code", $codetransport)
+            ->andwhere('ligne.poids <= (:poids)')
+            ->setParameter('poids', $poids)
+            ->select ('count(bl.bl)')
+            ->getQuery()
+            ->getSingleScalarResult()
+            ;
+    }
+
+    public function findcountBlByTranche($idAppli, $DateProd, $codetransport, $poids1, $poids2){
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idStatut', 'statut')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('statut.idStatut != (:st)')
+            ->andWhere('statut.idStatut != (:st2)')
+            ->setParameter('st', 9)
+            ->setParameter('st2', 10)
+            ->andWhere('bl.dateProduction LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->andwhere('bl.modexp IN (:code)')
+            ->setParameter("code", $codetransport)
+            ->andwhere('ligne.poids > (:poids1)')
+            ->setParameter('poids1', $poids1)
+            ->andwhere('ligne.poids <= (:poids2)')
+            ->setParameter('poids2', $poids2)
+            ->select ('count(bl.bl)')
+            ->getQuery()
+            ->getSingleScalarResult()
+            ;
+     }
+     public function findCountBlByTransport($idAppli, $DateProd, $codetransport){
+
+         return $this
+             ->createQueryBuilder('bl')
+             ->leftJoin('bl.bl', 'ligne')
+             ->innerJoin('ligne.numligne', 'tr')
+             ->innerJoin('tr.idStatut', 'statut')
+             ->innerJoin('tr.idfile', 'file')
+             ->innerJoin('file.idappli', 'appli')
+             ->where('appli.idappli IN (:idapp)')
+             ->setParameter('idapp', $idAppli)
+             ->andWhere('statut.idStatut != (:st)')
+             ->andWhere('statut.idStatut != (:st2)')
+             ->setParameter('st', 9)
+             ->setParameter('st2', 10)
+             ->andWhere('bl.dateProduction LIKE :dat')
+             ->setParameter('dat', $DateProd.'%')
+             ->andwhere('bl.modexp IN (:code)')
+             ->setParameter("code", $codetransport)
+             ->select('count(bl.bl)')
+             ->getQuery()
+             ->getSingleScalarResult()
+             ;
+     }
 }
