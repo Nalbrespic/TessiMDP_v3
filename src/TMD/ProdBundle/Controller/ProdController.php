@@ -3028,7 +3028,8 @@ dump($date);
         return new JsonResponse($bls);
     }
 
-    public function generate_pdfAction($idClient, $idOpe){
+    public function generate_pdfAction($idClient, $idOpe, $choix)
+    {
 
         $em = $this->getDoctrine()->getManager();
         $options = new Options();
@@ -3036,13 +3037,83 @@ dump($date);
 
         $dompdf = new Dompdf($options);
 
-        $date = date('Y-m-d');
-        $minusMonth = strtotime($date."- 1 months");
+        $em = $this->getDoctrine()->getManager();
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
+        $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
+        dump($client);
+        dump($ope);
+        $date = date('Y-m');
+        $minusMonth = strtotime($date . "- 1 months");
         $lastmonth = date("Y-m", $minusMonth);
         dump($lastmonth);
-        $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
-        dump($bl);
-        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig');
+        if ($choix == 1) {
+            $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $date);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $date);
+            foreach ($typeTransport as $type) {
+                $nbrTypeTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $date, $type['typeTransport']);
+                $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $date, $type['typeTransport']);
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
+
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $date, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        } else {
+                            $minusI = $i - 1;
+
+                            $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $date, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        }
+
+
+                    }
+                }
+            }
+        } else {
+            $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
+            foreach ($typeTransport as $type) {
+                $nbrTypeTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $lastmonth, $type['typeTransport']);
+                $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $lastmonth, $type['typeTransport']);
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
+
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        } else {
+                            $minusI = $i - 1;
+
+                            $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        }
+
+
+                    }
+                }
+            }
+
+        }
+
+
+        setlocale(LC_TIME, "fr_FR", "French");
+        if ($choix == 1){
+            $dateFrench = strftime("%B %G", strtotime($date));
+        } else {
+            $dateFrench = strftime("%B %G", strtotime($lastmonth));
+        }
+        dump($dateFrench);
+        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig', array(
+            'typesTransport'=>$typeTransport,
+            'nbreTypeTransport' => $nbrTypeTransport,
+            'tranches' => $tranches,
+            'client' => $client,
+            'appli' => $ope,
+            'month' => $dateFrench,
+            'totalBl'=> count($listBl)
+        ));
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
@@ -3053,69 +3124,85 @@ dump($date);
 
 
     }
-    public function testgenrate_pdfAction($idClient, $idOpe){
+    public function testgenrate_pdfAction($idClient, $idOpe, $choix){
 
         $em = $this->getDoctrine()->getManager();
-        $date = date('Y-m-d');
-        $minusMonth = strtotime($date."- 2 months");
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
+        $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
+        dump($client);
+        dump($ope);
+        $date = date('Y-m');
+        $minusMonth = strtotime($date."- 1 months");
         $lastmonth = date("Y-m", $minusMonth);
         dump($lastmonth);
-        $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
-        dump($listBl);
-        $nbBl = count($listBl);
-        $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
-        dump($typeTransport);
-        foreach ($typeTransport as $type){
-            $nbrTypeTransport[$type['typeTransport']]=$em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $lastmonth, $type['typeTransport']);
-        }
+        if ($choix == 1){
+            $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $date);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $date);
+            foreach ($typeTransport as $type){
+                $nbrTypeTransport[$type['typeTransport']]=$em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $date, $type['typeTransport']);
+                $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $date, $type['typeTransport']);
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
 
-//        foreach ($listBl as $bl){
-//            switch ($bl['typeTransport']) {
-//                case "PRESS" :
-//                    $nbrTypeTransport['PRESS'] += 1;
-//                    break;
-//                case  "CPRVE":
-//                    $nbrTypeTransport['CPRVE'] += 1;
-//                    break;
-//                case "COLD":
-//                    $nbrTypeTransport['COLD'] += 1;
-//                    break;
-//                case "COLI":
-//                    $nbrTypeTransport['COLI'] +=1;
-//                    break;
-//            }
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']])>0 ) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
 
-//        }
-        foreach ($typeTransport as $type) {
-//               dump($type['typeTransport']);
-            $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $lastmonth, $type['typeTransport']);
-            $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
-            $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $date, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        } else {
+                            $minusI = $i-1;
 
-            if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']])>0 ) {
-                for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
+                            $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $date, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        }
 
-                    if ($i == 0) {
-                        $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
-                    } else {
-                        $minusI = $i-1;
 
-                        $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
                     }
+                }
+            }
+        } else {
+            $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
+            foreach ($typeTransport as $type){
+                $nbrTypeTransport[$type['typeTransport']]=$em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $lastmonth, $type['typeTransport']);
+                $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $lastmonth, $type['typeTransport']);
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']])>0 ) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
+
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        } else {
+                            $minusI = $i-1;
+
+                            $tranches[$type['typeTransport']][$i]['nombreBl']= $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $lastmonth, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        }
 
 
+                    }
                 }
             }
         }
+
+
         dump($tranches);
         dump($nbrTypeTransport);
-
+        setlocale(LC_TIME, "fr_FR", "French");
+        if ($choix == 1){
+            $dateFrench = strftime("%B %G", strtotime($date));
+        } else {
+            $dateFrench = strftime("%B %G", strtotime($lastmonth));
+        }
+        dump($dateFrench);
         return $this->render('TMDProdBundle:Prod:pdftest.html.twig', array(
+            'typesTransport'=>$typeTransport,
             'nbreTypeTransport' => $nbrTypeTransport,
             'tranches' => $tranches,
-            'client' => $idClient,
-            'Appli' => $idOpe,
-            'lastMont' => $lastmonth
+            'client' => $client,
+            'appli' => $ope,
+            'month' => $dateFrench,
+            'totalBl'=> count($listBl)
         ));
     }
 
