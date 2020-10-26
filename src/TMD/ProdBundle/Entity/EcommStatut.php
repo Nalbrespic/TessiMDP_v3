@@ -19,7 +19,7 @@ class EcommStatut
      *
      * @ORM\Column(name="idStatut", type="smallint")
      * @ORM\Id
-     *
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $idStatut;
 
