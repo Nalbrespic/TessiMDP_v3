@@ -38,6 +38,7 @@
 # other
 .env
 .idea/*
+/node_modules/
 
 # eclipse
 .buildpath

@@ -20,6 +20,7 @@ class TransporteursTrancheRepository extends EntityRepository
             ->createQueryBuilder('tr')
             ->where('tr.transporteur IN (:id)')
             ->setParameter('id', $idTransporteur)
+            ->orderBy('tr.poidsMax', 'ASC')
             ->getQuery()
             ->getArrayResult();
     }
