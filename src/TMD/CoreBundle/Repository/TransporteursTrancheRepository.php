@@ -21,6 +21,7 @@ class TransporteursTrancheRepository extends EntityRepository
             ->innerJoin('tr.transporteur', 'trans')
             ->where('trans.idtransporteur IN (:id)')
             ->setParameter('id', $idTransporteur)
+            ->orderBy('tr.poidsMax', 'ASC')
             ->getQuery()
             ->getArrayResult();
     }

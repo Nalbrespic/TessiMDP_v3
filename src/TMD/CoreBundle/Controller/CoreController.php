@@ -252,18 +252,17 @@ class CoreController extends Controller
 
         $listTarifValide = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findAllValide();
         $transporteurs = $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
-        $listTarifClient = $em->getRepository('TMDCoreBundle:TransporteursTarifClient')->findbyDate();
+
         $clients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
         dump($listTarifValide);
         dump($transporteurs);
-        dump($listTarifClient);
+
         dump($clients);
 
         return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
             'listTarif' => $listTarifValide,
             'listTransporteurs' => $transporteurs,
-            'listTarifClient'=> $listTarifClient,
             'clients'=>$clients
         ));
     }
@@ -275,13 +274,14 @@ class CoreController extends Controller
         dump($transporteurs);
          $typesTransport= $em->getRepository('TMDAppliBundle:EcommTransport')->findallTransport();
         dump($typesTransport);
-        return new JsonResponse(array($transporteurs,$typesTransport));
+        $listClients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
+        return new JsonResponse(array($transporteurs,$typesTransport, $listClients));
     }
 
     public function transportFormSuiteAction(Request $request){
 
         $em = $this->getDoctrine()->getManager();
-        $idTransporteur = $request->get('idTransporteur');
+        $idTransporteur = $request->get('idtransporteur');
         dump($idTransporteur);
         $typeTransport = $em->getRepository('TMDAppliBundle:EcommTransport')->findByTransporteur($idTransporteur);
         $zones = $em->getRepository('TMDCoreBundle:TransporteursZones')->zonesByTransporteurs($idTransporteur);
@@ -308,6 +308,8 @@ class CoreController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $this->em = $em;
+        $idclient = $request->get('client');
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idclient);
         $idtransporteur = $request->get('transporteur');
         $transporteur= $em->getRepository('TMDAppliBundle:EcommTransporteurs')->find($idtransporteur);
         $idtypeTransport = $request->get('typeTransport');
@@ -317,13 +319,17 @@ class CoreController extends Controller
         $tarif = (float)$request->get('tarif');
         $idtranche = $request->get('tranche');
         $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($idtranche);
+        $date = $request->get('date');
+        $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
+        dump($dateFormat);
+        dump($client);
         dump($transporteur);
         dump($tranche);
         dump($zone);
         dump($tarif);
         dump($typeTransport);
         $message = 'ajout effectué avec succès';
-        $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idtransporteur, $idtranche, $idzone, $idtypeTransport);
+        $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idclient,$idtransporteur, $idtranche, $idzone, $idtypeTransport);
         dump($ancienTarif);
         if ($ancienTarif != []){
             foreach ($ancienTarif as $tarif){
@@ -333,12 +339,13 @@ class CoreController extends Controller
 
 
         $tarifTransporteur = new TransporteursTarif();
+        $tarifTransporteur->setIdclient($client);
         $tarifTransporteur->setTypeTransport($typeTransport);
         $tarifTransporteur->setTransporteur($transporteur);
         $tarifTransporteur->setIdTransportTranches($tranche);
         $tarifTransporteur->setidZone($zone);
         $tarifTransporteur->setTarif($tarif);
-        $tarifTransporteur->setDateDebut();
+        $tarifTransporteur->setDateDebut($dateFormat);
         $tarifTransporteur->setIsValid(true);
         $this->em->persist($tarifTransporteur);
         $this->em->flush();
@@ -349,6 +356,8 @@ class CoreController extends Controller
     public function saveTransportMasseAction(Request $request){
         $em = $this->getDoctrine()->getManager();
         $this->em = $em;
+        $idClient = $request->get('client');
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
         $idTransporteur = $request->get('idTransporteur');
         $transporteur= $em->getRepository('TMDAppliBundle:EcommTransporteurs')->find($idTransporteur);
         $idTransport = $request->get('idTransport');
@@ -359,7 +368,7 @@ class CoreController extends Controller
         $tarifsTranche = array_chunk($tarifs, count($zones));
         $date = $request->get('date');
         $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
-
+        dump($client);
         dump($tarifsTranche);
         dump($idTransporteur);
         dump($idTransport);
@@ -372,7 +381,7 @@ class CoreController extends Controller
             for ($t =0; $t<count($zones);$t++){
                 $tranche= $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($tranches[$i]['idTransportTranches']);
                 $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($zones[$t]['idTransporteursZones']);
-                $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
+                $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idClient, $idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
                 dump($tranche);
                 dump($zone);
                 dump($ancienTarif);
@@ -384,17 +393,21 @@ class CoreController extends Controller
 
                 }
 
-
-                $tarifsTransporteur = new TransporteursTarif();
-                $tarifsTransporteur->setTransporteur($transporteur);
-                $tarifsTransporteur->setTypeTransport($transport);
-                $tarifsTransporteur->setIdTransportTranches($tranche);
-                $tarifsTransporteur->setTarif($tarifsTranche[$i][$t]);
-                $tarifsTransporteur->setidZone($zone);
-                $tarifsTransporteur->setDateDebut($dateFormat);
-                $tarifsTransporteur->getIsValid(true);
-                $this->em->persist($tarifsTransporteur);
-                $this->em->flush();
+                if ($tarifsTranche[$i][$t] != "") {
+                    $tarifsTransporteur = new TransporteursTarif();
+                    if ($client != "") {
+                        $tarifsTransporteur->setIdclient($client);
+                    }
+                    $tarifsTransporteur->setTransporteur($transporteur);
+                    $tarifsTransporteur->setTypeTransport($transport);
+                    $tarifsTransporteur->setIdTransportTranches($tranche);
+                    $tarifsTransporteur->setTarif($tarifsTranche[$i][$t]);
+                    $tarifsTransporteur->setidZone($zone);
+                    $tarifsTransporteur->setDateDebut($dateFormat);
+                    $tarifsTransporteur->getIsValid(true);
+                    $this->em->persist($tarifsTransporteur);
+                    $this->em->flush();
+                }
             }
             }
 
@@ -414,28 +427,5 @@ class CoreController extends Controller
         return new JsonResponse(array($listClients));
     }
 
-    public function saveTarifClientAction(Request $request){
 
-        $em = $this->getDoctrine()->getManager();
-        $this->em = $em;
-        $idtransporteur = $request->get('idtransporteur');
-        $idTypeTransport = $request->get('idTypeTransport');
-        $tranport = $em->getRepository('TMDAppliBundle:EcommTransport')->find($idTypeTransport);
-        $idClient = $request->get('idclient');
-        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
-        dump($client);
-        $remise = $request->get('remise');
-        $date = $request->get('date');
-        $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
-
-        $tarifClient = new TransporteursTarifClient();
-        $tarifClient->setIdTransport($tranport);
-        $tarifClient->setIdClient($client);
-        $tarifClient->setRemise($remise);
-        $tarifClient->setDateUpdate($dateFormat);
-        $this->em->persist($tarifClient);
-        $this->em->flush();
-        $message = 'opération effectuée avec succès';
-        return new JsonResponse($message);
-    }
 }

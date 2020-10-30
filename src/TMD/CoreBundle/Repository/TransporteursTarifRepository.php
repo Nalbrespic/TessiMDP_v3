@@ -8,15 +8,18 @@ use Doctrine\ORM\EntityRepository;
 
 class TransporteursTarifRepository extends EntityRepository
 {
-    public function findSame($transporteur, $tranche,$zone, $typeTransport){
+    public function findSame ($idclient, $transporteur, $tranche,$zone, $typeTransport){
 
         return $this
             ->createQueryBuilder('tt')
+            ->innerJoin('tt.idclient', 'cl')
             ->innerJoin('tt.transporteur', 'tr')
             ->innerJoin('tt.typeTransport', 'type')
             ->innerJoin('tt.idTransportTranches', 'tranche')
             ->innerJoin('tt.zone', 'z')
-            ->where('tr.idtransporteur IN (:transporteur)')
+            ->where('cl.idclient IN (:idclient)')
+            ->setParameter('idclient', $idclient)
+            ->andWhere('tr.idtransporteur IN (:transporteur)')
             ->setParameter('transporteur', $transporteur)
             ->andWhere('type.idtransport IN (:typetransport)')
             ->setParameter('typetransport', $typeTransport)
@@ -38,7 +41,10 @@ class TransporteursTarifRepository extends EntityRepository
             ->innerJoin('tt.typeTransport', 'type')
             ->innerJoin('tt.idTransportTranches', 'tranche')
             ->innerJoin('tt.zone', 'z')
+            ->innerJoin('tt.idclient', 'cl')
             ->select('tt.tarif')
+            ->addSelect('cl.idclient')
+            ->addSelect('cl.nomclient')
             ->addSelect('tr.libelletransporteur')
             ->addSelect('type.codetransport')
             ->addSelect('tranche.poidsMax')
@@ -46,6 +52,27 @@ class TransporteursTarifRepository extends EntityRepository
             ->where('tt.dateDebut <= (:date)')
             ->setParameter('date', $date)
             ->orderBy('tt.dateDebut', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+    }
+
+    public function findTarif($idclient,$typeTransport, $date, $idTranche ){
+
+        return $this
+            ->createQueryBuilder('tarif')
+            ->innerJoin('tarif.idclient', 'cl')
+            ->innerJoin('tarif.typeTransport', 'type')
+            ->where('cl.idclient IN (:idclient)')
+            ->setParameter('idclient', $idclient)
+            ->andWhere('type.idtransport IN (:idtype)')
+            ->setParameter('idtype', $typeTransport)
+            ->andWhere('tarif.dateDebut < (:date)')
+            ->setParameter('date', $date)
+            ->andWhere('tarif.isValid = 1')
+            ->andWhere('tarif.idTransportTranches = (:idtrancche)')
+            ->setParameter('idtrancche', $idTranche)
+            ->select('tarif.tarif')
             ->getQuery()
             ->getArrayResult();
 

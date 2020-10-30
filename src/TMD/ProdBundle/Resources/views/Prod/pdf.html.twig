@@ -63,13 +63,14 @@
                             <h4>Colis expédiés en {{ key }}</h4>
                             <table class="table table-striped table-condensed" style="margin: 10px; width: 150px">
                                 <tr>
-                                    <td style="font-weight: bold">Tranche de poids en g</td><td style="font-weight: bold">Commandes VPC</td><td style="font-weight: bold">Commandes PRIME</td>
+                                    <td style="font-weight: bold">Tranche de poids en g</td><td colspan="2" style="font-weight: bold">Commandes VPC</td><td colspan="2" style="font-weight: bold">Commandes PRIME</td>
                                 </tr>
+
                                 <tbody>
                                 {% for tr in tranches[key]  %}
                                     {% if (tr['PRIME']['nombreBl'] != 0) or (tr['VPC']['nombreBl'] != 0) %}
                                     <tr>
-                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['PRIME']['nombreBl'] }}</td>
+                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['VPC']['tarif'] }}</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>{{ tr['PRIME']['tarif'] }}</td>
                                     </tr>
                                     {% endif %}
                                 {% endfor %}
