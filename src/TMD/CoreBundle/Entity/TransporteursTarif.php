@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use TMD\AppliBundle\Entity\EcommTransport;
 use TMD\AppliBundle\Entity\EcommTransporteurs;
+use TMD\ProdBundle\Entity\Client;
 use Tms\Bundle\LogisticBundle\Entity\EcommTransporteur;
 
 /**
@@ -62,6 +63,33 @@ class TransporteursTarif
      * })
      */
     private $zone;
+
+    /**
+     * @var Client
+     *
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idclient", referencedColumnName="idClient", nullable=true)
+     * })
+     */
+    private $idclient;
+
+    /**
+     * @return Client
+     */
+    public function getIdclient(): Client
+    {
+        return $this->idclient;
+    }
+
+    /**
+     * @param Client $idclient
+     */
+    public function setIdclient(Client $idclient)
+    {
+        $this->idclient = $idclient;
+    }
+
     /**
      * @var float
      *
