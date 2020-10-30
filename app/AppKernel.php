@@ -27,15 +27,18 @@ class AppKernel extends Kernel
             new TMD\DpdBundle\TMDDpdBundle(),
             new TMD\AppliBundle\TMDAppliBundle(),
             new TMD\CoriolisBundle\TMDCoriolisBundle(),
-//            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
-//            new Tms\Bundle\RestBundle\TmsRestBundle(),
-//            new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
+
+            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
+            new Tms\Bundle\RestBundle\TmsRestBundle(),
+            new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
+
             new TMD\StatBundle\TMDStatBundle(),
             new CMEN\GoogleChartsBundle\CMENGoogleChartsBundle(),
             new TMD\MinosBundle\TMDMinosBundle(),
             new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
             new Symfony\Bundle\DebugBundle\DebugBundle(),
-            new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle()
+            new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle(),
+
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {

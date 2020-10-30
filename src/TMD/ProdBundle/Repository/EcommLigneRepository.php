@@ -121,7 +121,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
             ->addSelect('count(cmd.numbl) as nbCmd')
-//            ->addSelect('statut.idStatut')
+            ->addSelect('statut.idStatut')
             ->addSelect('statut.statut as trStatut')
             ->addSelect('tr.json')
             ->addSelect('bl.modexp')
@@ -302,7 +302,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('bl.dateProduction')
             ->addSelect('bl.nColis')
             ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('tr.numCmdeClient')
+            ->groupBy('tr.expRef')
             ->getQuery()
             ->getArrayResult()
             ;

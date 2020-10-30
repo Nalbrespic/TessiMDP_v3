@@ -114,7 +114,7 @@ doctrine:
 #                connection: minos
 #                mappings:
 #                    TMDMinosBundle: ~
-
+#
 ##Profiler
 #web_profiler:
 #    toolbar: true

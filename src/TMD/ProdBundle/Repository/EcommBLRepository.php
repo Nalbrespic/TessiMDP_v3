@@ -361,6 +361,7 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('idapp', $idAppli)
             ->andWhere('bl.dateProduction LIKE :dat')
             ->setParameter('dat', $DateProd.'%')
+            ->addSelect('bl.dateProduction')
             ->addSelect('tr.destinataire')
             ->addSelect('tr.destCp')
             ->addSelect('tr.typeTransport')
@@ -394,7 +395,24 @@ class EcommBLRepository extends EntityRepository
             ->getArrayResult()
             ;
     }
-
+    public function findTypeTransport($idAppli, $DateProd)
+    {
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('bl.dateProduction LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->select('tr.typeTransport')
+            ->distinct()
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
 
     public function findAllBlByDateDepotByAppli($idAppli, $DateProd)
     {

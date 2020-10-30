@@ -298,6 +298,7 @@
                             <li role="presentation"><a href="#resteProd" aria-controls="resteProd" role="tab" data-toggle="tab">Reste à produire</a></li>
                             <li role="presentation"><a href="#ruptureProd" aria-controls="ruptureProd" role="tab" data-toggle="tab">Articles en rupture</a></li>
                             <li role="presentation"><a href="{{ path('tmd_prod_pnd',  {'idClient': idClient, 'idOpe': idOperation}) }}" role="tab">PND</a></li>
+                            <li role="presentation"><a href="#transports" aria-controls="transport" role="tab" data-toggle="tab">Transports</a></li>
                         </ul>
 
                         <div class="tab-content" style="position: relative;">
@@ -306,7 +307,7 @@
                              </div>
 
 
-                                        <div role="tabpanel" class="tab-pane" id="resteProd" style="position: relative;width: 90%;">
+                             <div role="tabpanel" class="tab-pane" id="resteProd" style="position: relative;width: 90%;">
                                              {% set compt = 0 %}
                                              {% set compt1 = 0 %}
 
@@ -388,7 +389,7 @@
 
                                         </div>
 
-                                         <div role="tabpanel" class="tab-pane" id="ruptureProd" style="position: relative;width: 90%;">
+                            <div role="tabpanel" class="tab-pane" id="ruptureProd" style="position: relative;width: 90%;">
                                              {% set compt = 0 %}
                                              {% set compt1 = 0 %}
 
@@ -463,6 +464,9 @@
                                             </div>
 
                                         </div>
+                            <div role="tabpanel" class="tab-pane" id="transports" style="position: relative;width: 90%">
+                            {{ include('TMDProdBundle:Prod/include:extractionTransport-I.html.twig') }}
+</div>
 
 
 

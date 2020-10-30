@@ -4,6 +4,9 @@ namespace TMD\ProdBundle\Controller;
 
 use DateTime;
 
+use Dompdf\Dompdf;
+
+use Dompdf\Options;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -733,6 +736,7 @@ class ProdController extends Controller
 
         $tabBlComplet2 = array();
         foreach ($tabBlComplet as $k=>$v){
+            dump($v);
             if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
                 $v['statut']['dateStatut'] = '';
             }else{
@@ -1739,14 +1743,29 @@ class ProdController extends Controller
 
             $tabBlComplet = array();
             foreach ($allBlByOpeByDate as $key=>$item){
+                $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                $historiqueStat =[];
+                for ($i=0; $i < count($histoStatut); $i++){
+
+                    $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
+                    $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+
+
+
+                }
+
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
             }
 
@@ -1814,14 +1833,29 @@ class ProdController extends Controller
 
             $tabBlComplet = array();
             foreach ($allBlByOpeByDate as $key=>$item){
+
+                    $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                    $historiqueStat =[];
+                    for ($i=0; $i < count($histoStatut); $i++){
+
+                        $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                        $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
+                        $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                        $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+
+
+
+                    }
                 if (isset($statuts[$item['numbl']])){
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut'] = $statuts[$item['numbl']];
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
                 else{
                     $tabBlComplet[$key] = $item;
                     $tabBlComplet[$key]['statut']['libelle']="";
                     $tabBlComplet[$key]['statut']['dateStatut']="";
+                    $tabBlComplet[$key]['histoStatut'] = $historiqueStat;
                 }
             }
 
@@ -1955,6 +1989,7 @@ class ProdController extends Controller
             }
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
 
+
             foreach ($nbBlByFile as $bl)
             {
                 $filesBl[$bl['idfile']]['nbBl'] = $bl[1];
@@ -2044,6 +2079,15 @@ class ProdController extends Controller
             ));
             }
 
+            $date = date('Y-m-d');
+            $minusMonth = strtotime($date."- 1 months");
+            $lastmonth = date("Y-m", $minusMonth);
+            dump($lastmonth);
+            $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+            dump($bl);
+            $nbBl = count($bl);
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
+            dump($typeTransport);
             $blretour = null;
 
             return $this->render('TMDProdBundle:Prod:suiviProd.html.twig', array(
@@ -2528,14 +2572,20 @@ class ProdController extends Controller
             foreach ($allBlByOpe as $key=>$item){
                 $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
                 $historiqueStat =[];
-                for ($i=0; $i < count($histoStatut); $i++){
 
+                for ($i=0; $i < count($histoStatut); $i++) {
+                    if ($histoStatut != []){
                     $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
                     $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
                     $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
                     $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
 
+                } else {
 
+                    $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
+                    }
 
                 }
 
@@ -2800,6 +2850,7 @@ class ProdController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $nbBlByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBlByOpeByDateDepot( $date, $idAppli);
+            dump($nbBlByFile);
             $bls = array();
             foreach ($nbBlByFile as $f=>$k){
                 array_push($bls,intval($k->getBl()->getNumbl()) ) ;
@@ -2820,7 +2871,8 @@ class ProdController extends Controller
             {
                 $filesBl[$bl['modexp']] = $bl[1];
             }
-
+            dump($syntheseArticles);
+            dump($filesBl);
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
 
         };
@@ -2895,10 +2947,16 @@ class ProdController extends Controller
          {
              $trackingCprve = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByNumligne($numLigne);
              dump($trackingCprve);
-             $statutLiv = $trackingCprve[0]['libelle'];
+             if ($trackingCprve == []){
+                 $statutLiv = "";
+             } else {
+             $statutLiv = $trackingCprve[0]['libelle'];}
          } elseif ($tracking[0]['typeTransport'] == "DPD" OR $tracking[0]['typeTransport'] == "DPDPREDI" OR $tracking[0]['typeTransport'] == "DPDRELAIS" ){
 
              $trackingDpd = $emDpd->getRepository('TMDDpdBundle:Trackings')->findStatutByNumligne($numLigne);
+             if ( $trackingDpd == []){
+                $statutLiv = "";
+             }
              $statutLiv = $trackingDpd[0]['libelle'];
          } else {
              $statutLiv = "";
@@ -2969,13 +3027,41 @@ class ProdController extends Controller
     public function SyntheseBlByDateProdAction(Request $request){
         $idope = $request->get('idope');
         $date = $request->get('date');
-
+dump($date);
         $em = $this->getDoctrine()->getManager();
         $bls= $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisBl($date, $idope);
+
         dump($bls);
 
         return new JsonResponse($bls);
     }
+
+    public function generate_pdfAction($idClient, $idOpe){
+
+        $em = $this->getDoctrine()->getManager();
+        $options = new Options();
+        $options->set('defaultFont', 'Roboto');
+
+        $dompdf = new Dompdf($options);
+
+        $date = date('Y-m-d');
+        $minusMonth = strtotime($date."- 1 months");
+        $lastmonth = date("Y-m", $minusMonth);
+        dump($lastmonth);
+        $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
+        dump($bl);
+        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig');
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        return new Response($dompdf->stream("test", [
+            'Attachment'=> true
+        ]));
+
+
+    }
+
 
 
 }

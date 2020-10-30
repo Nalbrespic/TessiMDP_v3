@@ -1,0 +1,27 @@
+
+<h3>Etat des Transports</h3>
+
+{% dump(idClient) %}
+{% dump(OperationsByClient) %}
+
+<a href="{{ path('tmd_prod_pdftest', {'idClient': idClient, 'idOpe': idOperation}) }}">Test pdf</a>
+
+
+{% block Javascript %}
+
+<script>
+
+{#    function extractpdf() {#}
+{#        $.ajax({#}
+{#            url: "{{ path('tmd_prod_pdftest') }}",#}
+{#            ContentType: 'html',#}
+{#            complete: function (data) {#}
+{#                console.log("it's ok !")#}
+{#            }#}
+{#        })#}
+{#    }#}
+
+
+</script>
+
+{% endblock %}
