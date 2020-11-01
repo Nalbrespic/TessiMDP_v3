@@ -3030,7 +3030,7 @@ dump($date);
 
     public function generate_pdfAction($idClient, $idOpe, $choix)
     {
-        set_time_limit(30);
+
         $em = $this->getDoctrine()->getManager();
         $options = new Options();
         $options->set('defaultFont', 'Roboto');
@@ -3061,24 +3061,41 @@ dump($date);
             $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $thisdate, $type['typeTransport']);
             $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
             $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+            $tranches[$type['typeTransport']]['totalTarif']['VPC'] =0;
+            $tranches[$type['typeTransport']]['totalTarif']['PRIME'] =0;
             if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
-                for ($i = 0; $i < count($tranches[$type['typeTransport']]); $i++) {
+                for ($i = 0; $i < count($tranches[$type['typeTransport']])-1; $i++) {
                     if ($i == 0) {
                         $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
                         $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
-                        $tarif =$em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
-dump($tarif);
-//                        $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $;
+                        $tarifVPC =$em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+dump($tarifVPC);
+                        if ($tarifVPC != []){
+                            $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                        }
                         $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsPRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
-//                        $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = ($tranches[$type['typeTransport']][$i]['PRIME']['nombreBl']) * ($em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']));
+                        $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                        $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifPRIME !=[]){
+                        $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                        $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                        }
 
                     } else {
                         $minusI = $i - 1;
                         $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                        $tarifVPC =$em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifVPC != []){ $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                        }
                         $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranchePRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
-//                        $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = ($tranches[$type['typeTransport']][$i]['VPC']['nombreBl']) * ($em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']));
-//                        $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = ($tranches[$type['typeTransport']][$i]['PRIME']['nombreBl']) * ($em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']));
-
+                        $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                        $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifPRIME !=[]){
+                            $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];}
                     }
                 }
             }
@@ -3104,7 +3121,7 @@ dump($tranches);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        return new Response($dompdf->stream("Etat des Transports -".$dateFrench, [
+        return new Response($dompdf->stream("Etat des Transports - ".$dateFrench, [
             'Attachment'=> true
         ]));
 

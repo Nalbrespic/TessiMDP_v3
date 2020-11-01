@@ -388,7 +388,7 @@ class CoreController extends Controller
                 if ($ancienTarif != [])
                 {
                     foreach ($ancienTarif as $onetarif){
-                        $onetarif->setValide(false);
+                        $onetarif->setIsValid(false);
                     }
 
                 }
@@ -404,7 +404,7 @@ class CoreController extends Controller
                     $tarifsTransporteur->setTarif($tarifsTranche[$i][$t]);
                     $tarifsTransporteur->setidZone($zone);
                     $tarifsTransporteur->setDateDebut($dateFormat);
-                    $tarifsTransporteur->getIsValid(true);
+                    $tarifsTransporteur->setIsValid(true);
                     $this->em->persist($tarifsTransporteur);
                     $this->em->flush();
                 }
