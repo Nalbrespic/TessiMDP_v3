@@ -1436,18 +1436,18 @@ $type = 'VPC';
             ->setParameter('idapp', $idAppli)
             ->andWhere('bl.dateProduction LIKE :dat')
             ->setParameter('dat', $DateProd.'%')
-            ->addSelect('bl.dateProduction')
             ->andWhere('statut.idStatut != 9')
             ->andWhere('statut.idStatut != 10')
-            ->andWhere('tr.typeTransport = (:typetransport)')
+            ->andWhere('tr.typeTransport IN (:typetransport)')
             ->setParameter('typetransport', $typetransport)
+            ->addSelect('bl.dateProduction')
             ->addSelect('tr.typeTransport')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.destPays')
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('sum(cmd.quantite) as quantite')
-
-            ->getQuery()->getArrayResult()
+            ->getQuery()
+            ->getArrayResult()
         ;
 
 

@@ -3155,7 +3155,7 @@ dump($tranches);
         dump($typeTransport);
         foreach ($typeTransport as $type) {
 
-            $listBl[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppliByTransport($idClient, $thisdate,$type['typeTransport']);
+            $listBl[$type['typeTransport']][] = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppliByTransport($idOpe, $thisdate,$type['typeTransport']);
         }
         dump($listBl);
 //        $allBl =[];
