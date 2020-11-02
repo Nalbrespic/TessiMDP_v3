@@ -9,26 +9,25 @@
     {% endblock %}
     <style>
         @page {
-            margin:50px 0 25px 0;
+            margin:50px 50px 25px 50px;
             font-size: 12px;
         }
-        .col-25{
-            /*width: 25%;*/
-            float: left;
-        }
+        /*.col-25{*/
+        /*    !*width: 25%;*!*/
+        /*    float: left;*/
+        /*}*/
         h4{text-align: center}
         .row{display: flex; flex-wrap: wrap;margin-top: 30px; width: 100%;}
         tbody:before, tbody:after { display: none; }
         td{text-align: center; font-size: 10px; line-height: 12px;border-bottom: 1px solid #000;margin-right: 5px  }
-        #tableau2{margin-left: 20px;}
-        #divTableaux{margin-left: 50px}
+        /*#tableau2{margin-left: 20px;}*/
+        /*#divTableaux{margin-left: 50px}*/
         /*table{border: 1px solid black}*/
 
     </style>
 </head>
 {%  block body %}
-
-    <div style="font-family: 'Roboto', sans-serif;">
+        <div style="font-family: 'Roboto', sans-serif;">
         <div class="container">
             <div class="blockTitle" style="text-align: center">
                 <h2 style="font-size: 24px">Etat des Transports {{ month }}</h2>
@@ -38,7 +37,7 @@
             <div class="row" style="display: flex; justify-content: center; ">
                 <div class="col-md-8" id="tableau1" style="width: 300px; margin: auto;border: 1px solid black; border-radius: 15px; ">
                     <h4>Colis selon le mode de Transport</h4>
-                    <table style="font-size: 12px;padding: 10px; margin-left: 10px" >
+                    <table style="font-size: 12px;padding: 10px; margin-left: 10px; width: 270px" >
                         <tr style="font-weight: bold;">
                             <td>Type de transport</td>
                             <td>Nombre de commandes</td>
@@ -55,18 +54,19 @@
                     </table>
                 </div>
             </div>
-            <div class="row" id="divTableaux" style="margin-top: 30px;">
+                <div  id="divTableaux" style="margin: 10px auto 0 auto; display: block; width: 100%;text-align: center;">
                 {% for key, value in tranches %}
+
                     {% if tranches[key]|length > 2 %}
 
-                        <div class="col-25" id="tableau2" style="width:250px; border: 1px solid black; border-radius: 15px;">
+                        <div class="col-25" id="tableau2" style="width:700px; border: 1px solid black; border-radius: 15px;margin-bottom: 100px">
                             <h4>Colis expédiés en {{ key }}</h4>
-                            <table class="table table-striped table-condensed" style="margin: 10px; width: 230px">
+                            <table class="table table-striped table-condensed" style="margin: 10px; width: 680px">
                                 <tr>
                                     <td style="font-weight: bold">Tranche de poids en g</td><td colspan="2" style="font-weight: bold">Commandes VPC</td><td colspan="2" style="font-weight: bold">Commandes PRIME</td>
                                 </tr>
                                 <tr>
-                                    <td></td><td style="font-weight: bold; font-style: italic">nbre colis</td><td style="font-weight: bold; font-style: italic">montant en €</td><td style="font-weight: bold; font-style: italic">nbre colis</td><td style="font-weight: bold; font-style: italic" >tarif en €</td>
+                                    <td></td><td style="font-weight: bold; font-style: italic">nbre colis</td><td style="font-weight: bold; font-style: italic">montant en €</td><td style="font-weight: bold; font-style: italic">nbre colis</td><td style="font-weight: bold; font-style: italic" >montant en €</td>
                                 </tr>
 
                                 <tbody>
@@ -89,6 +89,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                     {% endif %}
                 {% endfor %}
             </div>

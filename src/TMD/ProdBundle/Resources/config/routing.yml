@@ -236,6 +236,6 @@ tmd_prod_pdftest:
         _controller: TMDProdBundle:Prod:generate_pdf
 
 tmd_prod_visupdftest:
-    path: /visu_pdftest/{idClient}/{idOpe}
+    path: /visu_pdftest/{idClient}/{idOpe}/{choix}
     defaults:
         _controller: TMDProdBundle:Prod:testgenrate_pdf

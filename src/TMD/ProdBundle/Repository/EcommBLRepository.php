@@ -347,9 +347,9 @@ class EcommBLRepository extends EntityRepository
     }
 
 
-    public function findAllBlByDateProdByAppli($idAppli, $DateProd)
+    public function findAllBlByDateProdByAppli($idAppli, $DateProd, $mode = false)
     {
-        return $this
+        $result  = $this
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
             ->innerJoin('ligne.numligne', 'tr')
@@ -363,8 +363,13 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('dat', $DateProd.'%')
             ->addSelect('bl.dateProduction')
             ->addSelect('tr.destinataire')
-            ->addSelect('tr.destCp')
-            ->addSelect('tr.typeTransport')
+            ->addSelect('tr.destCp');
+
+        if ($mode) {
+            $result->andWhere('statut.idStatut != 9')
+                ->andWhere('statut.idStatut != 10');
+        }
+           $result->addSelect('tr.typeTransport')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.numCmdeClient')
             ->addSelect('tr.destRue')
@@ -391,9 +396,10 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('statut.statut as trStatut ')
             ->orderBy('tr.dateInsert', 'DESC')
             ->groupBy('ligne.numbl')
-            ->getQuery()
-            ->getArrayResult()
             ;
+
+
+           return $result->getQuery()->getArrayResult();
     }
     public function findTypeTransport($idAppli, $DateProd)
     {
@@ -1415,4 +1421,36 @@ $type = 'VPC';
              ->getSingleScalarResult()
              ;
      }
+
+    public function findAllBlByDateProdByAppliByTransport($idAppli, $DateProd, $typetransport)
+    {
+       return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idStatut', 'statut')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->where('appli.idappli IN (:idapp)')
+            ->setParameter('idapp', $idAppli)
+            ->andWhere('bl.dateProduction LIKE :dat')
+            ->setParameter('dat', $DateProd.'%')
+            ->addSelect('bl.dateProduction')
+            ->andWhere('statut.idStatut != 9')
+            ->andWhere('statut.idStatut != 10')
+            ->andWhere('tr.typeTransport = (:typetransport)')
+            ->setParameter('typetransport', $typetransport)
+            ->addSelect('tr.typeTransport')
+            ->addSelect('ligne.numbl')
+            ->addSelect('tr.destPays')
+            ->addSelect('ligne.poids as poidsReel')
+            ->addSelect('sum(cmd.quantite) as quantite')
+
+            ->getQuery()->getArrayResult()
+        ;
+
+
+
+    }
 }

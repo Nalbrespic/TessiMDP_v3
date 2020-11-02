@@ -41,4 +41,18 @@ class TransporteursTrancheRepository extends EntityRepository
             ->getResult()
             ;
     }
+
+    public function findTranche($idtransporteur,$poids){
+
+        return $this
+            ->createQueryBuilder('tr')
+            ->innerJoin('tr.transporteur', 'trans')
+            ->where('trans.idtransporteur = (:id)')
+            ->setParameter('id', $idtransporteur)
+            ->andWhere('tr.poidsMax >= (:poids)')
+            ->setParameter('poids', $poids)
+            ->select('Min(tr.poidsMax)')
+           ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
