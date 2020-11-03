@@ -4,6 +4,8 @@ namespace TMD\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use TMD\AppliBundle\Entity\EcommTransport;
+use TMD\AppliBundle\Entity\EcommTransporteurs;
 
 /**
  * TransporteursTranche
@@ -24,9 +26,12 @@ class TransporteursTranche
     private $idTransportTranches;
 
     /**
-     * @var integer
+     * @var EcommTransporteurs
      *
-     * @ORM\Column(name="idTransporteur", type="integer", length=6, nullable=false)
+     * @ORM\ManyToOne(targetEntity="TMD\AppliBundle\Entity\EcommTransporteurs")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idtransporteur", referencedColumnName="idTransporteur", nullable=false)
+     * })
      */
     private $transporteur;
 
@@ -61,17 +66,17 @@ class TransporteursTranche
     }
 
     /**
-     * @return int
+     * @return EcommTransporteurs
      */
-    public function getTransporteur(): int
+    public function getTransporteur()
     {
         return $this->transporteur;
     }
 
     /**
-     * @param int $transporteur
+     * @param EcommTransporteurs $transporteur
      */
-    public function setTransporteur(int $transporteur)
+    public function setTransport($transporteur)
     {
         $this->transporteur = $transporteur;
     }

@@ -2,26 +2,20 @@
 <h3>Etat des Transports</h3>
 
 {% dump(idClient) %}
-{% dump(OperationsByClient) %}
+{% dump(idOperation) %}
+<div>
+    <h4 style="margin-top: 20px">Extraction sous forme pdf des statistiques des moyens de transport utilisés</h4>
 
-<a href="{{ path('tmd_prod_pdftest', {'idClient': idClient, 'idOpe': idOperation}) }}">Test pdf</a>
+    <div style="display: flex; margin-top: 20px">
+        <a href="{{ path('tmd_prod_pdftest', {'idClient': idClient, 'idOpe': idOperation, 'choix': 1}) }}" style="font-size: 18px; margin-left:30px; margin-right: 30px">Mois en cours</a>
 
+        <a href="{{ path('tmd_prod_pdftest', {'idClient': idClient, 'idOpe': idOperation, 'choix': 2}) }}" style="font-size:18px">Mois précédent</a>
 
-{% block Javascript %}
-
-<script>
-
-{#    function extractpdf() {#}
-{#        $.ajax({#}
-{#            url: "{{ path('tmd_prod_pdftest') }}",#}
-{#            ContentType: 'html',#}
-{#            complete: function (data) {#}
-{#                console.log("it's ok !")#}
-{#            }#}
-{#        })#}
-{#    }#}
+    </div>
 
 
-</script>
+</div>
 
-{% endblock %}
+
+
+

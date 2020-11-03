@@ -231,6 +231,11 @@ tmd_prod_donneSyntheseBlByDateProd:
         _controller: TMDProdBundle:Prod:SyntheseBlByDateProd
 
 tmd_prod_pdftest:
-    path: /pdftest/{idClient}/{idOpe}
+    path: /pdftest/{idClient}/{idOpe}/{choix}
     defaults:
         _controller: TMDProdBundle:Prod:generate_pdf
+
+tmd_prod_visupdftest:
+    path: /visu_pdftest/{idClient}/{idOpe}/{choix}
+    defaults:
+        _controller: TMDProdBundle:Prod:testgenrate_pdf

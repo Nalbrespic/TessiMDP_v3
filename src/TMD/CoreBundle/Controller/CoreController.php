@@ -388,21 +388,23 @@ class CoreController extends Controller
                 if ($ancienTarif != [])
                 {
                     foreach ($ancienTarif as $onetarif){
-                        $onetarif->setValide(false);
+                        $onetarif->setIsValid(false);
                     }
 
                 }
 
                 if ($tarifsTranche[$i][$t] != "") {
                     $tarifsTransporteur = new TransporteursTarif();
-                    $tarifsTransporteur->setIdclient($client);
+                    if ($client != "") {
+                        $tarifsTransporteur->setIdclient($client);
+                    }
                     $tarifsTransporteur->setTransporteur($transporteur);
                     $tarifsTransporteur->setTypeTransport($transport);
                     $tarifsTransporteur->setIdTransportTranches($tranche);
                     $tarifsTransporteur->setTarif($tarifsTranche[$i][$t]);
                     $tarifsTransporteur->setidZone($zone);
                     $tarifsTransporteur->setDateDebut($dateFormat);
-                    $tarifsTransporteur->getIsValid(true);
+                    $tarifsTransporteur->setIsValid(true);
                     $this->em->persist($tarifsTransporteur);
                     $this->em->flush();
                 }

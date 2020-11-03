@@ -28,7 +28,8 @@ public function findByLibelle($libelle){
             ->where('t.libelletransporteur IN (:libelle)')
             ->setParameter('libelle', $libelle)
             ->getQuery()
-            ->getResult()
+            ->getArrayResult()
             ;
 }
+
 }

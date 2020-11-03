@@ -36,4 +36,16 @@ class EcommTransportRepository extends EntityRepository
             ->getQuery()
             ->getArrayResult();
     }
+
+    public function findByCodeTransport($codeTransport){
+        return $this
+            ->createQueryBuilder('type')
+            ->innerJoin('type.idtransporteur', 'trans')
+            ->where('type.codetransport IN (:code)')
+            ->setParameter('code', $codeTransport)
+            ->select('trans.idtransporteur')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

@@ -2079,15 +2079,7 @@ class ProdController extends Controller
             ));
             }
 
-            $date = date('Y-m-d');
-            $minusMonth = strtotime($date."- 1 months");
-            $lastmonth = date("Y-m", $minusMonth);
-            dump($lastmonth);
-            $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
-            dump($bl);
-            $nbBl = count($bl);
-            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $lastmonth);
-            dump($typeTransport);
+
             $blretour = null;
 
             return $this->render('TMDProdBundle:Prod:suiviProd.html.twig', array(
@@ -3036,7 +3028,8 @@ dump($date);
         return new JsonResponse($bls);
     }
 
-    public function generate_pdfAction($idClient, $idOpe){
+    public function generate_pdfAction($idClient, $idOpe, $choix)
+    {
 
         $em = $this->getDoctrine()->getManager();
         $options = new Options();
@@ -3044,22 +3037,175 @@ dump($date);
 
         $dompdf = new Dompdf($options);
 
-        $date = date('Y-m-d');
-        $minusMonth = strtotime($date."- 1 months");
+        $em = $this->getDoctrine()->getManager();
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
+        $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
+        dump($client);
+        dump($ope);
+        $date = date('Y-m');
+        $minusMonth = strtotime($date . "- 2 months");
         $lastmonth = date("Y-m", $minusMonth);
         dump($lastmonth);
-        $bl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $lastmonth);
-        dump($bl);
-        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig');
+        $tranches=[];
+        if ($choix == 1) {
+            $thisdate = $date;
+        } else {
+            $thisdate = $lastmonth;
+        }
+        $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $thisdate);
+        $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $thisdate);
+        dump($typeTransport);
+        $nbrTypeTransport =[];
+        foreach ($typeTransport as $type) {
+            $nbrTypeTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransport($idOpe, $thisdate, $type['typeTransport']);
+            $blTransport[$type['typeTransport']] = $em->getRepository('TMDProdBundle:EcommBl')->findBlbycodeTransporteur($idOpe, $thisdate, $type['typeTransport']);
+            $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+            $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+            $tranches[$type['typeTransport']]['totalTarif']['VPC'] =0;
+            $tranches[$type['typeTransport']]['totalTarif']['PRIME'] =0;
+            if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
+                for ($i = 0; $i < count($tranches[$type['typeTransport']])-1; $i++) {
+                    if ($i == 0) {
+                        $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                        $tarifVPC =$em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+dump($tarifVPC);
+                        if ($tarifVPC != []){
+                            $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                        }
+                        $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsPRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                        $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifPRIME !=[]){
+                        $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                        $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                        }
+
+                    } else {
+                        $minusI = $i - 1;
+                        $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                        $tarifVPC =$em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifVPC != []){ $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                        }
+                        $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranchePRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                        $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                        $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                        if ($tarifPRIME !=[]){
+                            $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                            $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];}
+                    }
+                }
+            }
+        }
+
+        
+        setlocale(LC_TIME, "fr_FR", "French");
+
+        $dateFrench = strftime("%B %G", strtotime($thisdate));
+
+dump($tranches);
+        dump($dateFrench);
+        $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig', array(
+            'typesTransport'=>$typeTransport,
+            'nbreTypeTransport' => $nbrTypeTransport,
+            'tranches' => $tranches,
+            'client' => $client,
+            'appli' => $ope,
+            'month' => $dateFrench,
+            'totalBl'=> count($listBl)
+        ));
 
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        return new Response($dompdf->stream("test", [
+        return new Response($dompdf->stream("Etat des Transports - ".$dateFrench, [
             'Attachment'=> true
         ]));
 
 
+    }
+    public function testgenrate_pdfAction($idClient, $idOpe, $choix){
+
+        $em = $this->getDoctrine()->getManager();
+        $options = new Options();
+        $options->set('defaultFont', 'Roboto');
+
+
+
+        $em = $this->getDoctrine()->getManager();
+        $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
+        $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
+        dump($client);
+        dump($ope);
+        $date = date('Y-m');
+        $minusMonth = strtotime($date . "- 2 months");
+        $lastmonth = date("Y-m", $minusMonth);
+        dump($lastmonth);
+        $tranches=[];
+        if ($choix == 1) {
+            $thisdate = $date;
+        } else {
+            $thisdate = $lastmonth;
+        }
+
+        $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $thisdate);
+        dump($typeTransport);
+        foreach ($typeTransport as $type) {
+
+            $listBl[$type['typeTransport']][] = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppliByTransport($idOpe, $thisdate,$type['typeTransport']);
+        }
+        dump($listBl);
+//        $allBl =[];
+//        for ($i=0; $i<count($listBl); $i++){
+//
+//            $allBl[$i]['dateProduction'] = $listBl[$i]['dateProduction'];
+//            $allBl[$i]['numbl'] = $listBl[$i]['numbl'];
+//            $allBl[$i]['typeTransport'] = $listBl[$i]['typeTransport'];
+//            $allBl[$i]['destPays'] = $listBl[$i]['destPays'];
+//            $allBl[$i]['poidsReel'] = $listBl[$i]['poidsReel'];
+//            $allBl[$i]['quantite'] = $listBl[$i]['quantite'];
+//            if ($listBl[$i]['quantite'] >= 4 or $listBl[$i]['poidsReel'] > 1000) {
+//
+//                $allBl[$i]['emballage']['type'] = 'C3';
+//                $allBl[$i]['emballage']['poids'] = 500;
+//            } elseif ($listBl[$i]['poidsReel'] <= 1000 and $listBl[$i]['poidsReel'] > 500  ){
+//                $allBl[$i]['emballage']['type'] = 'C2';
+//                $allBl[$i]['emballage']['poids'] = 300;
+//            } elseif ($listBl[$i]['poidsReel'] <= 500 and $listBl[$i]['poidsReel'] > 300){
+//                $allBl[$i]['emballage']['type'] = 'C1';
+//                $allBl[$i]['emballage']['poids'] = 150;
+//            } else {
+//                $allBl[$i]['emballage']['type'] = 'pochette';
+//                $allBl[$i]['emballage']['poids'] = 100;
+//            }
+//
+//        }
+//        for ($i=0;$i<count($allBl); $i++){
+//        if ($listBl[$i]['typeTransport'] != 'PRESS') {
+//            $idtransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($allBl[$i]['typeTransport']);
+//
+//            $poids = $allBl[$i]['poidsReel'] + $allBl[$i]['emballage']['poids'];
+//            $allBl[$i]['tranche'] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findTranche($idtransporteur[0]['idtransporteur'], $poids);
+//        }}
+        setlocale(LC_TIME, "fr_FR", "French");
+//        dump($allBl);
+//        dump($allBl[0]);
+
+
+        $dateFrench = strftime("%B %G", strtotime($thisdate));
+
+        return $this->render('TMDProdBundle:Prod:pdftest.html.twig', array(
+            'typesTransport'=>$typeTransport,
+//            'nbreTypeTransport' => $nbrTypeTransport,
+            'tranches' => $tranches,
+            'client' => $client,
+            'appli' => $ope,
+            'month' => $dateFrench,
+            'totalBl'=> count($listBl)
+        ));
     }
 
 
