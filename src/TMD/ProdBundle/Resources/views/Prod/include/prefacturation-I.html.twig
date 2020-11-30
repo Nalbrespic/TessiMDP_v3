@@ -1,0 +1,9 @@
+
+<h4>Choix de la période de préfacturation</h4>
+<div style="display: flex; margin-top: 20px">
+    <a href="{{ path('tmd_prod_prefacturation', {'idClient': idClient, 'idOpe': idOperation, 'choix': 1}) }}" ><button class="btn boutonsPrefact" style="font-size: 14px">Préfacturation mois en cours</button></a>
+
+
+    <a href="{{ path('tmd_prod_prefacturation', {'idClient': idClient, 'idOpe': idOperation, 'choix': 2}) }}" ><button class="btn boutonsPrefact" style="font-size: 14px">Préfacturation mois précédent</button></a>
+
+</div>
