@@ -1009,8 +1009,12 @@ class ProdController extends Controller
             }
 
             $tabJson = json_decode($v['json'], true);
-            if (isset($tabJson['TYPE'])) $type = $tabJson['TYPE'];
-//            var_dump($tabJson);
+            if (isset($tabJson['TYPE'])){
+                $type = $tabJson['TYPE'];
+            }else{
+                $type = "";
+            }
+
             array_push($tabBlComplet2,[date_format($v['dateFile'], "d-m-Y"),
                 $v['numbl'],
                 $v['refclient'],
