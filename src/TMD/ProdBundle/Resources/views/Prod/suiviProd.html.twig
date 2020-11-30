@@ -162,6 +162,7 @@
                                     <li role="presentation"><a href="#recherche" aria-controls="recherche" role="tab" data-toggle="tab">Recherche</a></li>
                                     {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}<li role="presentation" id="ongletProdModif"><a href="#modif" class="nav-link active" aria-controls="modif" role="tab" data-toggle="tab">Modifications</a></li>{% endif %}
                                     {% if is_granted('ROLE_ADMIN') %}<li role="presentation"><a href="#rgpd"  aria-controls="rgpd" role="tab" data-toggle="tab">RGPD</a></li>{% endif %}
+                                    {% if is_granted('ROLE_ATC') %}<li role="presentation"><a href="#prefacturation" aria-controls="prefacturation" data-toggle="tab">Préfacturation</a> </li>{% endif%}
                                 </ul>
 
                                 <!-- Tab panes -->
@@ -298,7 +299,7 @@
                             <li role="presentation"><a href="#resteProd" aria-controls="resteProd" role="tab" data-toggle="tab">Reste à produire</a></li>
                             <li role="presentation"><a href="#ruptureProd" aria-controls="ruptureProd" role="tab" data-toggle="tab">Articles en rupture</a></li>
                             <li role="presentation"><a href="{{ path('tmd_prod_pnd',  {'idClient': idClient, 'idOpe': idOperation}) }}" role="tab">PND</a></li>
-                            <li role="presentation"><a href="#transports" aria-controls="transport" role="tab" data-toggle="tab">Transports</a></li>
+
                         </ul>
 
                         <div class="tab-content" style="position: relative;">
@@ -464,9 +465,7 @@
                                             </div>
 
                                         </div>
-                            <div role="tabpanel" class="tab-pane" id="transports" style="position: relative;width: 90%">
-                            {{ include('TMDProdBundle:Prod/include:extractionTransport-I.html.twig') }}
-</div>
+
 
 
 
@@ -493,7 +492,11 @@
 
                                     </div>
 
+                                    <div role="tabpanel" class="tab-pane"  id="prefacturation">
 
+                                        {{ include('TMDProdBundle:Prod/include:prefacturation-I.html.twig') }}
+
+                                    </div>
 
 
                                 </div>

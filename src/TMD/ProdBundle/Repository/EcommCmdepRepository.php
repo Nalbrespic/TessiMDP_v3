@@ -375,5 +375,53 @@ class EcommCmdepRepository extends EntityRepository
             ;
     }
 
-
+    public function FindArticlesByOpeByDate($idOpe, $thisdate, $type)
+    {
+        $query = $this->_em->createQuery(' SELECT sum(cmd.quantite) FROM TMDProdBundle:EcommCmdep cmd
+                                                INNER JOIN TMDProdBundle:EcommBL bl
+                                                WITH cmd.numbl = bl.bl
+                                                INNER JOIN TMDProdBundle:EcommLignes ligne
+                                                WITH cmd.numbl = ligne.numbl
+                                                INNER JOIN TMDProdBundle:EcommTracking tr
+                                                WITH ligne.numligne = tr.numligne
+                                                INNER JOIN TMDProdBundle:EcommStatut st
+                                                WITH tr.idStatut = st.idStatut
+                                                INNER JOIN TMDProdBundle:EcommFiles file
+                                                WITH tr.idfile = file.idfile
+                                                INNER JOIN TMDProdBundle:EcommAppli ap
+                                                WITH file.idappli = ap.idappli
+                                                WHERE ap.idappli ='.$idOpe.'
+                                                    and st.idStatut != 9
+                                                    and st.idStatut !=10
+                                                    and bl.dateProduction LIKE '."'".$thisdate.'%'."'".'
+                                                    and tr.json LIKE '."'".'%'.$type.'%'."'".'
+                                                    and cmd.flagart !=1
+        ');
+        $result = $query->getSingleScalarResult();
+        return $result;
+    }
+    public function FindArticlesByOpeByDateNoType($idOpe, $thisdate)
+    {
+        $query = $this->_em->createQuery(' SELECT sum(cmd.quantite) FROM TMDProdBundle:EcommCmdep cmd
+                                                INNER JOIN TMDProdBundle:EcommBL bl
+                                                WITH cmd.numbl = bl.bl
+                                                INNER JOIN TMDProdBundle:EcommLignes ligne
+                                                WITH cmd.numbl = ligne.numbl
+                                                INNER JOIN TMDProdBundle:EcommTracking tr
+                                                WITH ligne.numligne = tr.numligne
+                                                INNER JOIN TMDProdBundle:EcommStatut st
+                                                WITH tr.idStatut = st.idStatut
+                                                INNER JOIN TMDProdBundle:EcommFiles file
+                                                WITH tr.idfile = file.idfile
+                                                INNER JOIN TMDProdBundle:EcommAppli ap
+                                                WITH file.idappli = ap.idappli
+                                                WHERE ap.idappli ='.$idOpe.'
+                                                    and st.idStatut != 9
+                                                    and st.idStatut !=10
+                                                   and bl.dateProduction LIKE '."'".$thisdate.'%'."'".'
+                                                    and cmd.flagart !=1
+        ');
+        $result = $query->getSingleScalarResult();
+        return $result;
+    }
 }
