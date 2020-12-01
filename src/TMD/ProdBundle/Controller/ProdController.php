@@ -3214,7 +3214,7 @@ dump($date);
         } else {
             $thisdate = $lastmonth;
         }
-        $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $thisdate);
+        $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $thisdate, true);
 
         if ($idClient == 713) {
             $colis['Enveloppe PRESS']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "ENVPRS");

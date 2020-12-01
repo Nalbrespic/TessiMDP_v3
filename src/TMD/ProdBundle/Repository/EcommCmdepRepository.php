@@ -393,7 +393,7 @@ class EcommCmdepRepository extends EntityRepository
                                                 WHERE ap.idappli ='.$idOpe.'
                                                     and st.idStatut != 9
                                                     and st.idStatut !=10
-                                                    and bl.dateProduction LIKE '."'".$thisdate.'%'."'".'
+                                                    and tr.dateDepot LIKE '."'".$thisdate.'%'."'".'
                                                     and tr.json LIKE '."'".'%'.$type.'%'."'".'
                                                     and cmd.flagart !=1
         ');
@@ -418,7 +418,7 @@ class EcommCmdepRepository extends EntityRepository
                                                 WHERE ap.idappli ='.$idOpe.'
                                                     and st.idStatut != 9
                                                     and st.idStatut !=10
-                                                   and bl.dateProduction LIKE '."'".$thisdate.'%'."'".'
+                                                   and tr.dateDepot LIKE '."'".$thisdate.'%'."'".'
                                                     and cmd.flagart !=1
         ');
         $result = $query->getSingleScalarResult();
