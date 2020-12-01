@@ -3334,7 +3334,7 @@ dump($date);
                 }
             }}
         setlocale(LC_TIME, "fr_FR.UTF-8", "fra");
-        dump($totalArticles);
+        dump($colis);
         $dateFrench = strftime("%B %G", strtotime($thisdate));
         dump($tranches);
         dump($dateFrench);
