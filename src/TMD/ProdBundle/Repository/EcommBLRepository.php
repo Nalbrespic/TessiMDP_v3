@@ -521,7 +521,7 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('id', $bls)
             ->andwhere('bl.dateProduction != :dat')
             ->setParameter('dat', '0000-00-00 00:00:00')
-            ->select('tr.typeTransport as modexp')
+            ->select('bl.modexp as modexp')
             ->addSelect('count(bl.modexp)')
             ->groupBy('bl.modexp')
             ->getQuery()
