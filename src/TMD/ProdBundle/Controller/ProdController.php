@@ -2867,6 +2867,7 @@ class ProdController extends Controller
             {
                 $filesBl[$bl['modexp']] = $bl[1];
             }
+            dump($countTransportbyFile);
             dump($syntheseArticles);
             dump($filesBl);
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
