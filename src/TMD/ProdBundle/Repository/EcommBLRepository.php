@@ -348,7 +348,7 @@ class EcommBLRepository extends EntityRepository
     }
 
 
-    public function findAllBlByDateProdByAppli($idAppli, $DateProd, $mode = false)
+    public function findAllBlByDateProdByAppli($idAppli, $dateDepot, $mode = false)
     {
         $result  = $this
             ->createQueryBuilder('bl')
@@ -360,8 +360,8 @@ class EcommBLRepository extends EntityRepository
             ->innerJoin('file.idappli', 'appli')
             ->where('appli.idappli IN (:idapp)')
             ->setParameter('idapp', $idAppli)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->addSelect('bl.dateProduction')
             ->addSelect('tr.destinataire')
             ->addSelect('tr.destCp');
@@ -1334,7 +1334,7 @@ class EcommBLRepository extends EntityRepository
             ->getSingleScalarResult()
             ;
     }
-    public function findcountBlByPoidsVPC($idAppli, $DateProd, $codetransport, $poids){
+    public function findcountBlByPoidsVPC($idAppli, $Datedepot, $codetransport, $poids){
         $type= 'VPC';
         return $this
             ->createQueryBuilder('bl')
@@ -1349,8 +1349,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $Datedepot.'%')
             ->andWhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->andwhere('ligne.poids <= (:poids)')
@@ -1363,7 +1363,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findcountBlByPoidsPRIME($idAppli, $DateProd, $codetransport, $poids){
+    public function findcountBlByPoidsPRIME($idAppli, $dateDepot, $codetransport, $poids){
         $type = 'PRIME';
         return $this
             ->createQueryBuilder('bl')
@@ -1378,8 +1378,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->andWhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->andwhere('ligne.poids <= (:poids)')
@@ -1392,7 +1392,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findcountBlByTrancheVPC($idAppli, $DateProd, $codetransport, $poids1, $poids2){
+    public function findcountBlByTrancheVPC($idAppli, $dateDepot, $codetransport, $poids1, $poids2){
         $type = 'VPC';
         return $this
             ->createQueryBuilder('bl')
@@ -1407,8 +1407,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->andwhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->andwhere('ligne.poids > (:poids1)')
@@ -1423,7 +1423,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findcountBlByTranchePRIME($idAppli, $DateProd, $codetransport, $poids1, $poids2){
+    public function findcountBlByTranchePRIME($idAppli, $dateDepot, $codetransport, $poids1, $poids2){
         $type ='PRIME';
         return $this
             ->createQueryBuilder('bl')
@@ -1438,8 +1438,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->andwhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->andwhere('ligne.poids > (:poids1)')
@@ -1454,7 +1454,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findCountBlByTransport($idAppli, $DateProd, $codetransport){
+    public function findCountBlByTransport($idAppli, $dateDepot, $codetransport){
 
         return $this
             ->createQueryBuilder('bl')
@@ -1469,8 +1469,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->andwhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->select('count(bl.bl)')
@@ -1479,7 +1479,7 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findCountBlByTransportByType($idAppli, $DateProd, $codetransport, $type){
+    public function findCountBlByTransportByType($idAppli, $dateDepot, $codetransport, $type){
 
         return $this
             ->createQueryBuilder('bl')
@@ -1494,8 +1494,8 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->andwhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
             ->andWhere('tr.json LIKE :type')
@@ -1555,7 +1555,7 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
+            ->andWhere('tr.dateDepot LIKE :dat')
             ->setParameter('dat', $thisdate.'%')
             ->andWhere('cmd.codearticle LIKE :code')
             ->setParameter('code', $colis)
@@ -1581,7 +1581,7 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
+            ->andWhere('tr.dateDepot LIKE :dat')
             ->setParameter('dat', $thisdate.'%')
             ->andWhere('cmd.codearticle LIKE :code')
             ->setParameter('code', '%'.$colis.'%')
