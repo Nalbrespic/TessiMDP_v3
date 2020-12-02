@@ -3069,6 +3069,7 @@ dump($date);
 
             $nbrTypeTransport['total']['VPC'] = 0;
             $nbrTypeTransport['total']['PRIME'] = 0;
+
             foreach ($typeTransport as $type) {
                 $nbrTypeTransport[$type['typeTransport']]['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"VPC");
                 $nbrTypeTransport[$type['typeTransport']]['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"PRIME");
@@ -3118,6 +3119,110 @@ dump($date);
                             if ($tarifPRIME != []) {
                                 $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
                                 $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ($idClient == 712){
+            $colis['Enveloppe PRESS']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "ENVPRS");
+            $colis['pochette']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "po");
+            $colis['petit carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C1");
+            $colis['moyen carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C2");
+            $colis['grand carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C3");
+            $colis['Enveloppe PRESS']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "ENVPRS");
+            $colis['pochette']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "po");
+            $colis['petit carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C1");
+            $colis['moyen carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C2");
+            $colis['grand carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C3");
+            $colis['Enveloppe PRESS']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "ENVPRS");
+            $colis['pochette']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "po");
+            $colis['petit carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C1");
+            $colis['moyen carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C2");
+            $colis['grand carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C3");
+            $totalColis['VPC'] = $colis['Enveloppe PRESS']['VPC'] + $colis['pochette']['VPC'] + $colis['petit carton']['VPC'] + $colis['moyen carton']['VPC'] + $colis['grand carton']['VPC'];
+            $totalColis['PRIME'] = $colis['Enveloppe PRESS']['PRIME'] + $colis['pochette']['PRIME'] + $colis['petit carton']['PRIME'] + $colis['moyen carton']['PRIME'] + $colis['grand carton']['PRIME'];
+            $totalColis['REASSORT'] = $colis['Enveloppe PRESS']['REASSORT'] + $colis['pochette']['REASSORT'] + $colis['petit carton']['REASSORT'] + $colis['moyen carton']['REASSORT'] + $colis['grand carton']['REASSORT'];
+            dump($colis);
+            $totalArticles['VPC'] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'VPC');
+            $totalArticles['PRIME']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'PRIME');
+            $totalArticles['REASSORT']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'REASSORT');
+
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $thisdate);
+
+            $nbrTypeTransport['total']['VPC'] = 0;
+            $nbrTypeTransport['total']['PRIME'] = 0;
+            $nbrTypeTransport['total']['REASSORT'] = 0;
+
+            foreach ($typeTransport as $type) {
+                $nbrTypeTransport[$type['typeTransport']]['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"VPC");
+                $nbrTypeTransport[$type['typeTransport']]['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"PRIME");
+                $nbrTypeTransport[$type['typeTransport']]['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"REASSORT");
+                $nbrTypeTransport['total']['VPC'] +=  $nbrTypeTransport[$type['typeTransport']]['VPC'];
+                $nbrTypeTransport['total']['PRIME'] += $nbrTypeTransport[$type['typeTransport']]['PRIME'];
+                $nbrTypeTransport['total']['REASSORT'] += $nbrTypeTransport[$type['typeTransport']]['REASSORT'];
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+                $tranches[$type['typeTransport']]['totalTarif']['VPC'] = 0;
+                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] = 0;
+                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['VPC'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['PRIME'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['REASSORT'] = 0;
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]) - 2; $i++) {
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            dump($tarifVPC);
+                            if ($tarifVPC != []) {
+                                $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsPRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifPRIME != []) {
+                                $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsREASSORT($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlREASSORT = $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tarifREASSORT = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifREASSORT != []) {
+                                $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'] = $nbrBlPRIME * $tarifREASSORT[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'];
+                            }
+
+                        } else {
+                            $minusI = $i - 1;
+                            $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifVPC != []) {
+                                $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranchePRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifPRIME != []) {
+                                $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheREASSORT($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlREASSORT = $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tarifREASSORT = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifREASSORT != []) {
+                                $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'] = $nbrBlREASSORT * $tarifREASSORT[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'];
                             }
                         }
                     }
@@ -3287,6 +3392,110 @@ dump($date);
                             if ($tarifPRIME != []) {
                                 $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
                                 $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ($idClient == 712){
+            $colis['Enveloppe PRESS']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "ENVPRS");
+            $colis['pochette']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "po");
+            $colis['petit carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C1");
+            $colis['moyen carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C2");
+            $colis['grand carton']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "C3");
+            $colis['Enveloppe PRESS']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "ENVPRS");
+            $colis['pochette']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "po");
+            $colis['petit carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C1");
+            $colis['moyen carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C2");
+            $colis['grand carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C3");
+            $colis['Enveloppe PRESS']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "ENVPRS");
+            $colis['pochette']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "po");
+            $colis['petit carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C1");
+            $colis['moyen carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C2");
+            $colis['grand carton']['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "REASSORT", "C3");
+            $totalColis['VPC'] = $colis['Enveloppe PRESS']['VPC'] + $colis['pochette']['VPC'] + $colis['petit carton']['VPC'] + $colis['moyen carton']['VPC'] + $colis['grand carton']['VPC'];
+            $totalColis['PRIME'] = $colis['Enveloppe PRESS']['PRIME'] + $colis['pochette']['PRIME'] + $colis['petit carton']['PRIME'] + $colis['moyen carton']['PRIME'] + $colis['grand carton']['PRIME'];
+            $totalColis['REASSORT'] = $colis['Enveloppe PRESS']['REASSORT'] + $colis['pochette']['REASSORT'] + $colis['petit carton']['REASSORT'] + $colis['moyen carton']['REASSORT'] + $colis['grand carton']['REASSORT'];
+            dump($colis);
+            $totalArticles['VPC'] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'VPC');
+            $totalArticles['PRIME']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'PRIME');
+            $totalArticles['REASSORT']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'REASSORT');
+
+            $typeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findTypeTransport($idOpe, $thisdate);
+
+            $nbrTypeTransport['total']['VPC'] = 0;
+            $nbrTypeTransport['total']['PRIME'] = 0;
+            $nbrTypeTransport['total']['REASSORT'] = 0;
+
+            foreach ($typeTransport as $type) {
+                $nbrTypeTransport[$type['typeTransport']]['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"VPC");
+                $nbrTypeTransport[$type['typeTransport']]['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"PRIME");
+                $nbrTypeTransport[$type['typeTransport']]['REASSORT'] = $em->getRepository('TMDProdBundle:EcommBl')->findCountBlByTransportByType($idOpe, $thisdate, $type['typeTransport'],"REASSORT");
+                $nbrTypeTransport['total']['VPC'] +=  $nbrTypeTransport[$type['typeTransport']]['VPC'];
+                $nbrTypeTransport['total']['PRIME'] += $nbrTypeTransport[$type['typeTransport']]['PRIME'];
+                $nbrTypeTransport['total']['REASSORT'] += $nbrTypeTransport[$type['typeTransport']]['REASSORT'];
+                $idTransporteur = $em->getRepository('TMDAppliBundle:EcommTransport')->findByCodeTransport($type['typeTransport']);
+                $tranches[$type['typeTransport']] = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
+                $tranches[$type['typeTransport']]['totalTarif']['VPC'] = 0;
+                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] = 0;
+                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['VPC'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['PRIME'] = 0;
+                $tranches[$type['typeTransport']]['totalBl']['REASSORT'] = 0;
+                if (isset($tranches[$type['typeTransport']]) && count($tranches[$type['typeTransport']]) > 0) {
+                    for ($i = 0; $i < count($tranches[$type['typeTransport']]) - 2; $i++) {
+                        if ($i == 0) {
+                            $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            dump($tarifVPC);
+                            if ($tarifVPC != []) {
+                                $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsPRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifPRIME != []) {
+                                $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoidsREASSORT($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlREASSORT = $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tarifREASSORT = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifREASSORT != []) {
+                                $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'] = $nbrBlPRIME * $tarifREASSORT[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'];
+                            }
+
+                        } else {
+                            $minusI = $i - 1;
+                            $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheVPC($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlVPC = $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['nombreBl'];
+                            $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifVPC != []) {
+                                $tranches[$type['typeTransport']][$i]['VPC']['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['VPC'] += $tranches[$type['typeTransport']][$i]['VPC']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranchePRIME($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlPRIME = $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['nombreBl'];
+                            $tarifPRIME = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifPRIME != []) {
+                                $tranches[$type['typeTransport']][$i]['PRIME']['tarif'] = $nbrBlPRIME * $tarifPRIME[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['PRIME'] += $tranches[$type['typeTransport']][$i]['PRIME']['tarif'];
+                            }
+                            $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTrancheREASSORT($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
+                            $nbrBlREASSORT = $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['nombreBl'];
+                            $tarifREASSORT = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
+                            if ($tarifREASSORT != []) {
+                                $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'] = $nbrBlREASSORT * $tarifREASSORT[0]['tarif'];
+                                $tranches[$type['typeTransport']]['totalTarif']['REASSORT'] += $tranches[$type['typeTransport']][$i]['REASSORT']['tarif'];
                             }
                         }
                     }
