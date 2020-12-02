@@ -3313,7 +3313,7 @@ dump($date);
                         if ($i == 0) {
                             $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByPoids($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$i]['poidsMax']);
                             $nbrBl = $tranches[$type['typeTransport']][$i]['nombreBl'];
-                            $tranches[$type['typeTransport']]['totalBl'] += $tranches[$type['typeTransport']][$i]['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl'] += $nbrBl;
                             $tarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
 
                             if ($tarif != []) {
@@ -3324,7 +3324,7 @@ dump($date);
                             $minusI = $i - 1;
                             $tranches[$type['typeTransport']][$i]['nombreBl'] = $em->getRepository('TMDProdBundle:EcommBL')->findcountBlByTranche($idOpe, $thisdate, $type['typeTransport'], $tranches[$type['typeTransport']][$minusI]['poidsMax'], $tranches[$type['typeTransport']][$i]['poidsMax']);
                             $nbrBl = $tranches[$type['typeTransport']][$i]['nombreBl'];
-                            $tranches[$type['typeTransport']]['totalBl'] += $tranches[$type['typeTransport']][$i]['nombreBl'];
+                            $tranches[$type['typeTransport']]['totalBl'] += $nbrBl;
                             $tarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
                             if ($tarif != []) {
                                 $tranches[$type['typeTransport']][$i]['tarif'] = $nbrBl * $tarif[0]['tarif'];

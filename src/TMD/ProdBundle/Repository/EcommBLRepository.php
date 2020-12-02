@@ -402,7 +402,7 @@ class EcommBLRepository extends EntityRepository
 
         return $result->getQuery()->getArrayResult();
     }
-    public function findTypeTransport($idAppli, $DateProd)
+    public function findTypeTransport($idAppli, $dateDepot)
     {
         return $this
             ->createQueryBuilder('bl')
@@ -412,8 +412,8 @@ class EcommBLRepository extends EntityRepository
             ->innerJoin('file.idappli', 'appli')
             ->where('appli.idappli IN (:idapp)')
             ->setParameter('idapp', $idAppli)
-            ->andWhere('bl.dateProduction LIKE :dat')
-            ->setParameter('dat', $DateProd.'%')
+            ->andWhere('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $dateDepot.'%')
             ->select('bl.modexp as typeTransport')
             ->distinct()
             ->getQuery()
@@ -1295,7 +1295,7 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
+            ->andWhere('tr.dateDepot LIKE :dat')
             ->setParameter('dat', $DateProd.'%')
             ->andWhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
@@ -1321,7 +1321,7 @@ class EcommBLRepository extends EntityRepository
             ->andWhere('statut.idStatut != (:st2)')
             ->setParameter('st', 9)
             ->setParameter('st2', 10)
-            ->andWhere('bl.dateProduction LIKE :dat')
+            ->andWhere('tr.dateDepot LIKE :dat')
             ->setParameter('dat', $DateProd.'%')
             ->andwhere('bl.modexp IN (:code)')
             ->setParameter("code", $codetransport)
