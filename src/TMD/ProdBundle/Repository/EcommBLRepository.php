@@ -1559,7 +1559,7 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('dat', $thisdate.'%')
             ->andWhere('cmd.codearticle LIKE :code')
             ->setParameter('code', $colis)
-            ->andWhere('tr.json = :type')
+            ->andWhere('tr.json LIKE :type')
             ->setParameter('type', '%'.$type.'%')
             ->select('count(bl.bl)')
             ->getQuery()
