@@ -156,7 +156,7 @@
                                 <td>Type de transport</td>
                                 <td>Nombre de commandes VPC</td>
                                 <td>Nombre de commandes PRIME</td>
-                                <td>Nombre de commandes REASSORT</td>
+                                <td>Nombre de commandes REASS</td>
                                 <td>TOTAL</td>
                             </tr>
 
@@ -164,12 +164,12 @@
                             {% for key, value in nbreTypeTransport %}
                                 {% if key != "total" %}
                                     <tr style="border-bottom: 1px solid #606060" >
-                                        <td >{{ key }}</td><td >{{ nbreTypeTransport[key]['VPC'] }}</td><td>{{ nbreTypeTransport[key]['PRIME'] }}</td><td>{{ nbreTypeTransport[key]['REASSORT'] }}</td><td>{{ nbreTypeTransport[key]['VPC'] +nbreTypeTransport[key]['PRIME']+ nbreTypeTransport[key]['REASSORT'] }}</td>
+                                        <td >{{ key }}</td><td >{{ nbreTypeTransport[key]['VPC'] }}</td><td>{{ nbreTypeTransport[key]['PRIME'] }}</td><td>{{ nbreTypeTransport[key]['REASS'] }}</td><td>{{ nbreTypeTransport[key]['VPC'] +nbreTypeTransport[key]['PRIME']+ nbreTypeTransport[key]['REASS'] }}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
                             <tr class="success" style="font-weight: bold; border: black 1px solid;">
-                                <td>TOTAL</td><td>{{ nbreTypeTransport['total']['VPC']}}</td><td>{{ nbreTypeTransport['total']['PRIME']}}</td><td>{{ nbreTypeTransport['total']['REASSORT']}}</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
+                                <td>TOTAL</td><td>{{ nbreTypeTransport['total']['VPC']}}</td><td>{{ nbreTypeTransport['total']['PRIME']}}</td><td>{{ nbreTypeTransport['total']['REASS']}}</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
 
                             </tbody>
                         </table>
@@ -179,17 +179,17 @@
                         <table class="table " id="table2" style="font-size: 12px; padding: 10px; width: 100%">
                             <thead>
                             <tr>
-                                <th>Type d'emballage</th><th>Nombre de colis VPC</th><th>Nombre de colis PRIME</th><th>Nombre de colis REASSORT</th><th>TOTAL</th>
+                                <th>Type d'emballage</th><th>Nombre de colis VPC</th><th>Nombre de colis PRIME</th><th>Nombre de colis REASS</th><th>TOTAL</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for key, value in colis %}
                                 <tr>
-                                    <td>{{ key }}</td><td>{{ colis[key]['VPC'] }}</td><td>{{ colis[key]['PRIME'] }}</td>><td>{{ colis[key]['REASSORT'] }}</td><td>{{ colis[key]['VPC'] + colis[key]['PRIME'] + colis[key]['REASSORT']}}</td>
+                                    <td>{{ key }}</td><td>{{ colis[key]['VPC'] }}</td><td>{{ colis[key]['PRIME'] }}</td>><td>{{ colis[key]['REASS'] }}</td><td>{{ colis[key]['VPC'] + colis[key]['PRIME'] + colis[key]['REASS']}}</td>
                                 </tr>
                             {% endfor %}
                             <tr class="success" style="font-weight: bold">
-                                <td>TOTAL</td><td>{{ totalColis['VPC'] }}</td><td>{{ totalColis['PRIME'] }}</td><td>{{ totalColis['REASSORT'] }}</td><td>{{ totalColis['VPC'] + totalColis['PRIME'] + totalColis['REASSORT']}}</td>
+                                <td>TOTAL</td><td>{{ totalColis['VPC'] }}</td><td>{{ totalColis['PRIME'] }}</td><td>{{ totalColis['REASS'] }}</td><td>{{ totalColis['VPC'] + totalColis['PRIME'] + totalColis['REASS']}}</td>
                             </tr>>
                             </tbody>
                         </table>
@@ -200,17 +200,17 @@
                         <table class="table display compact" id="table3" style="font-size: 12px; padding: 10px; width: 100%">
                             <thead>
                             <tr>
-                                <th></th><th>Nombre d'Articles VPC</th><th>Nombre d'Articles PRIME</th><th>Nombre d'Articles REASSORT</th><th>TOTAL</th>
+                                <th></th><th>Nombre d'Articles VPC</th><th>Nombre d'Articles PRIME</th><th>Nombre d'Articles REASS</th><th>TOTAL</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             <tr>
-                                <td>Nombre d'articles</td><td>{{ totalArticles['VPC'] }}</td><td>{{ totalArticles['PRIME'] }}</td><td>{{ totalArticles['REASSORT'] }}</td><td>{{ totalArticles['VPC'] + totalArticles['PRIME']+ totalArticles['REASSORT'] }}</td>
+                                <td>Nombre d'articles</td><td>{{ totalArticles['VPC'] }}</td><td>{{ totalArticles['PRIME'] }}</td><td>{{ totalArticles['REASS'] }}</td><td>{{ totalArticles['VPC'] + totalArticles['PRIME']+ totalArticles['REASS'] }}</td>
                             </tr>
 
                             <tr>
-                                <td>Articles Supp</td><td>{{ totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] }}</td><td>{{ totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME'] }}</td><td>{{ totalArticles['REASSORT'] - nbreTypeTransport['total']['REASSORT'] }}</td><td>{{ (totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] ) + (totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME']) +(totalArticles['REASSORT'] - nbreTypeTransport['total']['REASSORT']) }}</td>
+                                <td>Articles Supp</td><td>{{ totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] }}</td><td>{{ totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME'] }}</td><td>{{ totalArticles['REASS'] - nbreTypeTransport['total']['REASS'] }}</td><td>{{ (totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] ) + (totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME']) +(totalArticles['REASS'] - nbreTypeTransport['total']['REASS']) }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -226,7 +226,7 @@
                                 <table class="table display compact tableTransport" style="margin: 10px; width: 100%" id="table{{ key }}" >
                                     <thead>
                                     <tr>
-                                        <th style="font-weight: bold">Tranche de poids en g</th><th colspan="2" style="font-weight: bold">Commandes VPC</th><th colspan="2" style="font-weight: bold">Commandes PRIME</th><th colspan="2" style="font-weight: bold">Commandes REASSORT</th>
+                                        <th style="font-weight: bold">Tranche de poids en g</th><th colspan="2" style="font-weight: bold">Commandes VPC</th><th colspan="2" style="font-weight: bold">Commandes PRIME</th><th colspan="2" style="font-weight: bold">Commandes REASS</th>
                                     </tr>
                                     <tr>
                                         <th></th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic">montant en €</th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic" >montant en €</th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic" >montant en €</th>
@@ -235,19 +235,19 @@
                                     <tbody>
                                     {% for tr in tranches[key]  %}
                                         {% if (tr['idTransportTranches'] is defined) %}
-                                            {% if (tr['PRIME']['nombreBl'] != 0) or (tr['VPC']['nombreBl'] != 0) or (tr['REASSORT']['nombreBl'] != 0) %}
+                                            {% if (tr['PRIME']['nombreBl'] != 0) or (tr['VPC']['nombreBl'] != 0) or (tr['REASS']['nombreBl'] != 0) %}
                                                 <tr>
-                                                    {% if (tr['PRIME']['tarif'] is defined ) or (tr['VPC']['tarif'] is defined) or (tr['REASSORT']['tarif'] is defined) %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['VPC']['tarif'] }}</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>{{ tr['PRIME']['tarif'] }}</td><td>{{ tr['REASSORT']['nombreBl'] }}</td><td>{{ tr['REASSORT']['tarif'] }}</td>
+                                                    {% if (tr['PRIME']['tarif'] is defined ) or (tr['VPC']['tarif'] is defined) or (tr['REASS']['tarif'] is defined) %}
+                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['VPC']['tarif'] }}</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>{{ tr['PRIME']['tarif'] }}</td><td>{{ tr['REASS']['nombreBl'] }}</td><td>{{ tr['REASS']['tarif'] }}</td>
                                                     {% else %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>no tarif</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>no tarif</td><td>{{ tr['REASSORT']['nombreBl'] }}</td><td>no tarif</td>
+                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>no tarif</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>no tarif</td><td>{{ tr['REASS']['nombreBl'] }}</td><td>no tarif</td>
                                                     {% endif %}
                                                 </tr>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     <tr class="success" style="font-weight: bold">
-                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl']['VPC'] }}</td><td>{{ tranches[key]['totalTarif']['VPC'] }}</td><td>{{ tranches[key]['totalBl']['PRIME'] }}</td><td>{{ tranches[key]['totalTarif']['PRIME'] }}</td><td>{{ tranches[key]['totalBl']['REASSORT'] }}</td><td>{{ tranches[key]['totalTarif']['REASSORT'] }}</td>
+                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl']['VPC'] }}</td><td>{{ tranches[key]['totalTarif']['VPC'] }}</td><td>{{ tranches[key]['totalBl']['PRIME'] }}</td><td>{{ tranches[key]['totalTarif']['PRIME'] }}</td><td>{{ tranches[key]['totalBl']['REASS'] }}</td><td>{{ tranches[key]['totalTarif']['REASS'] }}</td>
                                     </tr>
                                     </tbody>
                                 </table>
