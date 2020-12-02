@@ -1391,8 +1391,8 @@ class EcommBLRepository extends EntityRepository
             ->getSingleScalarResult()
             ;
     }
-    public function findcountBlByPoidsREASSORT($idAppli, $dateDepot, $codetransport, $poids){
-        $type = 'REASSORT';
+    public function findcountBlByPoidsREASS($idAppli, $dateDepot, $codetransport, $poids){
+        $type = 'REASS';
         return $this
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
@@ -1481,8 +1481,8 @@ class EcommBLRepository extends EntityRepository
             ->getSingleScalarResult()
             ;
     }
-    public function findcountBlByTrancheREASSORT($idAppli, $dateDepot, $codetransport, $poids1, $poids2){
-        $type ='REASSORT';
+    public function findcountBlByTrancheREASS($idAppli, $dateDepot, $codetransport, $poids1, $poids2){
+        $type ='REASS';
         return $this
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
