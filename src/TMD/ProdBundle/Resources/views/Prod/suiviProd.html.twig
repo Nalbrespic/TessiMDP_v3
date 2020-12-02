@@ -162,7 +162,7 @@
                                     <li role="presentation"><a href="#recherche" aria-controls="recherche" role="tab" data-toggle="tab">Recherche</a></li>
                                     {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}<li role="presentation" id="ongletProdModif"><a href="#modif" class="nav-link active" aria-controls="modif" role="tab" data-toggle="tab">Modifications</a></li>{% endif %}
                                     {% if is_granted('ROLE_ADMIN') %}<li role="presentation"><a href="#rgpd"  aria-controls="rgpd" role="tab" data-toggle="tab">RGPD</a></li>{% endif %}
-                                    {% if is_granted('ROLE_ATC') %}<li role="presentation"><a href="#prefacturation" aria-controls="prefacturation" data-toggle="tab">Préfacturation</a> </li>{% endif%}
+                                    {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}<li role="presentation"><a href="#prefacturation" aria-controls="prefacturation" data-toggle="tab">Préfacturation</a> </li>{% endif%}
                                 </ul>
 
                                 <!-- Tab panes -->
