@@ -26,6 +26,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('count(bl.idbl)')
             ->addSelect('site.abregesiteprod')
             ->addSelect('max(bl.dateProduction) as maxDate')
+            ->addSelect('tr.dateDepot')
             ->groupBy('tr.idfile')
             ->getQuery()
             ->getResult()

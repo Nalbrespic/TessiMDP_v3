@@ -1993,7 +1993,7 @@ class ProdController extends Controller
             }
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
 
-
+            dump($nbBlByFile);
             foreach ($nbBlByFile as $bl)
             {
                 $filesBl[$bl['idfile']]['nbBl'] = $bl[1];
@@ -2002,6 +2002,11 @@ class ProdController extends Controller
                 }
                 $filesBl[$bl['idfile']]['sitexp'] = $bl['abregesiteprod'];
                 $filesBl[$bl['idfile']]['dateMaxProd'] = $bl['maxDate'];
+
+                if (!empty($bl['dateDepot']) ) {
+                    $dateDepot = $bl['dateDepot']->format('Y-m-d h:i');
+                    $filesBl[$bl['idfile']]['dateDepot'] = $dateDepot;
+                }
                 foreach ($modeTransport as $transport)
                 {
                     $filesBl[$bl['idfile']]['transport'][$transport['typeTransport']]=0;
@@ -2035,7 +2040,7 @@ class ProdController extends Controller
                     }
                 }
             }
-
+            dump($filesBl);
             $nbBlByFileProd = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlByFileProd($files);
             $filesBlProd = array();
             $dateMinProdByApplication = '2040-01-01 ';
