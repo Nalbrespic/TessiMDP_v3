@@ -239,3 +239,8 @@ tmd_prod_prefacturation:
     path: /prefacturation/{idClient}/{idOpe}/{choix}
     defaults:
         _controller: TMDProdBundle:Prod:Prefacturation
+
+tmd_prod_annuleArticle:
+    path: /AnnulArticle
+    defaults:
+        _controller: TMDProdBundle:Prod:AnnulArticle
