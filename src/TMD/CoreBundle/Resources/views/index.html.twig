@@ -2143,46 +2143,6 @@
 
 
 
-<<<<<<< Updated upstream
-=======
-                modal.style.display = "none";
-            }
-            if (event.target === modalConfirme) {
-               console.log("it's Ok")
-                $.ajax({
-                    url: "{{ path('tmd_prod_annuleArticle') }}",
-                    type: "POST",
-                    data: {num:  num},
-                    dataType: "html",
-                    contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                    complete: function (data) {
-                        modal.style.display = "none";
-                        console.log('controller ok')
-
-                        var modal2 = document.getElementById('modalDelete2');
-                        var modalConfirme2 = document.getElementById('modalDeleteConfirme2');
-                        $("#modalDeleteContenu2").html("La commande n°"+numbl+" a bien été annulée");
-                        modal2.style.display = "block";
-                        window.onclick = function (event) {
-                            if (event.target === modal2) {
-                                modal2.style.display = "none";
-                                document.location.reload(true);
-                            }
-                            if (event.target === modalConfirme2){
-                                modal2.style.display = "none";
-                                document.location.reload(true);
-                            }
-                        }
-
-                    }
-
-
-
-                // })
->>>>>>> Stashed changes
-
-
-
 {% endblock %}
 
 </body>
