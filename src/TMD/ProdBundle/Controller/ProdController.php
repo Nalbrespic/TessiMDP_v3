@@ -2261,6 +2261,11 @@ class ProdController extends Controller
                 }
                 $filesBl[$bl['idfile']]['sitexp'] = $bl['abregesiteprod'];
                 $filesBl[$bl['idfile']]['dateMaxProd'] = $bl['maxDate'];
+
+                if (!empty($bl['dateDepot']) ) {
+                    $dateDepot = $bl['dateDepot']->format('Y-m-d h:i');
+                    $filesBl[$bl['idfile']]['dateDepot'] = $dateDepot;
+                }
                 foreach ($modeTransport as $transport)
                 {
                     $filesBl[$bl['idfile']]['transport'][$transport['typeTransport']]=0;
