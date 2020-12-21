@@ -1019,8 +1019,10 @@
                                 '<div class="col-md-4"><h5>Date de dépôt</h5><p>'+ moment(tracking[0]["date"]).format('LL') +'</p></div>'
 
                             html += '<div class="col-md-4"><h5>Statut de la commande</h5>';
-                            if (histoStatut[nbstatut-1].idstatut == 1) {
+                            if (histoStatut[nbstatut-1].idstatut == 1 ){
                                 html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div>';
+                            } else if (histoStatut[nbstatut-1].idstatut == 0){
+                                html += '<p>'+ statut.statut +'</p></div>';
                             } else {
                                 html += '<p>'+ histoStatut[nbstatut-1].statut +'</p></div>';
                             }
@@ -1044,7 +1046,7 @@
                             html += '<div class="swiper-wrapper"><div class="swiper-slide">' +
                                 '                      <div class="timestamp"><span class="date">'+ moment(item.datestatut.date).format('LLL') +'</span></div>'
 
-                                if (item.idstatut == 1) {
+                                if (item.idstatut == 1 || item.idstatut == 0) {
                                     html += '<div class="status"><span style="display: inline-block">' + item.observation + '</span></div>' +
                                         '  </div>'
                                 } else {
@@ -1853,7 +1855,7 @@
                 if (obj[i]['histoStatut'] != undefined) {
                     var histoStatut = obj[i]['histoStatut'];
                     var lastStatut = histoStatut[histoStatut.length - 1];
-                    console.log('dernier statut: ', lastStatut);
+                    console.log('dernier idstatut: ', lastStatut['idstatut']);
                 }
 
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
@@ -1951,9 +1953,8 @@
                     html += '<td>' + obj[i]['modexp'] + '</td>';
                 }
 
-                if (lastStatut != undefined) {
-                    console.log(lastStatut.idstatut);
-                    if (lastStatut.idstatut == 1) {
+                if (lastStatut != undefined && lastStatut.idstatut != 0){
+                    if (lastStatut.idstatut == 1 ) {
                         html += '<td>' + lastStatut.observation + '</td>';
                     } else {
                         html += '<td>' + lastStatut.statut + '</td>';
@@ -1961,6 +1962,7 @@
                 }
                 else {
                     html += '<td>'+ obj[i]['trStatut']+'</td>';
+
                 }
 
                 if ( ( obj[i]['statut']['libelle']) === ""){
@@ -1997,6 +1999,7 @@
                     html += '{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td><button onclick="AnnulTracking('+obj[i]['numbl']+')" style="background: none; border:none" type="button"><span class="glyphicon glyphicon-remove" style="color: #D34026"></span></button></td>{% endif %}';
 
                 console.log('objet en cours: ', obj[i]);
+                console.log('statut objet: ',obj[i]['trStatut'])
             }
 
             html += '</tr></table></div>';
