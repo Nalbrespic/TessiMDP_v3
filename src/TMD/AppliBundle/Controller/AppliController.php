@@ -441,7 +441,7 @@ class AppliController extends Controller
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
 
                 $env = $this->container->get('kernel')->getEnvironment();
-
+                dump($env);
                 if ($env != 'dev'){
                     $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
                     $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
