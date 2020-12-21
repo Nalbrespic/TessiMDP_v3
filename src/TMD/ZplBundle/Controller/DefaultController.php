@@ -44,6 +44,7 @@ class DefaultController extends Controller
 
             try {
                 $bl = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $numCmd));
+                dump($bl);
                 $numLigne = $bl->getBl()->getNumLigne();
             }
             catch (Exception $e) {
