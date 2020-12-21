@@ -371,8 +371,10 @@
 
                         <img class="img-responsive"  src="{{ asset('Images/PanneauAttention.png') }}" style="padding: 0px;max-width: 17px;margin: auto;"></a>
                     </div>
-                    {% else %}
+                    {% elseif (nbBlbyfile[file['idfile']] is defined) %}
                     {{ nbBlbyfile[file['idfile']]['dateDepot']|date("d/m/Y") }}
+                    {% else %}
+                        {{ '-' }}
                 {% endif %}
             </td>
             <td style="width: 122px;">{% if nbBlByFileProd[file['idfile']]['minProd'] is defined %}
