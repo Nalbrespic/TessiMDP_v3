@@ -413,7 +413,7 @@ class AppliController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $button = true;
-
+        dump($etat);
 
         if ($etat != 'nc' and $etat != '3' ) {
             if ($etat != '9'){
@@ -439,6 +439,7 @@ class AppliController extends Controller
 
 
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
+
                 $env = $this->container->get('kernel')->getEnvironment();
 
                 if ($env != 'dev'){
@@ -447,7 +448,7 @@ class AppliController extends Controller
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
-
+                    dump($chemeinImageMod1);
                 $articleArray = array();
                 $articlesAverif = array();
                 $indexeArtVerif = 0;
@@ -497,6 +498,7 @@ class AppliController extends Controller
                         $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
                     }
                 }
+                dump($articleArray);
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
                 $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
