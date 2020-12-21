@@ -445,10 +445,10 @@ class AppliController extends Controller
                 if ($env != 'dev'){
                     $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
                     $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
+                    dump($chemeinImageMod1);
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
-                    dump($chemeinImageMod1);
                 $articleArray = array();
                 $articlesAverif = array();
                 $indexeArtVerif = 0;
