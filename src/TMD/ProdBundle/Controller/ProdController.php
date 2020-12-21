@@ -2577,11 +2577,13 @@ class ProdController extends Controller
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
                 $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
+                dump($histoStatut);
                 $historiqueStat =[];
 
                 for ($i=0; $i < count($histoStatut); $i++) {
-                    if ($histoStatut != []){
+                    if ($histoStatut != [] and $histoStatut[$i]['idstatut'] !=0){
                     $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
+                    dump($em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut']));
                     $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
                     $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
                     $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
@@ -2936,16 +2938,22 @@ class ProdController extends Controller
             $statut = $em->getRepository('TMDProdBundle:EcommTracking')->findStatutByBl($numBl);
             $histStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($numBl);
             $historiqueStat =[];
-            for ($i=0; $i < count($histStatut); $i++){
+            for ($i=0; $i < count($histStatut); $i++) {
+                if ($histStatut != [] and $histStatut[$i]['idstatut'] !=0){
+                    $historiqueStat[$i]['idstatut'] = $histStatut[$i]['idstatut'];
+                    dump($em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut']));
+                    $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut'])->getStatut();
+                    $historiqueStat[$i]['observation'] = $histStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histStatut[$i]['datestatut'];
 
-                $historiqueStat[$i]['idstatut'] = $histStatut[$i]['idstatut'];
-                $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut'])->getStatut();
-                $historiqueStat[$i]['observation'] = $histStatut[$i]['observation'];
-                $historiqueStat[$i]['datestatut'] = $histStatut[$i]['datestatut'];
+                } else {
 
+                    $historiqueStat[$i]['idstatut'] = $histStatut[$i]['idstatut'];
+                    $historiqueStat[$i]['observation'] = $histStatut[$i]['observation'];
+                    $historiqueStat[$i]['datestatut'] = $histStatut[$i]['datestatut'];
+                }
 
-
-        }
+            }
             // récupérer le statut de la livraison lorsqu'il est disponible:
            $statutLiv = [];
             $numLigne = $tracking[0]['numligne'];
