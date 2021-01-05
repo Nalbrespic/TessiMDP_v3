@@ -102,8 +102,8 @@ doctrine:
                     TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
                     TMDZplBundle: ~
-#                    TmsLogisticBundle: ~
-#                    TMDStatBundle: ~
+                    TmsLogisticBundle: ~
+                    TMDStatBundle: ~
             colisprive:
                 connection: colisprive
                 mappings:
@@ -123,24 +123,24 @@ doctrine:
 #    intercept_redirects: true
 
 ## FOSRest Configuration
-#fos_rest:
-#    routing_loader:
-#        default_format: json
-#    param_fetcher_listener: force
-#    service:
-#        serializer: jms_serializer.serializer
-#    serializer:
-#        version: ~
-#        groups: []
-#        serialize_null: false
+fos_rest:
+    routing_loader:
+        default_format: json
+    param_fetcher_listener: force
+    service:
+        serializer: jms_serializer.serializer
+    serializer:
+        version: ~
+        groups: []
+        serialize_null: false
 
 # TmsRest
-#tms_rest:
-#    default:
-#        pagination:
-#            limit:
-#                default: 50
-#                maximum: 500
+tms_rest:
+    default:
+        pagination:
+            limit:
+                default: 50
+                maximum: 500
 # Pagination
 knp_paginator:
     page_range: 5
