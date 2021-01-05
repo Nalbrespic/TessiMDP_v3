@@ -15,10 +15,12 @@ tmd_coriolis:
     resource: "@TMDCoriolisBundle/Resources/config/routing.yml"
     prefix:   /coriolis
 
+
 tms_logistic:
     type: rest
     resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
     prefix:   /api
+
 
 tmd_appli:
     resource: "@TMDAppliBundle/Resources/config/routing.yml"

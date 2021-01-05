@@ -42,7 +42,7 @@
         "symfony/polyfill-apcu": "^1.0",
         "symfony/swiftmailer-bundle": "^2.6.4",
         "symfony/symfony": "3.4.*",
-        "tms/logistic-bundle": "dev-master",
+        "tms/logistic-bundle": "1.*",
         "twig/extensions": "^1.5",
         "twig/twig": "^1.0||^2.0"
     },
