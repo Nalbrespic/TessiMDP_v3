@@ -439,7 +439,7 @@ class AppliController extends Controller
 
 
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
-
+                dump($cheminImage);
                 $env = $this->container->get('kernel')->getEnvironment();
                 dump($env);
                 if ($env != 'dev'){
@@ -449,6 +449,7 @@ class AppliController extends Controller
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
+
                 $articleArray = array();
                 $articlesAverif = array();
                 $indexeArtVerif = 0;
@@ -480,13 +481,14 @@ class AppliController extends Controller
                         }
 
                         if (strlen($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
-                            if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
+                            if ( file_exists($chemeinImageMod1 . $v->getNomimg())) {
                                 $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
                                 $dimensions = getimagesizefromstring(file_get_contents($chemeinImageMod1.$v->getNomimg()));
                                 $articleArray['art'][$k]['dimensionL'] = $dimensions[0];
                                 $articleArray['art'][$k]['dimensionH'] = $dimensions[1];
                             }
                         }
+
                         $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
                     }
                     else{

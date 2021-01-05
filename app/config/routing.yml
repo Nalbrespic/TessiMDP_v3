@@ -2,9 +2,9 @@
 #    resource: "@TMDMinosBundle/Resources/config/routing.yml"
 #    prefix:   /
 #
-#tmd_stat:
-#    resource: "@TMDStatBundle/Resources/config/routing.yml"
-#    prefix:   /
+tmd_stat:
+    resource: "@TMDStatBundle/Resources/config/routing.yml"
+    prefix:   /
 
 tmd_root :
     path: /
@@ -14,7 +14,7 @@ tmd_root :
 tmd_coriolis:
     resource: "@TMDCoriolisBundle/Resources/config/routing.yml"
     prefix:   /coriolis
-
+#
 #tms_logistic:
 #    type: rest
 #    resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
