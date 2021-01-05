@@ -403,7 +403,7 @@
                                                 {% endif %}
                                             {% endfor %}
 
-                                            {%  if articleComp['perso1']|length  != 0 or articleComp['perso2']|length  != 0 or articleComp['Image'] != null %}
+                                            {%  if articleComp['perso1']|length  != 0 or articleComp['perso2']|length  != 0  or articleComp['Image'] is defined %}
                                                 <table class="table " style="margin-bottom:6px;background-color: white;{% if em['quantite'] == '1' %}width: 50%;margin-left: auto;margin-right: auto;{% endif %}">
                                                     {% set recup = 1 %}
                                                     {% for art in articles['art']  %}
@@ -453,6 +453,17 @@
                                                                                                 <div class="row" >
                                                                                                     <div class="col-md-12" style="text-align: center;">
                                                                                                         <img src="data:image/png;base64,{{ art['Image'] }}"  style="max-width: 290px;max-height: 130px;">
+                                                                                                    </div>
+                                                                                                    <div class="col-md-12" style="text-align: center;">
+                                                                                                        {{ art['nameImage'] }}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </td>
+                                                                                        {% else %}
+                                                                                            <td style="padding: 0;border: inherit;">
+                                                                                                <div class="row" >
+                                                                                                    <div class="col-md-12" style="text-align: center;">
+                                                                                                        <img src="{{ asset('Images/aucune-image.jpeg') }}" style="max-width: 290px;max-height: 130px;">
                                                                                                     </div>
                                                                                                     <div class="col-md-12" style="text-align: center;">
                                                                                                         {{ art['nameImage'] }}
@@ -519,7 +530,7 @@
                                                                             <td {%  if art['perso1']|length  == 0 and art['perso2']|length  == 0  %}class="col-md-11"{%  endif %} class="col-md-8" style="padding-bottom: 0;padding-top: 0px;">
                                                                                 <table class="table" style="margin-bottom: 0;">
                                                                                     <tr>
-                                                                                        {% if  art['Image']|length > 0 %}
+                                                                                        {% if  art['Image'] is not null %}
                                                                                             <td style="padding: 0;border: inherit;">
                                                                                                 <div class="row" >
                                                                                                     <div class="col-md-12" style="text-align: center;">
@@ -530,8 +541,18 @@
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </td>
+                                                                                        {% else %}
+                                                                                        <td style="padding: 0;border: inherit;">
+                                                                                            <div class="row" >
+                                                                                                <div class="col-md-12" style="text-align: center;">
+                                                                                                    <img src="{{ asset('Images/aucune-image.jpeg') }}" style="max-width: 290px;max-height: 130px;">
+                                                                                                </div>
+                                                                                                <div class="col-md-12" style="text-align: center;">
+                                                                                                    {{ art['nameImage'] }}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </td>
                                                                                         {% endif %}
-
                                                                                         {% if art['artAverif'] is defined %}
                                                                                     </tr>
                                                                                     <tr>
@@ -804,6 +825,7 @@
         var tab = {{ articlesAverif|json_encode|raw }}
 
             function scanCodeAverif(){
+                console.log('tableau:', tab)
                 var code =  $('#entered_verif').val();
                 var codeDejaSaisi = 0;
                 for ( var i = 0 ; i < tab.length ; i++){
@@ -815,6 +837,7 @@
                             }
 
                         } else {
+
                             document.getElementById("imageAverif" + tab[i]['id']).style.display = 'none';
                             document.getElementById("imageverifok" + tab[i]['id']).style.display = '';
                             tab[i]['indexVerif'] = 1;

@@ -164,7 +164,8 @@ class DefaultController extends Controller
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
                     $histoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl->getBl()->getNumbl(), 'idstatut' => '2'));
-                    if (sizeof($histoVerif) == 0) {
+                    dump($histoVerif);
+                    if ($histoVerif == null) {
                         $break++;
                         $em->persist($histo);
                         $em->flush();
@@ -177,7 +178,7 @@ class DefaultController extends Controller
                 $break2 = 0;
                 while (!$updateDateDepotOK and $break2 < 3) {
                     $dateVerif = $em->getRepository('TMDProdBundle:EcommTracking')->findOneBy(array('expRef' => $bl->getBl()->getNumbl(), 'dateDepot' => $dateDepotAverif));
-                    if (sizeof($dateVerif) == 0) {
+                    if ($dateVerif == null) {
                         $break2++;
                         $trackBL->setDateDepot($dateDepotAverif);
                         $em->flush();
@@ -190,7 +191,7 @@ class DefaultController extends Controller
                 $break3 = 0;
                 while (!$updateProdOK and $break3 < 3) {
                     $dateProdVerif = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl->getBl()->getNumbl(), 'dateProduction' => $dateProdAverif));
-                    if (sizeof($dateProdVerif) == 0) {
+                    if ($dateProdVerif == null) {
                         $break3++;
                         $bl->setDateProduction($dateProdAverif);
                         $em->flush();
