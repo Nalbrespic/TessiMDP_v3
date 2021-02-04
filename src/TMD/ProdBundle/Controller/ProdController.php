@@ -3329,8 +3329,11 @@ dump($date);
 
         $logo = (base64_encode(stream_get_contents($ope->getAppliImage())));
         $date = date('Y-m');
+        dump($date);
         $minusMonth = strtotime($date . "- 1 months");
         $lastmonth = date("Y-m", $minusMonth);
+        dump($lastmonth);
+
 
         $tranches=[];
         if ($choix == 1) {
@@ -3339,6 +3342,7 @@ dump($date);
             $thisdate = $lastmonth;
         }
         $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $thisdate, true);
+        dump($listBl);
 
         if ($idClient == 713) {
             $colis['Enveloppe PRESS']['VPC'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "VPC", "ENVPRS");
@@ -3434,7 +3438,7 @@ dump($date);
             $totalColis['VPC'] = $colis['Enveloppe PRESS']['VPC'] + $colis['pochette']['VPC'] + $colis['petit carton']['VPC'] + $colis['moyen carton']['VPC'] + $colis['grand carton']['VPC'];
             $totalColis['PRIME'] = $colis['Enveloppe PRESS']['PRIME'] + $colis['pochette']['PRIME'] + $colis['petit carton']['PRIME'] + $colis['moyen carton']['PRIME'] + $colis['grand carton']['PRIME'];
             $totalColis['REASS'] = $colis['Enveloppe PRESS']['REASS'] + $colis['pochette']['REASS'] + $colis['petit carton']['REASS'] + $colis['moyen carton']['REASS'] + $colis['grand carton']['REASS'];
-            dump($colis);
+
             $totalArticles['VPC'] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'VPC');
             $totalArticles['PRIME']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'PRIME');
             $totalArticles['REASS']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'REASS');
@@ -3562,10 +3566,10 @@ dump($date);
                 }
             }}
         setlocale(LC_TIME, "fr_FR.UTF-8", "fra");
-        dump($colis);
-        $dateFrench = strftime("%B %G", strtotime($thisdate));
-        dump($tranches);
-        dump($dateFrench);
+
+        $dateFrench = strftime("%B %Y", strtotime($thisdate));
+
+
         return $this->render('TMDProdBundle:Prod:prefacturation.html.twig', array(
             'typesTransport' => $typeTransport,
             'nbreTypeTransport' => $nbrTypeTransport,

@@ -391,6 +391,7 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('tr.instrLivrais2')
             ->addSelect('tr.destPays')
             ->addSelect('tr.montant')
+            ->addSelect('tr.json')
             ->addSelect('file.nbpages')
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
