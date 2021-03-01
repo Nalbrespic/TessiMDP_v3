@@ -3481,7 +3481,7 @@ dump($date);
 
         setlocale(LC_TIME, "fr_FR.utf8", "fra");
         $dateFrench = ucwords(utf8_encode(strftime("%B %G", strtotime($thisdate))));
-
+        dump($dateFrench);
         return $this->render('TMDProdBundle:Prod:prefacturation.html.twig', array(
             'listArticles' => $listArticles,
             'typeCommande'=> $typeCommande,
