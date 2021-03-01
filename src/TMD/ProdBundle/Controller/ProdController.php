@@ -3478,8 +3478,8 @@ dump($date);
 
 
         $listArticles = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeByDate($idOpe, $thisdate);
-        dump($tranches);
-        setlocale(LC_TIME, "fr_FR.UTF-8", "fra");
+
+        setlocale(LC_TIME, "fr_FR.UTF8", "fra");
         $dateFrench = utf8_encode(strftime("%B %G", strtotime($thisdate)));
 
         return $this->render('TMDProdBundle:Prod:prefacturation.html.twig', array(
