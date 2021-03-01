@@ -375,7 +375,7 @@ class EcommCmdepRepository extends EntityRepository
             ;
     }
 
-    public function FindArticlesByOpeByDate($idOpe, $thisdate, $type)
+    public function FindCountArticlesByOpeByDate($idOpe, $thisdate, $type)
     {
         $query = $this->_em->createQuery(' SELECT sum(cmd.quantite) FROM TMDProdBundle:EcommCmdep cmd
                                                 INNER JOIN TMDProdBundle:EcommBL bl
@@ -423,5 +423,32 @@ class EcommCmdepRepository extends EntityRepository
         ');
         $result = $query->getSingleScalarResult();
         return $result;
+    }
+
+    public function findArticlesByOpeByDate($ipOp, $date)
+    {
+        return $this
+            ->createQueryBuilder('cmd')
+            ->innerJoin('cmd.numbl', 'ligne')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile','file')
+//            ->innerJoin('tr.idStatut','st')
+            ->where('file.idappli = (:id)')
+            ->setParameter('id', $ipOp)
+            ->andWhere('cmd.numseq != 99')
+            ->andWhere('tr.idStatut != (:an)')
+            ->andWhere('tr.dateDepot LIKE :date ')
+            ->setParameter('date', $date.'%')
+            ->setParameter('an', 9)
+            ->select('sum(cmd.quantite) as quantite')
+            ->addSelect('cmd.libelle')
+            ->addSelect('cmd.flagart')
+            ->addSelect('cmd.codearticle')
+            ->groupBy('cmd.codearticle ')
+            ->orderBy('quantite', 'DESC')
+            ->getQuery()
+            ->getArrayResult()
+
+            ;
     }
 }

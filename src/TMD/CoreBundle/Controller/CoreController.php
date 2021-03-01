@@ -107,6 +107,7 @@ class CoreController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsPbWSwithop($idOpe);
+        dump($trackingsErreurWS);
 
         $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($trackingsErreurWS[$current]->getNumbl());
         $trackLength = sizeof($trackingsErreurWS);

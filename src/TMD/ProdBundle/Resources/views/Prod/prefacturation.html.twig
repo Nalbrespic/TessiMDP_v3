@@ -4,7 +4,7 @@
     Préfacturation
 {% endblock %}
 {% block body %}
-    <h3 style="border-bottom: #504a62 2px solid; padding-bottom: 20px; width: 40%">{{ client.nomclient }} - Préfacturation pour {{ month }}</h3>
+    <h3 style="border-bottom: #504a62 2px solid; padding-bottom: 20px; width: 40%" id="NomClient">{{ client.nomclient }} - Préfacturation pour {{ month }}</h3>
 
     <div class="title">
         {% if logo is defined %}
@@ -18,10 +18,18 @@
 
     <div>
 
+{#        <div class="wrapper">#}
+{#            <a id="lienPdf" href="{{ path('tmd_prod_pdf', {'idClient': client.idclient, 'idOpe':appli.idappli, 'thisdate':date}) }}"><span>Exporter vers Pdf</span></a>#}
+{#        </div>#}
+        <div >
+            <table id="tableExtract">
+                <thead>
+                    <tr>
+                        <th></th><th></th><th></th>
+                    </tr>
+                </thead>
+            </table>
 
-
-        <div class="wrapper">
-            <a id="lienPdf" href="{{ path('tmd_prod_pdf', {'idClient': client.idclient, 'idOpe':appli.idappli, 'thisdate':date}) }}"><span>Exporter vers Pdf</span></a>
         </div>
 
 
@@ -31,272 +39,219 @@
         {#    <a href="{{ path('tmd_prod_pdf', {'idClient': client.idclient, 'idOpe':appli.idappli, 'thisdate':date}) }}"><button id="cmd" >Exporter en Pdf</button></a>#}
 
         <div class="container" id="mesTableaux" style="width: 100%; margin-top: 20px">
-            {% if (idclient == '713') %}
-                <div class="row" style="display: flex; justify-content: space-between;align-items: center; margin-bottom: 50px; padding-bottom: 15px">
-                    <div class="col-md-3 divTable" id="tableau1">
-                        <h4>Colis selon le mode de Transport</h4>
+            <div id="tablist">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" class="active" ><a href="#ModeTransport" aria-controls="ModeTransport" role="tab" data-toggle="tab">Mode de Transport</a></li>
+                    <li role="presentation"><a href="#emballages" aria-controls="emballages" role="tab" data-toggle="tab">Emballages</a></li>
+                    <li role="presentation"><a href="#CommandeTransport" aria-controls="CommandeTransport" role="tab" data-toggle="tab">Commande selon Transport - Tarification</a> </li>
+                    <li role="presentation"><a href="#articleCmde" aria-controls="articleCmde" role="tab" data-toggle="tab">Articles commandés</a> </li>
+                </ul>
+            </div>
+            <div class="tab-content" style="position: relative;" >
+                <div role="tabpanel" class="tab-pane active" id="ModeTransport">
+            {% if typeCommande|length > 1 %}
+
+                        <h4 id="titleTable1" style="margin: 20px 0;text-align: center">Colis selon le mode de Transport</h4>
                         <table class="table display compact " id="table1" style="font-size: 12px;padding: 10px;width: 95%" id="table1" >
                             <thead style="font-weight: bold;">
                             <tr>
                                 <th>Type de transport</th>
-                                <th>Nombre de commandes VPC</th>
-                                <th>Nombre de commandes PRIME</th>
+                                {% for key, value in typeCommande %}
+                                <th>Nombre de commandes {{value}}</th>
+                                {% endfor %}
                                 <th>TOTAL</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for key, value in nbreTypeTransport %}
                                 {% if key != "total" %}
+
                                     <tr style="border-bottom: 1px solid #606060" >
-                                        <td >{{ key }}</td><td >{{ nbreTypeTransport[key]['VPC'] }}</td><td>{{ nbreTypeTransport[key]['PRIME'] }}</td><td>{{ nbreTypeTransport[key]['VPC'] + nbreTypeTransport[key]['PRIME'] }}</td>
+                                        <td >{{ key }}</td>{% for type in typeCommande %}<td >{{ nbreTypeTransport[key][type] }}</td>{% endfor %}<td>{{ nbreTypeTransport[key]['total'] }}</td>
                                     </tr>
                                 {% endif %}
                             {% endfor %}
                             <tr class="success" style="font-weight: bold; border: black 1px solid;">
-                                <td>TOTAL</td><td>{{ nbreTypeTransport['total']['VPC']}}</td><td>{{ nbreTypeTransport['total']['PRIME']}}</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
-
+                                <td>TOTAL</td>{% for type in typeCommande %}<td>{{ nbreTypeTransport['total'][type]}}</td>{% endfor %}<td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="col-md-3 divTable">
-                        <h4>Emballages</h4>
-                        <table class="table " id="table2" style="font-size: 12px; padding: 10px">
-                            <thead>
-                            <tr>
-                                <th>Type d'emballage</th><th>Nombre de colis VPC</th><th>Nombre de colis PRIME</th><th>TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for key, value in colis %}
-                                <tr>
-                                    <td>{{ key }}</td><td>{{ colis[key]['VPC'] }}</td><td>{{ colis[key]['PRIME'] }}</td><td>{{ colis[key]['VPC'] + colis[key]['PRIME'] }}</td>
-                                </tr>
-                            {% endfor %}
-                            <tr class="success" style="font-weight: bold">
-                                <td>TOTAL</td><td>{{ totalColis['VPC'] }}</td><td>{{ totalColis['PRIME'] }}</td><td>{{ totalColis['VPC'] + totalColis['PRIME'] }}</td>
-                            </tr>>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3 divTable">
-                        <h4>Total des Articles</h4>
-
-                        <table class="table display compact" id="table3" style="font-size: 12px; padding: 10px">
-                            <thead>
-                            <tr>
-                                <th></th><th>Nombre d'Articles VPC</th><th>Nombre d'Articles PRIME</th><th>TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <tr>
-                                <td>Nombre d'articles</td><td>{{ totalArticles['VPC'] }}</td><td>{{ totalArticles['PRIME'] }}</td><td>{{ totalArticles['VPC'] + totalArticles['PRIME'] }}</td>
-                            </tr>
-
-                            <tr>
-                                <td>Articles Supp</td><td>{{ totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] }}</td><td>{{ totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME'] }}</td><td>{{ (totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] ) + (totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME']) }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">
-                    {% for key, value in tranches %}
-
-                        {% if tranches[key]|length > 2 %}
-
-                            <div class="col-25 divTable"  style="width:45%;margin-left: 20px;margin-right: 20px; ">
-                                <h4>Colis expédiés en {{ key }}</h4>
-                                <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="table{{ key }}" >
-                                    <thead>
+                    {% else %}
+                                <h4 id="titleTable1" style="margin: 20px 0;text-align: center">Colis selon le mode de Transport</h4>
+                                <table class="table display compact " id="table1" style="font-size: 12px;padding: 10px;" id="table1" >
+                                    <thead style="font-weight: bold;">
                                     <tr>
-                                        <th style="font-weight: bold">Tranche de poids en g</th><th colspan="2" style="font-weight: bold">Commandes VPC</th><th colspan="2" style="font-weight: bold">Commandes PRIME</th>
-                                    </tr>
-                                    <tr>
-                                        <th></th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic">montant en €</th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic" >montant en €</th>
+                                        <th>Type de transport</th>
+                                        <th>Nombre de commandes</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for tr in tranches[key]  %}
-                                        {% if (tr['idTransportTranches'] is defined) %}
-                                            {% if (tr['PRIME']['nombreBl'] != 0) or (tr['VPC']['nombreBl'] != 0) %}
-                                                <tr>
-                                                    {% if (tr['PRIME']['tarif'] is defined ) or (tr['VPC']['tarif'] is defined) %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['VPC']['tarif'] }}</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>{{ tr['PRIME']['tarif'] }}</td>
-                                                    {% else %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>no tarif</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>no tarif</td>
-                                                    {% endif %}
-                                                </tr>
-                                            {% endif %}
-                                        {% endif %}
+                                    {% for key, value in nbreTypeTransport %}
+                                        <tr style="border-bottom: 1px solid #606060" >
+                                            <td style="text-align: center;">{{ key }}</td><td style="text-align: right">{{ value }}</td>
+                                        </tr>
                                     {% endfor %}
-                                    <tr class="success" style="font-weight: bold">
-                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl']['VPC'] }}</td><td>{{ tranches[key]['totalTarif']['VPC'] }}</td><td>{{ tranches[key]['totalBl']['PRIME'] }}</td><td>{{ tranches[key]['totalTarif']['PRIME'] }}</td>
-                                    </tr>
+                                    <tr class="success" style="font-weight: bold; border: black 1px solid;"><td style="text-align: center; border-width: 1px;">TOTAL</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
+
                                     </tbody>
                                 </table>
-                            </div>
-
-                        {% endif %}
-                    {% endfor %}
+                    {% endif %}
                 </div>
-            {% elseif (idclient == '712') %}
-                <div class="row" style="display: flex; justify-content: space-between;align-items: center; margin-bottom: 50px; padding-bottom: 15px">
-                    <div class="col-md-3 divTable" id="tableau1">
-                        <h4>Colis selon le mode de Transport</h4>
-                        <table class="table display compact " id="table1" style="font-size: 12px;padding: 10px;width: 95%" id="table1" >
-                            <thead style="font-weight: bold;">
-                            <tr>
-                                <th>Type de transport</th>
-                                <th>Nombre de commandes VPC</th>
-                                <th>Nombre de commandes PRIME</th>
-                                <th>Nombre de commandes REASS</th>
-                                <th>TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for key, value in nbreTypeTransport %}
-                                {% if key != "total" %}
-                                    <tr style="border-bottom: 1px solid #606060" >
-                                        <td >{{ key }}</td><td >{{ nbreTypeTransport[key]['VPC'] }}</td><td>{{ nbreTypeTransport[key]['PRIME'] }}</td><td>{{ nbreTypeTransport[key]['REASS'] }}</td><td>{{ nbreTypeTransport[key]['VPC'] +nbreTypeTransport[key]['PRIME']+ nbreTypeTransport[key]['REASS'] }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                            <tr class="success" style="font-weight: bold; border: black 1px solid;">
-                                <td>TOTAL</td><td>{{ nbreTypeTransport['total']['VPC']}}</td><td>{{ nbreTypeTransport['total']['PRIME']}}</td><td>{{ nbreTypeTransport['total']['REASS']}}</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3 divTable">
-                        <h4>Emballages</h4>
-                        <table class="table " id="table2" style="font-size: 12px; padding: 10px">
-                            <thead>
-                            <tr>
-                                <th>Type d'emballage</th><th>Nombre de colis VPC</th><th>Nombre de colis PRIME</th><th>Nombre de colis REASS</th><th>TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for key, value in colis %}
-                                <tr>
-                                    <td>{{ key }}</td><td>{{ colis[key]['VPC'] }}</td><td>{{ colis[key]['PRIME'] }}</td>><td>{{ colis[key]['REASS'] }}</td><td>{{ colis[key]['VPC'] + colis[key]['PRIME'] + colis[key]['REASS']}}</td>
-                                </tr>
-                            {% endfor %}
-                            <tr class="success" style="font-weight: bold">
-                                <td>TOTAL</td><td>{{ totalColis['VPC'] }}</td><td>{{ totalColis['PRIME'] }}</td><td>{{ totalColis['REASS'] }}</td><td>{{ totalColis['VPC'] + totalColis['PRIME'] + totalColis['REASS']}}</td>
-                            </tr>>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3 divTable">
-                        <h4>Total des Articles</h4>
-
-                        <table class="table display compact" id="table3" style="font-size: 12px; padding: 10px">
-                            <thead>
-                            <tr>
-                                <th></th><th>Nombre d'Articles VPC</th><th>Nombre d'Articles PRIME</th><th>Nombre d'Articles REASS</th><th>TOTAL</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <tr>
-                                <td>Nombre d'articles</td><td>{{ totalArticles['VPC'] }}</td><td>{{ totalArticles['PRIME'] }}</td><td>{{ totalArticles['REASS'] }}</td><td>{{ totalArticles['VPC'] + totalArticles['PRIME']+ totalArticles['REASS'] }}</td>
-                            </tr>
-
-                            <tr>
-                                <td>Articles Supp</td><td>{{ totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] }}</td><td>{{ totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME'] }}</td><td>{{ totalArticles['REASS'] - nbreTypeTransport['total']['REASS'] }}</td><td>{{ (totalArticles['VPC'] - nbreTypeTransport['total']['VPC'] ) + (totalArticles['PRIME'] - nbreTypeTransport['total']['PRIME']) +(totalArticles['REASS'] - nbreTypeTransport['total']['REASS']) }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">
-                    {% for key, value in tranches %}
-
-                        {% if tranches[key]|length > 2 %}
-
-                            <div class="col-25 divTable"  style="width:45%;margin-left: 20px;margin-right: 20px; ">
-                                <h4>Colis expédiés en {{ key }}</h4>
-                                <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="table{{ key }}" >
-                                    <thead>
-                                    <tr>
-                                        <th style="font-weight: bold">Tranche de poids en g</th><th colspan="2" style="font-weight: bold">Commandes VPC</th><th colspan="2" style="font-weight: bold">Commandes PRIME</th><th colspan="2" style="font-weight: bold">Commandes REASS</th>
-                                    </tr>
-                                    <tr>
-                                        <th></th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic">montant en €</th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic" >montant en €</th><th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic" >montant en €</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for tr in tranches[key]  %}
-                                        {% if (tr['idTransportTranches'] is defined) %}
-                                            {% if (tr['PRIME']['nombreBl'] != 0) or (tr['VPC']['nombreBl'] != 0) or (tr['REASS']['nombreBl'] != 0) %}
-                                                <tr>
-                                                    {% if (tr['PRIME']['tarif'] is defined ) or (tr['VPC']['tarif'] is defined) or (tr['REASS']['tarif'] is defined) %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>{{ tr['VPC']['tarif'] }}</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>{{ tr['PRIME']['tarif'] }}</td><td>{{ tr['REASS']['nombreBl'] }}</td><td>{{ tr['REASS']['tarif'] }}</td>
-                                                    {% else %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['VPC']['nombreBl']}}</td><td>no tarif</td><td>{{ tr['PRIME']['nombreBl'] }}</td><td>no tarif</td><td>{{ tr['REASS']['nombreBl'] }}</td><td>no tarif</td>
-                                                    {% endif %}
-                                                </tr>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    <tr class="success" style="font-weight: bold">
-                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl']['VPC'] }}</td><td>{{ tranches[key]['totalTarif']['VPC'] }}</td><td>{{ tranches[key]['totalBl']['PRIME'] }}</td><td>{{ tranches[key]['totalTarif']['PRIME'] }}</td><td>{{ tranches[key]['totalBl']['REASS'] }}</td><td>{{ tranches[key]['totalTarif']['REASS'] }}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="row" style="display: flex; justify-content: space-between; border-bottom: 1px black solid; margin-bottom: 50px; padding-bottom: 15px">
-                    <div class="col-md-3 divTable" id="tableau1">
-                        <h4>Colis selon le mode de Transport</h4>
-                        <table class="table display compact " id="table1" style="font-size: 12px;padding: 10px;" id="table1" >
-                            <thead style="font-weight: bold;">
-                            <tr>
-                                <th>Type de transport</th>
-                                <th>Nombre de commandes</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for key, value in nbreTypeTransport %}
-                                <tr style="border-bottom: 1px solid #606060" >
-                                    <td style="text-align: center;">{{ key }}</td><td style="text-align: right">{{ value }}</td>
-                                </tr>
-                            {% endfor %}
-                            <tr class="success" style="font-weight: bold; border: black 1px solid;"><td style="text-align: center; border-width: 1px;">TOTAL</td><td style="text-align: right;border-width: 1px;">{{ totalBl }}</td></tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3">
-                        <h4>Emballages</h4>
-
+                <div role="tabpanel" class="tab-pane" id="emballages">
+                    {% if typeCommande|length > 1 %}
+                        <h4 id="titleTable2" style="margin: 20px 0;text-align: center">Emballages</h4>
                         <table class="table display compact divTable" id="table2" style="font-size: 12px; padding: 10px">
                             <thead>
                             <tr>
-                                <th>Type d'emballage</th><th>Nombre de colis </th>
+                                <th>Type d'emballage</th>{% for type in typeCommande %}<th>Nombre de colis {{type}}</th>{% endfor %}<th>TOTAL</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for key, value in colis %}
                                 <tr>
-                                    <td>{{ key }}</td><td>{{ colis[key] }}</td>
+                                    <td>{{ key }}</td>{% for type in typeCommande %}<td>{{ colis[key][type] }}</td>{% endfor %}<td>{{ totalColis[key]['total']  }}</td>
                                 </tr>
                             {% endfor %}
-                            <tr class="success">
-                                <td >TOTAL</td><td>{{ totalColis }}</td>
+                            <tr class="success" style="font-weight: bold">
+                                <td>TOTAL</td>{% for type in typeCommande %}<td>{{ totalColis[type] }}</td>{% endfor %}<td>{{ totalColis['total'] }}</td>
                             </tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="col-md-3">
-                        <h4>Total des Articles</h4>
+                    {% else %}
+                        <h4 id="titleTable2" style="margin: 20px 0;text-align: center">Emballages</h4>
+                    <table class="table display compact divTable" id="table2" style="font-size: 12px; padding: 10px">
+                        <thead>
+                        <tr>
+                            <th>Type d'emballage</th><th>Nombre de colis </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, value in colis %}
+                            <tr>
+                                <td>{{ key }}</td><td>{{ colis[key] }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr class="success">
+                            <td >TOTAL</td><td>{{ totalColis }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    {% endif %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="CommandeTransport">
+                    {% if typeCommande|length > 1 %}
+                    <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">
+                        {% for key, value in tranches %}
+                            {% set counter = (counter | default(0) + 1) %}
+                            {% if tranches[key]|length > 2 %}
 
-                        <table class="table display compact divTable" id="table3" style="font-size: 12px; padding: 10px">
+                                <div class=" divTable"  style="width:45%;margin-left: 10px;margin-right: 30px; ">
+                                    <h4 id="titleTableTransport{{ counter }}" style="margin: 20px 0;text-align: center">Colis expédiés en {{ key }}</h4>
+                                    <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="tableTransport{{ counter }}" >
+                                        <thead>
+                                        <tr>
+                                            <th style="font-weight: bold">Tranche de poids en g</th>{% for type in typeCommande %}{% if (tranches[key]['totalBl'][type] != 0) %}<th colspan="2" style="font-weight: bold">Commandes {{type}}</th>{% endif %}{% endfor %}
+                                        </tr>
+                                        <tr>
+                                            <th></th>{% for type in typeCommande %}{% if (tranches[key]['totalBl'][type] != 0) %}<th style="font-weight: bold; font-style: italic">nbre colis</th><th style="font-weight: bold; font-style: italic">montant en €</th>{% endif %}{% endfor %}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for tr in tranches[key]  %}
+                                            {% if (tr['idTransportTranches'] is defined) %}
+                                                {% if (tr['nombreBl'] != 0)  %}
+                                                    <tr>
+                                                        <td>{{ tr['poidsMax'] }}</td>
+                                                        {% for type in typeCommande %}
+                                                            {% if (tranches[key]['totalBl'][type] !=0) %}
+                                                                <td>{{ tr[type]['nombreBl']}}</td>
+                                                                {% if (tr[type]['tarif'] is defined) %}
+                                                                    <td>{{ tr[type]['tarif'] }}</td>
+                                                                {% else %}
+                                                                    <td>no tarif</td>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tr class="success" style="font-weight: bold">
+                                            <td style="font-weight: bold">Total</td>{% for type in typeCommande %}{% if (tranches[key]['totalBl'][type] != 0) %}<td>{{ tranches[key]['totalBl'][type] }}</td><td>{{ tranches[key]['totalTarif'][type] }}</td>{% endif %}{% endfor %}
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">
+                            {% for key, value in tranches %}
+                                {% set counter = (counter | default(0) + 1) %}
+                                {% if tranches[key]|length > 2 %}
+
+                                    <div class="divTable"  style="width:45%;margin-left: 10px;margin-right: 30px; ">
+                                        <h4 id="titleTableTransport{{ counter }}" style="margin: 20px 0;text-align: center">Colis expédiés en {{ key }}</h4>
+                                        <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="tableTransport{{ counter }}" >
+                                            <thead>
+                                            <tr>
+                                                <th style="font-weight: bold">Tranche de poids en g</th><th style="font-weight: bold">nombres de commandes </th><td style="font-weight: bold">Tarif</td>
+                                            </tr>
+
+                                            </thead>
+                                            <tbody>
+                                            {% for tr in tranches[key]  %}
+                                                {% if (tr['idTransportTranches'] is defined) %}
+                                                    {% if (tr['nombreBl'] != 0)  %}
+                                                        <tr>
+                                                            {% if (tr['tarif'] is defined ) %}
+                                                                <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>{{ tr['tarif'] }}</td>
+                                                            {% else %}
+                                                                <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>no tarif</td>
+                                                            {% endif %}
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            <tr class="success" style="font-weight: bold">
+                                                <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl'] }}</td><td>{{ tranches[key]['totalTarif'] }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="articleCmde">
+                    {% if typeCommande|length > 1 %}
+                        <div >
+                            <h4 id="titleTable3" style="margin: 20px 0;text-align: center">Total des Articles</h4>
+                            <table class="table display compact divTable" id="table3" style="font-size: 12px; padding: 10px;width: 100%">
+                                <thead>
+                                <tr>
+                                    <th></th>{% for type in typeCommande %}<th>Nombre d'Articles {{type}}</th>{% endfor %}<th>TOTAL</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                <tr>
+                                    <td>Nombre d'articles</td>{% for type in typeCommande %}<td>{{ totalArticles['VPC'] }}</td>{% endfor %}<td>{{ totalArticles['VPC'] + totalArticles['PRIME'] }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Articles Supp</td>{% for type in typeCommande %}<td>{{ totalArticles[type] - nbreTypeTransport['total'][type] }}</td>{% endfor %}<td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                    <div >
+                        <h4 id="titleTable3" style="margin: 20px 0;text-align: center">Total des Articles</h4>
+                        <table class="table display compact divTable" id="table3" style="font-size: 12px; padding: 10px;width: 100%">
                             <thead>
                             <tr>
                                 <td></td><th>Nombre d'Articles </th>
@@ -314,51 +269,97 @@
                             </tbody>
                         </table>
                     </div>
+                    {% endif %}
+                    <div>
+                        <h4 id="titleArticleCommande" style="margin: 20px 0;text-align: center">Articles Commandés</h4>
+                        <table class="table display compact divTable" id="articleCommande" style="font-size: 12px; padding: 10px">
+                            <thead>
+                            <th>Code Article</th>
+                            <th>Libellé article</th>
+                            <th>Quantité</th>
+                            </thead>
+                            <tbody>
+                            {% for article in listArticles %}
+                                <tr>
+                                    <td>{{ article['codearticle'] }}</td>
+                                    <td>{{ article['libelle'] }}</td>
+                                    <td>{{ article['quantite'] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div>
-                <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">
-                    {% for key, value in tranches %}
+            </div>
 
-                        {% if tranches[key]|length > 2 %}
 
-                            <div class="col-25 divTable"  style="width:45%;margin-left: 20px;margin-right: 20px; ">
-                                <h4>Colis expédiés en {{ key }}</h4>
-                                <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="table{{ key }}" >
-                                    <thead>
-                                    <tr>
-                                        <th style="font-weight: bold">Tranche de poids en g</th><th style="font-weight: bold">nombres de commandes </th><td style="font-weight: bold">Tarif</td>
-                                    </tr>
+{#               #}
+{#                    <div class="col-md-3">#}
+{#                        <h4>Total des Articles</h4>#}
 
-                                    </thead>
-                                    <tbody>
-                                    {% for tr in tranches[key]  %}
-                                        {% if (tr['idTransportTranches'] is defined) %}
-                                            {% if (tr['nombreBl'] != 0)  %}
-                                                <tr>
-                                                    {% if (tr['tarif'] is defined ) %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>{{ tr['tarif'] }}</td>
-                                                    {% else %}
-                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>no tarif</td>
-                                                    {% endif %}
-                                                </tr>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    <tr class="success" style="font-weight: bold">
-                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl'] }}</td><td>{{ tranches[key]['totalTarif'] }}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+{#                        <table class="table display compact divTable" id="table3" style="font-size: 12px; padding: 10px">#}
+{#                            <thead>#}
+{#                            <tr>#}
+{#                                <td></td><th>Nombre d'Articles </th>#}
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody>#}
 
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+{#                            <tr>#}
+{#                                <td>Nombre d'articles</td><td>{{ totalArticles}}</td>#}
+{#                            </tr>#}
+
+{#                            <tr>#}
+{#                                <td>Articles Supp</td><td>{{ totalArticles - totalBl }}</td>#}
+{#                            </tr>#}
+{#                            </tbody>#}
+{#                        </table>#}
+{#                    </div>#}
+{#                </div>#}
+{#                <div  id="divTableaux" style="margin: 10px auto 0 auto; display: flex;flex-wrap: wrap;justify-content: space-between; width: 100%;text-align: center;">#}
+{#                    {% for key, value in tranches %}#}
+
+{#                        {% if tranches[key]|length > 2 %}#}
+
+{#                            <div class="col-25 divTable"  style="width:45%;margin-left: 20px;margin-right: 20px; ">#}
+{#                                <h4>Colis expédiés en {{ key }}</h4>#}
+{#                                <table class="table display compact tableTransport" style="margin: 10px; width: 96%" id="table{{ key }}" >#}
+{#                                    <thead>#}
+{#                                    <tr>#}
+{#                                        <th style="font-weight: bold">Tranche de poids en g</th><th style="font-weight: bold">nombres de commandes </th><td style="font-weight: bold">Tarif</td>#}
+{#                                    </tr>#}
+
+{#                                    </thead>#}
+{#                                    <tbody>#}
+{#                                    {% for tr in tranches[key]  %}#}
+{#                                        {% if (tr['idTransportTranches'] is defined) %}#}
+{#                                            {% if (tr['nombreBl'] != 0)  %}#}
+{#                                                <tr>#}
+{#                                                    {% if (tr['tarif'] is defined ) %}#}
+{#                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>{{ tr['tarif'] }}</td>#}
+{#                                                    {% else %}#}
+{#                                                        <td>{{ tr['poidsMax'] }}</td><td>{{ tr['nombreBl']}}</td><td>no tarif</td>#}
+{#                                                    {% endif %}#}
+{#                                                </tr>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                    <tr class="success" style="font-weight: bold">#}
+{#                                        <td style="font-weight: bold">Total</td><td>{{ tranches[key]['totalBl'] }}</td><td>{{ tranches[key]['totalTarif'] }}</td>#}
+{#                                    </tr>#}
+{#                                    </tbody>#}
+{#                                </table>#}
+{#                            </div>#}
+
+{#                        {% endif %}#}
+{#                    {% endfor %}#}
+{#                </div>#}
+{#            {% endif %}#}
+{#        </div>#}
 
     </div>
 
-    </div>
 
 
 {% endblock %}

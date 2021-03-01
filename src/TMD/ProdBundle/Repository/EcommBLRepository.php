@@ -334,7 +334,6 @@ class EcommBLRepository extends EntityRepository
             ->addSelect('file.filename')
             ->addSelect('ligne.poids as poidsReel')
             ->addSelect('IDENTITY(tr.idStatut) as trStatut')
-            ->addSelect('tr.json')
             ->addSelect('bl.modexp')
             ->addSelect('bl.dateProduction')
             ->addSelect('bl.nColis')
@@ -365,13 +364,8 @@ class EcommBLRepository extends EntityRepository
             ->setParameter('dat', $dateDepot.'%')
             ->addSelect('bl.dateProduction')
             ->addSelect('tr.destinataire')
-            ->addSelect('tr.destCp');
-
-        if ($mode) {
-            $result->andWhere('statut.idStatut != 9')
-                ->andWhere('statut.idStatut != 10');
-        }
-        $result->addSelect('tr.typeTransport')
+            ->addSelect('tr.destCp')
+            ->addSelect('tr.typeTransport')
             ->addSelect('ligne.numbl')
             ->addSelect('tr.numCmdeClient')
             ->addSelect('tr.destRue')
@@ -1336,8 +1330,8 @@ class EcommBLRepository extends EntityRepository
             ->getSingleScalarResult()
             ;
     }
-    public function findcountBlByPoidsVPC($idAppli, $Datedepot, $codetransport, $poids){
-        $type= 'VPC';
+    public function findcountBlByPoidsbyType($idAppli, $Datedepot, $codetransport, $poids, $type){
+
         return $this
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
@@ -1365,65 +1359,10 @@ class EcommBLRepository extends EntityRepository
             ;
     }
 
-    public function findcountBlByPoidsPRIME($idAppli, $dateDepot, $codetransport, $poids){
-        $type = 'PRIME';
-        return $this
-            ->createQueryBuilder('bl')
-            ->leftJoin('bl.bl', 'ligne')
-            ->innerJoin('ligne.numligne', 'tr')
-            ->innerJoin('tr.idStatut', 'statut')
-            ->innerJoin('tr.idfile', 'file')
-            ->innerJoin('file.idappli', 'appli')
-            ->where('appli.idappli IN (:idapp)')
-            ->setParameter('idapp', $idAppli)
-            ->andWhere('statut.idStatut != (:st)')
-            ->andWhere('statut.idStatut != (:st2)')
-            ->setParameter('st', 9)
-            ->setParameter('st2', 10)
-            ->andWhere('tr.dateDepot LIKE :dat')
-            ->setParameter('dat', $dateDepot.'%')
-            ->andWhere('bl.modexp IN (:code)')
-            ->setParameter("code", $codetransport)
-            ->andwhere('ligne.poids <= (:poids)')
-            ->setParameter('poids', $poids)
-            ->andWhere('tr.json LIKE :type')
-            ->setParameter('type', '%'.$type.'%')
-            ->select ('count(bl.bl)')
-            ->getQuery()
-            ->getSingleScalarResult()
-            ;
-    }
-    public function findcountBlByPoidsREASS($idAppli, $dateDepot, $codetransport, $poids){
-        $type = 'REASS';
-        return $this
-            ->createQueryBuilder('bl')
-            ->leftJoin('bl.bl', 'ligne')
-            ->innerJoin('ligne.numligne', 'tr')
-            ->innerJoin('tr.idStatut', 'statut')
-            ->innerJoin('tr.idfile', 'file')
-            ->innerJoin('file.idappli', 'appli')
-            ->where('appli.idappli IN (:idapp)')
-            ->setParameter('idapp', $idAppli)
-            ->andWhere('statut.idStatut != (:st)')
-            ->andWhere('statut.idStatut != (:st2)')
-            ->setParameter('st', 9)
-            ->setParameter('st2', 10)
-            ->andWhere('tr.dateDepot LIKE :dat')
-            ->setParameter('dat', $dateDepot.'%')
-            ->andWhere('bl.modexp IN (:code)')
-            ->setParameter("code", $codetransport)
-            ->andwhere('ligne.poids <= (:poids)')
-            ->setParameter('poids', $poids)
-            ->andWhere('tr.json LIKE :type')
-            ->setParameter('type', '%'.$type.'%')
-            ->select ('count(bl.bl)')
-            ->getQuery()
-            ->getSingleScalarResult()
-            ;
-    }
 
-    public function findcountBlByTrancheVPC($idAppli, $dateDepot, $codetransport, $poids1, $poids2){
-        $type = 'VPC';
+
+    public function findcountBlByTrancheByType($idAppli, $dateDepot, $codetransport, $poids1, $poids2, $type){
+
         return $this
             ->createQueryBuilder('bl')
             ->leftJoin('bl.bl', 'ligne')
