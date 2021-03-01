@@ -347,7 +347,7 @@
             {% if tagArticle %}
                 {% set totalArticle = 0 %}
                 {% set recla = 0 %}
-                {% if nbBlbyfile[file['idfile']]['articles'] is defined %}
+                {% if nbBlbyfile[file['idfile']]['articles'][0] is defined %}
                     {% for k,v in nbBlbyfile[file['idfile']]['articles'][0] %}
                         {% set totalArticle =  totalArticle + v %}
                         {% set nk = k|replace({'é' :'e'}) %}

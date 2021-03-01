@@ -3329,8 +3329,11 @@ dump($date);
 
         $logo = (base64_encode(stream_get_contents($ope->getAppliImage())));
         $date = date('Y-m');
+        dump($date);
         $minusMonth = strtotime($date . "- 1 months");
         $lastmonth = date("Y-m", $minusMonth);
+        dump($lastmonth);
+
 
         $tranches=[];
         if ($choix == 1) {
@@ -3339,6 +3342,7 @@ dump($date);
             $thisdate = $lastmonth;
         }
         $listBl = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlByDateProdByAppli($idOpe, $thisdate, true);
+
         $typeCommande =[];
         foreach ( $listBl as $bl){
             if (!empty($bl['json'])) {
@@ -3376,6 +3380,7 @@ dump($date);
                     $totalColis['total'] = $totalColis[$value];
                 }
                 $totalArticles[$value] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindCountArticlesByOpeByDate($idOpe, $thisdate, $value);
+
 
 
                 $nbrTypeTransport['total'][$value] = 0;
@@ -3471,10 +3476,12 @@ dump($date);
                 }
             }}
 
+
         $listArticles = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeByDate($idOpe, $thisdate);
         dump($tranches);
         setlocale(LC_TIME, "fr_FR.UTF-8", "fra");
         $dateFrench = utf8_encode(strftime("%B %G", strtotime($thisdate)));
+
         return $this->render('TMDProdBundle:Prod:prefacturation.html.twig', array(
             'listArticles' => $listArticles,
             'typeCommande'=> $typeCommande,

@@ -24,11 +24,19 @@ class PndController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $statuts_pnd = [];
+        $statuts_pndTemp = [];
         // récupération des de statuts PND
         foreach (self::STATUTS_PND_ABREGES as $statut_pnd_abrege) {
-            $statuts_pnd[] =  $em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($statut_pnd_abrege);
+            $statuts_pndTemp[] =  $em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($statut_pnd_abrege);
         }
+        $statuts_pnd[0] =$statuts_pndTemp[3];
+        $statuts_pnd[1] =$statuts_pndTemp[0];
+        $statuts_pnd[2] =$statuts_pndTemp[1];
+        $statuts_pnd[3] =$statuts_pndTemp[2];
+        $statuts_pnd[4] =$statuts_pndTemp[4];
+
+
+        dump($statuts_pnd);
 
         if ($request->getMethod() === 'POST') {
             $numCmd = $request->request->get('numCmd');
