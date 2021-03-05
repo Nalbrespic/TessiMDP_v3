@@ -736,7 +736,6 @@ class ProdController extends Controller
 
         $tabBlComplet2 = array();
         foreach ($tabBlComplet as $k=>$v){
-            dump($v);
             if (date_format($v['statut']['dateStatut'], "d-m-Y") == '30-11-1999') {
                 $v['statut']['dateStatut'] = '';
             }else{
@@ -1993,7 +1992,6 @@ class ProdController extends Controller
             }
             $modeTransport = $em->getRepository('TMDProdBundle:EcommBl')->findDistinctTransportByFile($filesPaginator);
 
-            dump($nbBlByFile);
             foreach ($nbBlByFile as $bl)
             {
                 $filesBl[$bl['idfile']]['nbBl'] = $bl[1];
@@ -2040,7 +2038,6 @@ class ProdController extends Controller
                     }
                 }
             }
-            dump($filesBl);
             $nbBlByFileProd = $em->getRepository('TMDProdBundle:EcommBl')->findNbBlByFileProd($files);
             $filesBlProd = array();
             $dateMinProdByApplication = '2040-01-01 ';
@@ -2335,7 +2332,6 @@ class ProdController extends Controller
             {
                 $tabSyntheseGeneralaProd += intval($tab['totProd']);
             }
-            dump($tabSyntheseGeneralaProd);
             //pagination
             $nbPages = ceil(count($nbTrackingByFile) / $nbParPage);
             if ($page > $nbPages) {
@@ -2536,7 +2532,6 @@ class ProdController extends Controller
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlByFile($id);
             $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileArray($id);
             $articlesPersos = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesPersoByFileArray($id);
-            dump($articlesPersos);
             $articleArray = array();
             foreach ($articles as $key => $item) {
                 $articleArray[$key] = $item;
@@ -2572,18 +2567,14 @@ class ProdController extends Controller
                     $statuts[$cp['numbl']]['dateStatut'] = $cp['dateStatut'];
                 }
             }
-            dump($statuts);
-            dump($allBlByOpe);
             $tabBlComplet = array();
             foreach ($allBlByOpe as $key=>$item){
                 $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($item['numbl']);
-                dump($histoStatut);
                 $historiqueStat =[];
 
                 for ($i=0; $i < count($histoStatut); $i++) {
                     if ($histoStatut != [] and $histoStatut[$i]['idstatut'] !=0){
                     $historiqueStat[$i]['idstatut'] = $histoStatut[$i]['idstatut'];
-                    dump($em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut']));
                     $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histoStatut[$i]['idstatut'])->getStatut();
                     $historiqueStat[$i]['observation'] = $histoStatut[$i]['observation'];
                     $historiqueStat[$i]['datestatut'] = $histoStatut[$i]['datestatut'];
@@ -2611,7 +2602,6 @@ class ProdController extends Controller
 //                $statutLibelle = $this->container->get('tmd_getInfo');
 //                $tabBlComplet[$key]['statutLibelle'] = $statutLibelle->getStatutWithId($tabBlComplet[$key]['idStatut'])->getStatut();
             }
-            dump($tabBlComplet);
             $reponse = array('add' => $tabBlComplet, 'articles' => $articleArray, 'perso' => $articlesPersos);
             return new JsonResponse($reponse);
 
@@ -2621,19 +2611,15 @@ class ProdController extends Controller
 
     public function annuleTrackingAction (Request $request){
         $numbl = $request->get('numbl');
-        dump($numbl);
         $em = $this->getDoctrine()->getManager();
 
         $ligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($numbl);
         $numLigne = $ligne[0]->getNumligne()->getNumligne();
         $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
-        dump($tracking[0][0]);
         $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
-        dump($statut);
         $abregeStatut = $statut->getAbregestatut();
         $observation="commande annulée par opérateur";
         $sm = $this->get('tmd_statut');
-        dump($statut->getIdStatut());
         $sm->changeStatut($tracking[0][0],$abregeStatut,$observation, $this->getUser());
 //
 //        $tracking[0][0]->setIdStatut($statut);
@@ -2858,7 +2844,6 @@ class ProdController extends Controller
             $em = $this->getDoctrine()->getManager();
 
             $nbBlByFile = $em->getRepository('TMDProdBundle:EcommBl')->findBlByOpeByDateDepot( $date, $idAppli);
-            dump($nbBlByFile);
             $bls = array();
             foreach ($nbBlByFile as $f=>$k){
                 array_push($bls,intval($k->getBl()->getNumbl()) ) ;
@@ -2879,9 +2864,6 @@ class ProdController extends Controller
             {
                 $filesBl[$bl['modexp']] = $bl[1];
             }
-            dump($countTransportbyFile);
-            dump($syntheseArticles);
-            dump($filesBl);
             return new JsonResponse(array(sizeof($bls), $syntheseArticles, $filesBl));
 
         };
@@ -2941,7 +2923,6 @@ class ProdController extends Controller
             for ($i=0; $i < count($histStatut); $i++) {
                 if ($histStatut != [] and $histStatut[$i]['idstatut'] !=0){
                     $historiqueStat[$i]['idstatut'] = $histStatut[$i]['idstatut'];
-                    dump($em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut']));
                     $historiqueStat[$i]['statut'] = $em->getRepository('TMDProdBundle:EcommStatut')->find($histStatut[$i]['idstatut'])->getStatut();
                     $historiqueStat[$i]['observation'] = $histStatut[$i]['observation'];
                     $historiqueStat[$i]['datestatut'] = $histStatut[$i]['datestatut'];
@@ -2957,11 +2938,9 @@ class ProdController extends Controller
             // récupérer le statut de la livraison lorsqu'il est disponible:
            $statutLiv = [];
             $numLigne = $tracking[0]['numligne'];
-            dump($numLigne);
          if ($tracking[0]['typeTransport'] == "CPRVE" OR $tracking[0]['typeTransport'] == "CPRV" OR $tracking[0]['typeTransport'] == "CPRVTC" OR $tracking[0]['typeTransport'] == "CPRVT")
          {
              $trackingCprve = $emCP->getRepository('TMDColisPriveBundle:Trackings')->findStatutByNumligne($numLigne);
-             dump($trackingCprve);
              if ($trackingCprve == []){
                  $statutLiv = "";
              } else {
@@ -3012,27 +2991,22 @@ class ProdController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $TrackingRupt = $em->getRepository('TMDProdBundle:EcommLignes')->findAllBlRuptureByOpe($idOpe);
-        dump($TrackingRupt);
         return new JsonResponse(array($TrackingRupt));
 
     }
 
     public function AnnulTrackingAllAction (Request $request){
         $listTracking = $request->get('listtracking');
-        dump($listTracking);
 
         $em = $this->getDoctrine()->getManager();
         foreach ($listTracking as $bl) {
             $ligne = $em->getRepository('TMDProdBundle:EcommLignes')->findBlNumligne($bl);
             $numLigne = $ligne[0]->getNumligne()->getNumligne();
             $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->trackingByNumligne($numLigne);
-            dump($tracking[0][0]);
             $statut = $em->getRepository('TMDProdBundle:EcommStatut')->find(9);
-            dump($statut);
             $abregeStatut = $statut->getAbregestatut();
             $observation = "commande annulée par opérateur";
             $sm = $this->get('tmd_statut');
-            dump($statut->getIdStatut());
             $sm->changeStatut($tracking[0][0], $abregeStatut, $observation, $this->getUser());
         }
 
@@ -3042,11 +3016,9 @@ class ProdController extends Controller
     public function SyntheseBlByDateProdAction(Request $request){
         $idope = $request->get('idope');
         $date = $request->get('date');
-dump($date);
         $em = $this->getDoctrine()->getManager();
         $bls= $em->getRepository('TMDProdBundle:EcommBl')->syntheseMoisBl($date, $idope);
 
-        dump($bls);
 
         return new JsonResponse($bls);
     }
@@ -3059,7 +3031,6 @@ dump($date);
         $options->set('defaultFont', 'Roboto');
 
         $dompdf = new Dompdf($options);
-        dump($thisdate);
         $em = $this->getDoctrine()->getManager();
         $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
         $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
@@ -3079,7 +3050,6 @@ dump($date);
             $colis['grand carton']['PRIME'] = $em->getRepository('TMDProdBundle:EcommBl')->findColisByDate($idOpe, $thisdate, "PRIME", "C3");
             $totalColis[$value] = $colis['Enveloppe PRESS'][$value] + $colis['pochette'][$value] + $colis['petit carton'][$value] + $colis['moyen carton'][$value] + $colis['grand carton'][$value];
             $totalColis['PRIME'] = $colis['Enveloppe PRESS']['PRIME'] + $colis['pochette']['PRIME'] + $colis['petit carton']['PRIME'] + $colis['moyen carton']['PRIME'] + $colis['grand carton']['PRIME'];
-            dump($colis);
             $totalArticles[$value] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,$value);
             $totalArticles['PRIME']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'PRIME');
 
@@ -3106,7 +3076,6 @@ dump($date);
                             $nbrBlVPC = $tranches[$type['typeTransport']][$i][$value]['nombreBl'];
                             $tranches[$type['typeTransport']]['totalBl'][$value] += $tranches[$type['typeTransport']][$i][$value]['nombreBl'];
                             $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
-                            dump($tarifVPC);
                             if ($tarifVPC != []) {
                                 $tranches[$type['typeTransport']][$i][$value]['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
                                 $tranches[$type['typeTransport']]['totalTarif'][$value] += $tranches[$type['typeTransport']][$i][$value]['tarif'];
@@ -3161,7 +3130,6 @@ dump($date);
             $totalColis[$value] = $colis['Enveloppe PRESS'][$value] + $colis['pochette'][$value] + $colis['petit carton'][$value] + $colis['moyen carton'][$value] + $colis['grand carton'][$value];
             $totalColis['PRIME'] = $colis['Enveloppe PRESS']['PRIME'] + $colis['pochette']['PRIME'] + $colis['petit carton']['PRIME'] + $colis['moyen carton']['PRIME'] + $colis['grand carton']['PRIME'];
             $totalColis['REASS'] = $colis['Enveloppe PRESS']['REASS'] + $colis['pochette']['REASS'] + $colis['petit carton']['REASS'] + $colis['moyen carton']['REASS'] + $colis['grand carton']['REASS'];
-            dump($colis);
             $totalArticles[$value] = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,$value);
             $totalArticles['PRIME']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'PRIME');
             $totalArticles['REASS']  = $em->getRepository('TMDProdBundle:EcommCmdep')->FindArticlesByOpeByDate($idOpe,$thisdate,'REASS');
@@ -3194,7 +3162,6 @@ dump($date);
                             $nbrBlVPC = $tranches[$type['typeTransport']][$i][$value]['nombreBl'];
                             $tranches[$type['typeTransport']]['totalBl'][$value] += $tranches[$type['typeTransport']][$i][$value]['nombreBl'];
                             $tarifVPC = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findTarif($idClient, $type['typeTransport'], $thisdate, $tranches[$type['typeTransport']][$i]['idTransportTranches']);
-                            dump($tarifVPC);
                             if ($tarifVPC != []) {
                                 $tranches[$type['typeTransport']][$i][$value]['tarif'] = $nbrBlVPC * $tarifVPC[0]['tarif'];
                                 $tranches[$type['typeTransport']]['totalTarif'][$value] += $tranches[$type['typeTransport']][$i][$value]['tarif'];
@@ -3293,8 +3260,6 @@ dump($date);
 
         $dateFrench = strftime("%B %G", strtotime($thisdate));
 
-        dump($tranches);
-        dump($dateFrench);
         $html = $this->renderview('TMDProdBundle:Prod:pdf.html.twig', array(
             'typesTransport'=>$typeTransport,
             'nbreTypeTransport' => $nbrTypeTransport,
@@ -3329,10 +3294,8 @@ dump($date);
 
         $logo = (base64_encode(stream_get_contents($ope->getAppliImage())));
         $date = date('Y-m');
-        dump($date);
         $minusMonth = strtotime($date . "- 1 months");
         $lastmonth = date("Y-m", $minusMonth);
-        dump($lastmonth);
 
 
         $tranches=[];

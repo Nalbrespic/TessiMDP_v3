@@ -54,7 +54,6 @@ $(function()
 	}).on('datepicker-first-date-selected', function(event, obj)
 	{
 		/* This event will be triggered when first date is selected */
-		console.log('first-date-selected',obj);
 		// obj will be something like this:
 		// {
 		// 		date1: (Date object of the earlier date)
@@ -63,7 +62,6 @@ $(function()
 	.on('datepicker-change',function(event,obj)
 	{
 		/* This event will be triggered when second date is selected */
-		console.log('change',obj);
 		// obj will be something like this:
 		// {
 		// 		date1: (Date object of the earlier date),
@@ -74,27 +72,22 @@ $(function()
 	.on('datepicker-apply',function(event,obj)
 	{
 		/* This event will be triggered when user clicks on the apply button */
-		console.log('apply',obj);
 	})
 	.on('datepicker-close',function()
 	{
 		/* This event will be triggered before date range picker close animation */
-		console.log('before close');
 	})
 	.on('datepicker-closed',function()
 	{
 		/* This event will be triggered after date range picker close animation */
-		console.log('after close');
 	})
 	.on('datepicker-open',function()
 	{
 		/* This event will be triggered before date range picker open animation */
-		console.log('before open');
 	})
 	.on('datepicker-opened',function()
 	{
 		/* This event will be triggered after date range picker open animation */
-		console.log('after open');
 	});
 
 

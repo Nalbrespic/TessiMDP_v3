@@ -31,7 +31,6 @@ class StatutManager
     public function changeStatut(EcommTracking $tracking, string $agregeStatut, string $statutObservation, UserInterface $user) {
         // get status
         $statut = $this->em->getRepository('TMDProdBundle:EcommStatut')->getByAbrege($agregeStatut);
-        dump($statut->getIdStatut());
         // change status himself
         $tracking->setIdStatut($statut);
 

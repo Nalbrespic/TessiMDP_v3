@@ -1149,7 +1149,6 @@
                             dataType: "json",
                             contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                             complete: function (html) {
-                                console.log('html: ',html)
                         var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true, 'vue' : 1,'appAverif': 'false'})|escape('js') }}';
                         temp = temp.replace('varBl', cmd);
 
