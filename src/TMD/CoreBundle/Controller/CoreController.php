@@ -107,7 +107,6 @@ class CoreController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $trackingsErreurWS = $em->getRepository('TMDProdBundle:EcommLignes')->findTrackingsPbWSwithop($idOpe);
-        dump($trackingsErreurWS);
 
         $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($trackingsErreurWS[$current]->getNumbl());
         $trackLength = sizeof($trackingsErreurWS);
@@ -236,13 +235,10 @@ class CoreController extends Controller
         if ($request->isXmlHttpRequest()) {
 
             $numTracking = $request->get('numTracking');
-            dump($numTracking);
             $em = $this->getDoctrine()->getManager();
 
             $Cmde = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('nColis' => $numTracking));
-            dump($Cmde);
             $Bl = $Cmde->getBl()->getNumbl();
-            dump($Bl);
 
             return new JsonResponse(array($Bl));
         }
@@ -256,10 +252,7 @@ class CoreController extends Controller
 
         $clients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
-        dump($listTarifValide);
-        dump($transporteurs);
 
-        dump($clients);
 
         return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
             'listTarif' => $listTarifValide,
@@ -272,9 +265,7 @@ class CoreController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $transporteurs = $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
-        dump($transporteurs);
          $typesTransport= $em->getRepository('TMDAppliBundle:EcommTransport')->findallTransport();
-        dump($typesTransport);
         $listClients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
         return new JsonResponse(array($transporteurs,$typesTransport, $listClients));
     }
@@ -283,13 +274,9 @@ class CoreController extends Controller
 
         $em = $this->getDoctrine()->getManager();
         $idTransporteur = $request->get('idtransporteur');
-        dump($idTransporteur);
         $typeTransport = $em->getRepository('TMDAppliBundle:EcommTransport')->findByTransporteur($idTransporteur);
         $zones = $em->getRepository('TMDCoreBundle:TransporteursZones')->zonesByTransporteurs($idTransporteur);
         $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
-         dump($typeTransport);
-         dump($zones);
-         dump($tranche);
         return new JsonResponse(array($typeTransport, $zones, $tranche));
     }
 
@@ -300,8 +287,6 @@ class CoreController extends Controller
         $zones = $em->getRepository('TMDCoreBundle:TransporteursZones')->zonesByTransporteurs($idTransport);
         $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->findByTransporteur($idTransporteur);
 
-        dump($zones);
-        dump($tranche);
         return new JsonResponse(array($zones, $tranche));
     }
 
@@ -322,16 +307,8 @@ class CoreController extends Controller
         $tranche = $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($idtranche);
         $date = $request->get('date');
         $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
-        dump($dateFormat);
-        dump($client);
-        dump($transporteur);
-        dump($tranche);
-        dump($zone);
-        dump($tarif);
-        dump($typeTransport);
         $message = 'ajout effectué avec succès';
         $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idclient,$idtransporteur, $idtranche, $idzone, $idtypeTransport);
-        dump($ancienTarif);
         if ($ancienTarif != []){
             foreach ($ancienTarif as $tarif){
                 $tarif->setIsValid(false);
@@ -369,23 +346,12 @@ class CoreController extends Controller
         $tarifsTranche = array_chunk($tarifs, count($zones));
         $date = $request->get('date');
         $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
-        dump($client);
-        dump($tarifsTranche);
-        dump($idTransporteur);
-        dump($idTransport);
-        dump($zones);
-        dump($tranches);
-        dump($tarifs);
-        dump($dateFormat);
 
         for ($i = 0; $i < count($tranches); $i++){
             for ($t =0; $t<count($zones);$t++){
                 $tranche= $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($tranches[$i]['idTransportTranches']);
                 $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($zones[$t]['idTransporteursZones']);
                 $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idClient, $idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
-                dump($tranche);
-                dump($zone);
-                dump($ancienTarif);
                 if ($ancienTarif != [])
                 {
                     foreach ($ancienTarif as $onetarif){
@@ -423,7 +389,6 @@ class CoreController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $listClients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
-        dump($listClients);
 
         return new JsonResponse(array($listClients));
     }

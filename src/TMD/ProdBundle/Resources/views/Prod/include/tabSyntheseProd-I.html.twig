@@ -214,7 +214,6 @@
         // max.setMonth(m);
         var thismonth = moment(toDay).format('YYYY-MM');
 
-        console.log('mois en cours',thismonth);
         $.ajax({
             url: "{{ path('tmd_prod_donneSyntheseBlByDateProd') }}",
             type: "POST",
@@ -224,9 +223,7 @@
             complete: function(data){
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('objet reçu: ', obj);
                 var nbrCommande = obj[0].cn;
-                console.log('commandes du mois en cours', nbrCommande);
 
 
 
