@@ -7,7 +7,11 @@ Gestion transports
 {% block body %}
 <h3 style="text-align: center;"> Gestion des transporteurs</h3>
     <div class="container">
-        <div class="row" style="display:flex; margin-top: 50px;">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class="nav-item"><a class="nav-link active" href="#facturation">Facturation</a></li>
+      <li role="presentation" class="nav-item"><a class="nav-link" href="#tarifTransports">Gestion des tarifs</a></li>
+    </ul>
+        <div class="row" style="display:flex; margin-top: 50px;" id="tarifTransports">
             <div class="col-md-10">
                 <div>
                     <div class="btn btn-success" onclick="ajoutMasse()">Ajouter une grille tarifaire</div>

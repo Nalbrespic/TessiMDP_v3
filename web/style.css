@@ -481,3 +481,6 @@ button.dt-button:hover{
     color: #28274d !important;
     font-weight: bolder !important;
 }
+#tableProdFichier thead tr td{
+    padding: 0px !important;
+}
