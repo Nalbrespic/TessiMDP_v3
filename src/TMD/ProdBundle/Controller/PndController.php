@@ -36,7 +36,6 @@ class PndController extends Controller
         $statuts_pnd[4] =$statuts_pndTemp[4];
 
 
-        dump($statuts_pnd);
 
         if ($request->getMethod() === 'POST') {
             $numCmd = $request->request->get('numCmd');

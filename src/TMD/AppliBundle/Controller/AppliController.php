@@ -413,7 +413,6 @@ class AppliController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $button = true;
-        dump($etat);
 
         if ($etat != 'nc' and $etat != '3' ) {
             if ($etat != '9'){
@@ -439,13 +438,10 @@ class AppliController extends Controller
 
 
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
-                dump($cheminImage);
                 $env = $this->container->get('kernel')->getEnvironment();
-                dump($env);
                 if ($env != 'dev'){
                     $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
                     $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
-                    dump($chemeinImageMod1);
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
@@ -500,11 +496,9 @@ class AppliController extends Controller
                         $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
                     }
                 }
-                dump($articleArray);
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
                 $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
-                dump($jouristo);
 
                 if ($etat === '1') {
                     $messageApresScan = "Commande N° " . $bl . " déjà produite !";

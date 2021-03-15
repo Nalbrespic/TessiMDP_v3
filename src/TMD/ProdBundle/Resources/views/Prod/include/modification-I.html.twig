@@ -40,7 +40,6 @@
             var mycheck = document.getElementById('searchRupt');
 
             if (mycheck.checked == true) {
-                console.log("coché !!");
                 $.ajax({
                     url: "{{ path('tmd_prod_rechercheRupt') }}",
                     type: "POST",
@@ -53,7 +52,6 @@
                         var obj = JSON.parse(json);
                         var tabtrackings = obj[0]
                         var len = tabtrackings.length;
-                        console.log(tabtrackings);
 
                         if ( len !== 0) {
 
@@ -133,7 +131,6 @@
                  dataType: "html",
                  contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                  complete: function (data) {
-                     console.log('données envoyées !')
                      searchRupt()
                      succes.style.display = "";
                      setTimeout(function () {
