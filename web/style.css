@@ -152,7 +152,7 @@ table.table-bordered.table-striped.tableSynthese tbody tr th
 
 table.table-bordered.table-striped.tableSynthese tbody tr td
 {
-    padding: 0 5px 0 5px;
+    padding: 0px;
     vertical-align: inherit;
 }
 
@@ -480,4 +480,7 @@ button.dt-button:hover{
     background-color: white !important;
     color: #28274d !important;
     font-weight: bolder !important;
+}
+.tableSynthese > tbody > tr > th {
+    padding:0;
 }
