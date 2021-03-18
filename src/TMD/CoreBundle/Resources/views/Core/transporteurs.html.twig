@@ -7,110 +7,118 @@ Gestion transports
 {% block body %}
 <h3 style="text-align: center;"> Gestion des transporteurs</h3>
     <div class="container">
-    <ul class="nav nav-tabs">
-      <li role="presentation" class="nav-item"><a class="nav-link active" href="#facturation">Facturation</a></li>
-      <li role="presentation" class="nav-item"><a class="nav-link" href="#tarifTransports">Gestion des tarifs</a></li>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" id="ongletTransportDefaut" class="active"><a href="#facturation" aria-controls="facturation" role="tab" data-toggle="tab">Facturation</a></li>
+        <li role="presentation"><a href="#tarifTransports" aria-controls="tarifTransports" role="tab" data-toggle="tab">Gestion des tarifs</a></li>
+{#        <li role="presentation" class="nav-item"><a class="nav-link active" href="#facturation">Facturation</a></li>#}
+{#        <li role="presentation" class="nav-item"><a class="nav-link" href="#tarifTransports">Gestion des tarifs</a></li>#}
     </ul>
-        <div class="row" style="display:flex; margin-top: 50px;" id="tarifTransports">
-            <div class="col-md-10">
-                <div>
-                    <div class="btn btn-success" onclick="ajoutMasse()">Ajouter une grille tarifaire</div>
-                    <div class="btn btn-primary" onclick="ajoutTarifTransport()">Ajouter un tarif</div>
-                </div>
-            <div  style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px; margin-top: 20px; padding: 15px">
-                <h5>Liste des tarifs par transporteur</h5>
-                <div class="row">
-                <div class="form-group col-md-4">
-                       <label for="selectTransporteur">Tri par Client</label>
-                        <select  class="form-control custom-select" id="selectClient" onchange="selectClient()">
-                            <option value="allClient">Sélectionner</option>
-                            {%  for client in clients %}
-                            <option value="{{ client.nomclient }}">{{ client.nomclient }}</option>
-
-                        {% endfor %}
-                        </select>
+         <div class="tab-content" style="position: relative;" >
+            <div  role="tabpanel" class="tab-pane active"  id="facturation">
+                <h4>TEST</h4>
+            </div>
+            <div  role="tabpanel" class="tab-pane"  id="tarifTransports">
+                <div class="col-md-10" style="margin-top: 30px">
+                    <div>
+                        <div class="btn btn-success" onclick="ajoutMasse()">Ajouter une grille tarifaire</div>
+                        <div class="btn btn-primary" onclick="ajoutTarifTransport()">Ajouter un tarif</div>
                     </div>
+                <div  style=" border: grey 2px solid; border-radius: 15px; margin-right: 15px; margin-top: 20px; padding: 15px">
+                    <h5>Liste des tarifs par transporteur</h5>
+                    <div class="row">
                     <div class="form-group col-md-4">
-                       <label for="selectTransporteur">Tri par Transporteur</label>
-                        <select  class="form-control custom-select" id="selectTransporteur" onchange="selectTransporteur()">
-                            <option value="allTransporteur">Sélectionner</option>
-                            {%  for transporteur in listTransporteurs %}
-                            <option value="{{ transporteur.libelletransporteur }}">{{ transporteur.libelletransporteur }}</option>
+                           <label for="selectTransporteur">Tri par Client</label>
+                            <select  class="form-control custom-select" id="selectClient" onchange="selectClient()">
+                                <option value="allClient">Sélectionner</option>
+                                {%  for client in clients %}
+                                <option value="{{ client.nomclient }}">{{ client.nomclient }}</option>
 
-                        {% endfor %}
-                        </select>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                           <label for="selectTransporteur">Tri par Transporteur</label>
+                            <select  class="form-control custom-select" id="selectTransporteur" onchange="selectTransporteur()">
+                                <option value="allTransporteur">Sélectionner</option>
+                                {%  for transporteur in listTransporteurs %}
+                                <option value="{{ transporteur.libelletransporteur }}">{{ transporteur.libelletransporteur }}</option>
+
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="overflow:auto;height: 400px">
+                        <table class="table" style="border: 1px grey solid;" id="tableTransporteursTarif">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>transporteur</th>
+                                    <th>Type d'envoi</th>
+                                    <th>tranche de poids</th>
+                                    <th>zone d'envoi</th>
+                                    <th>tarif</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for tarif in listTarif  %}
+                                <tr id="lignesTarifs">
+                                    <td>{{ tarif.nomclient }}</td>
+                                    <td>{{ tarif.libelletransporteur }}</td>
+                                    <td>{{ tarif.codetransport }}</td>
+                                    <td> jusqu'à {{ tarif.poidsMax }} g</td>
+                                    <td>{{ tarif.zone }}</td>
+                                    <td>{{ tarif.tarif }} €</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <div style="overflow:auto;height: 400px">
-                    <table class="table" style="border: 1px grey solid;" id="tableTransporteursTarif">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>transporteur</th>
-                                <th>Type d'envoi</th>
-                                <th>tranche de poids</th>
-                                <th>zone d'envoi</th>
-                                <th>tarif</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for tarif in listTarif  %}
-                            <tr id="lignesTarifs">
-                                <td>{{ tarif.nomclient }}</td>
-                                <td>{{ tarif.libelletransporteur }}</td>
-                                <td>{{ tarif.codetransport }}</td>
-                                <td> jusqu'à {{ tarif.poidsMax }} g</td>
-                                <td>{{ tarif.zone }}</td>
-                                <td>{{ tarif.tarif }} €</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
                 </div>
+
+
+            <div class="modal fade" tabindex="-1" role="dialog" id="modalTransport" style="display: none; ">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 800px;">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeTransport()">&times;</span></button>
+                            <h4 class="modal-title">Ajouter un tarif transport</h4>
+                        </div>
+                        <div class="modal-body" id="modalTransportContent">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeTransport()">annuler</button>
+                            <button type="button" class="btn btn-primary" onclick="envoiAjout()">Ajouter le tarif transporteur</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+
+
+            <div class="modal fade" tabindex="-1" role="dialog" id="modalMasseTransporteurs" style="display: none;">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: 800px; top:150px">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeMasse()">&times;</span></button>
+                            <h4 class="modal-title">Ajout d'une grille tarifaire</h4>
+
+                        </div>
+                        <div class="modal-body" id="modalMasseTransporteursContent" >
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default " data-dismiss="modal" onclick="closeMasse()">annuler</button>
+                            <button type="button" class="btn btn-primary" onclick="saveTarifsMasse()">Ajouter les tarifs transporteur</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
             </div>
-            </div>
-
-
-        <div class="modal fade" tabindex="-1" role="dialog" id="modalTransport" style="display: none; ">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content" style="width: 800px;">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeTransport()">&times;</span></button>
-                        <h4 class="modal-title">Ajouter un tarif transport</h4>
-                    </div>
-                    <div class="modal-body" id="modalTransportContent">
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeTransport()">annuler</button>
-                        <button type="button" class="btn btn-primary" onclick="envoiAjout()">Ajouter le tarif transporteur</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-
-
-
-        <div class="modal fade" tabindex="-1" role="dialog" id="modalMasseTransporteurs" style="display: none;">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content" style="width: 800px; top:150px">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" onclick="closeMasse()">&times;</span></button>
-                        <h4 class="modal-title">Ajout d'une grille tarifaire</h4>
-
-                    </div>
-                    <div class="modal-body" id="modalMasseTransporteursContent" >
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default " data-dismiss="modal" onclick="closeMasse()">annuler</button>
-                        <button type="button" class="btn btn-primary" onclick="saveTarifsMasse()">Ajouter les tarifs transporteur</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+         </div>
     </div>
 
 {% endblock %}
