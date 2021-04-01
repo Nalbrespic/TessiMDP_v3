@@ -1,0 +1,138 @@
+{% extends '@TMDCore/index.html.twig' %}
+
+{% block title %}
+    Gestion des Appli
+{% endblock %}
+
+{% block body %}
+<div class="container" style="width: 100%">
+
+    <div class="title" style="text-align: center">
+        <h3>Liste des Opérations</h3>
+    </div>
+    <div>
+        {% for message in app.session.flashbag.get('addApp') %}
+            <div class="row">
+                <div class="col-md-12">
+
+                    <p class="alert alert-success">
+                        {{ message}}
+                    </p>
+                </div>
+
+            </div>
+        {% endfor %}
+        <div class="alert alert-success" id="messageAppli" role="alert" style="visibility: hidden">
+            L'opération a bien été modifiée
+        </div>
+        <table class="table table-striped table-bordered" id="appliTable">
+            <thead>
+            <tr>
+                <th>Date de création</th>
+                <th>Nom de l'opération</th>
+                <th>Client</th>
+                <th>Client Emetteur</th>
+                <th>Modifier</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for app in applis %}
+            <tr>
+                <td>{{ app.dateappli|date('d/m/Y') }}</td>
+                <td>{{ app.appliname }}</td>
+                <td>{{ app.client }}</td>
+                {% if (app.emetteur == null ) %}
+                <td>Tessi MD</td>
+                {% else %}
+                <td>{{ app.emetteur }}</td>
+                {% endif %}
+                <td style="text-align: center"><i class="editbutton fa fa-pen-square" href="#" style="color: orange;background-color: white;font-size: 22px;cursor: pointer"></i></td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="modal fade" id="appliModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" id="appliModalContent">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="color:red;">&times;</span>
+                    </button>
+                    <h3 class="modal-title" id="exampleModalLabel">Ajout d'application</h3>
+
+                </div>
+                <div class="modal-body">
+                    <div class="well">
+                        {{ form_start(form) }}
+                        <div class="form-row">
+                            <div class="form-group col-md-6 formClass" id="nameInput" >
+                                {{ form_label(form.appliname, "Nom de l'opération") }}
+                                {{ form_widget(form.appliname,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.appliname) }}
+                            </div>
+                            <div class="form-group col-md-6 formClass" id="maillingInput">
+                                {{ form_label(form.codeappli, 'Code Appli') }}
+                                {{ form_widget(form.codeappli,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.codeappli) }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6 formClass" id="dossierInput" >
+                                {{ form_label(form.dossierimg, "Dossier Image") }}
+                                {{ form_widget(form.dossierimg,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.dossierimg) }}
+                            </div>
+                            <div class="form-group col-md-6 formClass" id="clienInput" >
+                                {{ form_label(form.idclient, 'Client') }}
+                                {{ form_widget(form.idclient,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.idclient) }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12 formClass" id="logoInput">
+                                {{ form_label(form.appliImage, 'Logo') }}
+                                {{ form_widget(form.appliImage) }}
+                                {{ form_errors(form.appliImage) }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6 formClass" id="trtInput" >
+                                {{ form_label(form.idtrtappli, 'Traitement') }}
+                                {{ form_widget(form.idtrtappli,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.idtrtappli) }}
+                            </div>
+                            <div class="form-group col-md-6 formClass" id="maillingInput">
+                                {{ form_label(form.mailing, 'mailling') }}
+                                {{ form_widget(form.mailing,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.mailing) }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6 formClass" id="prodInput">
+                                {{ form_label(form.idtypeprod, 'Type production') }}
+                                {{ form_widget(form.idtypeprod,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.idtypeprod) }}
+                            </div>
+                            <div class="form-group col-md-6 formClass" id="prodInput">
+                                {{ form_label(form.idclientEmmetteur, 'Client emetteur') }}
+                                {{ form_widget(form.idclientEmmetteur,{'attr':{'class':'form-control'}}) }}
+                                {{ form_errors(form.idclientEmmetteur) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row modal-footer" id="buttonModal">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+                    {{ form_widget(form.valider, { 'label': 'enregistrer' }) }}
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

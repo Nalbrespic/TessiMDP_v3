@@ -37,6 +37,15 @@ class ClientRepository extends EntityRepository
             ;
     }
 
+public function findClientByName($name){
 
+        return $this
+            ->createQueryBuilder('cl')
+            ->where('cl.nomclient LIKE (:name)')
+            ->setParameter('name', '%'.$name.'%')
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+}
 
 }

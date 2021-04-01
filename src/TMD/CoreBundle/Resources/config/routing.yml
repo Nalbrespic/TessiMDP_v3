@@ -83,3 +83,13 @@ tmd_core_saveTarifClient:
     path: /saveTarifClient
     defaults:
         _controller: TMDCoreBundle:Core:saveTarifClient
+
+tmd_core_applis:
+    path: /gestionAppli
+    defaults:
+        _controller: TMDCoreBundle:Core:gestionAppli
+
+tmd_core_editAppli:
+    path: /modifAppli
+    defaults:
+        _controller: TMDCoreBundle:Core:gestionAppliEdite

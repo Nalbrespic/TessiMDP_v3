@@ -3,6 +3,7 @@
 namespace TMD\CoreBundle\Controller;
 
 use DateTime;
+use PhpParser\Node\Expr\Cast\Object_;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,10 +12,12 @@ use TMD\AppliBundle\TMDAppliBundle;
 use TMD\CoreBundle\Entity\TransporteursTarif;
 use TMD\CoreBundle\Entity\TransporteursTarifClient;
 use TMD\CoreBundle\TMDCoreBundle;
+use TMD\ProdBundle\Entity\EcommAppli;
 use TMD\ProdBundle\Entity\EcommArticles;
 use TMD\ProdBundle\Entity\EcommCmdep;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
 use TMD\ProdBundle\Entity\EcommLignes;
+use TMD\ProdBundle\Form\EcommAppliType;
 use TMD\ProdBundle\Form\EcommLignesType;
 use TMD\ProdBundle\Form\EcommTrackingType;
 use TMD\ProdBundle\TMDProdBundle;
@@ -369,23 +372,14 @@ class CoreController extends Controller
         $tarifsTranche = array_chunk($tarifs, count($zones));
         $date = $request->get('date');
         $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
-        dump($client);
-        dump($tarifsTranche);
-        dump($idTransporteur);
-        dump($idTransport);
-        dump($zones);
-        dump($tranches);
-        dump($tarifs);
-        dump($dateFormat);
+
 
         for ($i = 0; $i < count($tranches); $i++){
             for ($t =0; $t<count($zones);$t++){
                 $tranche= $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($tranches[$i]['idTransportTranches']);
                 $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($zones[$t]['idTransporteursZones']);
                 $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idClient, $idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
-                dump($tranche);
-                dump($zone);
-                dump($ancienTarif);
+
                 if ($ancienTarif != [])
                 {
                     foreach ($ancienTarif as $onetarif){
@@ -426,6 +420,53 @@ class CoreController extends Controller
         dump($listClients);
 
         return new JsonResponse(array($listClients));
+    }
+
+    public function gestionAppliAction(Request $request){
+
+        $applis = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findAllOpe();
+
+        $appli = new EcommAppli();
+        $form = $this->get('form.factory')->create(EcommAppliType::class, $appli);
+
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+
+            if( $form->getData()->getappliImage()) {
+                $blob = $form->getData()->getappliImage()->getpathname();
+                $appli->setappliImage(file_get_contents($blob));
+            }
+
+            $em->persist($appli);
+            $em->flush();
+
+            $request->getSession()->getFlashBag()->add('addApp', 'Application bien enregistrée.');
+
+            return $this->redirectToRoute('tmd_core_applis', array());
+        }
+
+        return $this->render('TMDCoreBundle:Core:gestionAppli.html.twig', array(
+            'form' => $form->createView(),
+            'applis'=>$applis,
+        ));
+
+    }
+    public function gestionAppliEditeAction( Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $date = $request->get('0');
+        $nameAppli = $request->get('1');
+        $client = $request->get('2');
+        $emetteur = $request->get('3');
+        dump($nameAppli);
+        $appli = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findOneBy(array('appliname'=>$nameAppli));
+        $idclientEmetteur = $this->getDoctrine()->getRepository('TMDProdBundle:Client')->findOneBy(array('nomclient'=>$emetteur));
+if ($idclientEmetteur != null) {
+    $appli->setIdclientEmmetteur($idclientEmetteur);
+    $em->persist($appli);
+    $em->flush();
+}
+$message = "ok";
+        return new JsonResponse(array($date,$nameAppli,$client,$emetteur));
     }
 
 

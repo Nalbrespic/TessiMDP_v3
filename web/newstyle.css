@@ -76,10 +76,10 @@ body{
 
   border: 2px solid #c82333;
 }
-div.titreFenetre > h3{
-    color: white;
-    border-bottom: none;
-}
+/*div.titreFenetre > h3{*/
+/*    color: white;*/
+/*    border-bottom: none;*/
+/*}*/
 
 .lignetracking{
     margin-top: 10px;

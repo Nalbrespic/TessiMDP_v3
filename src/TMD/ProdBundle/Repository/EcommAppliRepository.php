@@ -34,6 +34,24 @@ class EcommAppliRepository extends EntityRepository
 
             ;
     }
+    public function findAllOpe(){
+
+        return $this
+            ->createQueryBuilder('app')
+            ->innerJoin('app.idclient', 'cl')
+            ->leftJoin('app.idclientEmmetteur', 'E')
+            ->select('app.dateappli')
+            ->addSelect('app.idappli')
+            ->addSelect('app.appliname')
+            ->addSelect('cl.nomclient as client')
+            ->addSelect('E.nomclient as emetteur')
+            ->orderBy('app.dateappli', 'DESC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+
 
 
 }
