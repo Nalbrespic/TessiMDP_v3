@@ -3440,7 +3440,17 @@ class ProdController extends Controller
             }}
 
 
-        $listArticles = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeByDate($idOpe, $thisdate);
+        $articlesList = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByOpeByDate($idOpe, $thisdate);
+        dump($articlesList);
+        $listArticles = [];
+        $noCharacter = ['&','<','>','"'];
+        for ($i=0; $i < count($articlesList); $i++){
+            $listArticles[$i] = $articlesList[$i];
+            foreach ($noCharacter as $char) {
+                $listArticles[$i]['libelle'] = str_replace($char, ' ', $articlesList[$i]['libelle']);
+            }
+        }
+        dump($articlesList);
 
         setlocale(LC_TIME, "fr_FR.UTF-8", "fra");
         $dateFrench = utf8_encode(strftime("%B %G", strtotime($thisdate)));
