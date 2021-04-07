@@ -836,6 +836,7 @@
             // }
         ]
         var parametersAppli ={
+            destroy: true,
             rowReorder: true,
             language: language,
             ordering: false,
@@ -901,6 +902,11 @@
 
     })
 </script>
+    <script>
+        function editFormAppli() {
+
+        }
+    </script>
     <script>
         $(document).on('click', "[id^='appliTable'] .editbutton", 'tr', function (x) {
             var tableID = $(this).closest('table').attr('id');    // id of the table

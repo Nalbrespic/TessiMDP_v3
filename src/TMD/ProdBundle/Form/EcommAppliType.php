@@ -66,13 +66,15 @@ class EcommAppliType extends AbstractType
                 },
             ))
             ->add('idclientEmmetteur', EntityType::class, array(
-                'class'        => 'TMD\ProdBundle\Entity\Client',
+                'class' => 'TMD\ProdBundle\Entity\Client',
                 'choice_label' => 'nomclient',
                 'multiple'     => false,
-                'query_builder' => function(ClientRepository $repository) {
+                'query_builder' => function(ClientRepository $repository){
                     return $repository->createQueryBuilder('u')
+                        ->where('u.idclient = 39')
+                        ->orWhere('u.idclient=598')
                         ->orderBy('u.nomclient', 'ASC');
-                },
+                }
             ))
 //            ->add('configs', CollectionType::class, array(
 //                'entry_type' => EcommAppliConfigType::class,

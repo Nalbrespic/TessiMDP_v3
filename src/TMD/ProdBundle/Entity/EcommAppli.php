@@ -159,15 +159,15 @@ class EcommAppli
 //     */
 //    private $transports;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommAppliConfig", cascade={"persist"})
-     *  @ORM\JoinTable(name="ecomm_Appli_AppliConfig" ,
-     *                     joinColumns={@ORM\JoinColumn(name="idApp", referencedColumnName="idAppli",  nullable=true )}
-     *
-     * )
-     *
-     */
-    private $configs;
+//    /**
+//     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommAppliConfig", cascade={"persist"})
+//     *  @ORM\JoinTable(name="ecomm_Appli_AppliConfig" ,
+//     *                     joinColumns={@ORM\JoinColumn(name="idApp", referencedColumnName="idAppli",  nullable=true )}
+//     *
+//     * )
+//     *
+//     */
+//    private $configs;
 
 
 

@@ -425,7 +425,7 @@ class CoreController extends Controller
     public function gestionAppliAction(Request $request){
 
         $applis = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findAllOpe();
-
+        dump($applis);
         $appli = new EcommAppli();
         $form = $this->get('form.factory')->create(EcommAppliType::class, $appli);
 
@@ -460,11 +460,11 @@ class CoreController extends Controller
         dump($nameAppli);
         $appli = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findOneBy(array('appliname'=>$nameAppli));
         $idclientEmetteur = $this->getDoctrine()->getRepository('TMDProdBundle:Client')->findOneBy(array('nomclient'=>$emetteur));
-if ($idclientEmetteur != null) {
-    $appli->setIdclientEmmetteur($idclientEmetteur);
-    $em->persist($appli);
-    $em->flush();
-}
+        if ($idclientEmetteur != null) {
+            $appli->setIdclientEmmetteur($idclientEmetteur);
+            $em->persist($appli);
+            $em->flush();
+        }
 $message = "ok";
         return new JsonResponse(array($date,$nameAppli,$client,$emetteur));
     }
