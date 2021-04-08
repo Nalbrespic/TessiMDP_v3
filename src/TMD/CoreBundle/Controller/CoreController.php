@@ -440,7 +440,7 @@ class CoreController extends Controller
             $em->persist($appli);
             $em->flush();
 
-            $request->getSession()->getFlashBag()->add('addApp', 'Application bien enregistrée.');
+            $request->getSession()->getFlashBag()->add('addApp', 'Opération bien enregistrée.');
 
             return $this->redirectToRoute('tmd_core_applis', array());
         }
@@ -451,22 +451,28 @@ class CoreController extends Controller
         ));
 
     }
+    public function EditeFormAction(Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $idAppli= $request->get('idappli');
+        $appli = $em->getRepository('TMDProdBundle:EcommAppli')->findbyId($idAppli);
+        dump($appli);
+        $request->getSession()->getFlashBag()->add('editApp', 'l\'opération a bien été modifiée');
+        return new JsonResponse(array($appli));
+    }
     public function gestionAppliEditeAction( Request $request){
         $em = $this->getDoctrine()->getManager();
-        $date = $request->get('0');
-        $nameAppli = $request->get('1');
-        $client = $request->get('2');
-        $emetteur = $request->get('3');
-        dump($nameAppli);
-        $appli = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findOneBy(array('appliname'=>$nameAppli));
-        $idclientEmetteur = $this->getDoctrine()->getRepository('TMDProdBundle:Client')->findOneBy(array('nomclient'=>$emetteur));
-        if ($idclientEmetteur != null) {
-            $appli->setIdclientEmmetteur($idclientEmetteur);
+       $idappli = $request->get('idappli');
+        $idemetteur = $request->get('idemetteur');
+
+        $appli = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->find($idappli);
+        $clientEmetteur = $this->getDoctrine()->getRepository('TMDProdBundle:Client')->find($idemetteur);
+        if ($clientEmetteur != null) {
+            $appli->setIdclientEmmetteur($clientEmetteur);
             $em->persist($appli);
             $em->flush();
         }
 $message = "ok";
-        return new JsonResponse(array($date,$nameAppli,$client,$emetteur));
+        return new JsonResponse(array($clientEmetteur));
     }
 
 

@@ -89,6 +89,11 @@ tmd_core_applis:
     defaults:
         _controller: TMDCoreBundle:Core:gestionAppli
 
+tmd_core_editFormAppli:
+    path: /editeForm
+    defaults:
+        _controller: TMDCoreBundle:Core:EditeForm
+
 tmd_core_editAppli:
     path: /modifAppli
     defaults:

@@ -7,6 +7,24 @@ use Doctrine\ORM\EntityRepository;
 
 class EcommAppliRepository extends EntityRepository
 {
+    public function findbyId($id){
+        return $this
+            ->createQueryBuilder('a')
+            ->innerJoin('a.idclient', 'c')
+            ->leftJoin('a.idclientEmmetteur', 'e')
+            ->where('a.idappli = :id')
+            ->setParameter('id', $id)
+            ->select('a.appliname')
+            ->addSelect('a.codeappli')
+            ->addSelect('a.dateappli')
+            ->addSelect('c.nomclient as client')
+            ->addSelect('e.nomclient as emetteur' )
+            ->addSelect('e.idclient as idEmetteur')
+            ->getQuery()
+            ->getArrayResult()
+
+            ;
+    }
     public function findAppliByClient($idClient)
     {
         return $this
