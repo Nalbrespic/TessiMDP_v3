@@ -484,3 +484,100 @@ button.dt-button:hover{
 #tableProdFichier thead tr td{
     padding: 0px !important;
 }
+
+.buttonFacturation{
+    background-color: #28274d !important;
+    color: white !important;
+}
+
+.buttonFacturation:hover{
+    background-color: white !important;
+    color: #28274d !important;
+    border: #28274d 1px solid !important;
+}
+.icon-tab {
+    margin-top: 30px;
+
+    text-align : center;
+    cursor: pointer;
+}
+
+.icon-tab span.glyphicon {
+    display : block;
+    font-size: 35px;
+
+    color: #8d98b8;
+
+    margin:  0px auto;
+    line-height: 65px;
+
+    transition-duration: 0.25s;
+}
+
+.icon-tab span.glyphicon::before {
+    padding: 2px 6.5px;
+    border-radius: 80%;
+}
+
+
+.icon-tab.active span.glyphicon {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.icon-tab.active span.glyphicon::before {
+    padding: 15px 19.5px;
+    border-radius: 100%;
+
+    transition-duration: 0.4s;
+}
+
+.icon-tab.active span.glyphicon::before {
+    background: linear-gradient(to bottom right, #24C6DC, #514A9D);
+}
+
+
+.icon-label {
+    color:  #b3b3b3;
+    font-size: 16px;
+
+    transition-duration: 0.35s;
+}
+
+
+.icon-tab.active .icon-label, .icon-tab:hover .icon-label {
+    color: black;
+}
+
+.icon-tab:hover span.glyphicon {
+    margin-bottom: 10px;
+}
+
+
+.item {
+    margin-top: 50px;
+}
+
+
+@media (max-width:767px) {
+    .icon-tab {
+
+    }
+
+    .icon-tab span {
+        display: inline !important;
+        vertical-align : middle;
+    }
+
+    .icon-tab.active span.glyphicon {
+        padding-right: 10px;
+    }
+
+    .icon-tab:hover span.glyphicon {
+        padding-right: 10px;
+        transition-duration: 0.25s;
+    }
+}
+.logoTransport:hover{
+    box-shadow: grey 3px 3px 3px 3px;
+}

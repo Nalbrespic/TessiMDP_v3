@@ -124,6 +124,28 @@ class EcommAppli
      */
     private $idtypeprod = 1 ;
 
+    public function getIdclientEmmetteur()
+    {
+        return $this->idclientEmmetteur;
+    }
+
+    /**
+     * @param Client $idclientEmmetteur
+     */
+    public function setIdclientEmmetteur(Client $idclientEmmetteur)
+    {
+        $this->idclientEmmetteur = $idclientEmmetteur;
+    }
+
+    /**
+     * @var \TMD\ProdBundle\Entity\Client
+     *
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idClientEmetteur", referencedColumnName="idClient", nullable=true)
+     * })
+     */
+    private $idclientEmmetteur;
 //    /**
 //     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommCompteTransport", cascade={"persist"})
 //     *  @ORM\JoinTable(name="ecomm_Appli_Transport",

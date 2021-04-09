@@ -13,6 +13,7 @@
         {#<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">#}
         {#<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">#}
         <link rel="stylesheet" href="{{ asset('jquery-ui-1.12.1/jquery-ui.theme.min.css') }}">
+{#        <link rel="stylesheet" type="text/css" href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/49833/main.css" />#}
         <link rel="stylesheet" href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('css/fullcalendar.css') }}">
         <link rel="stylesheet" href="{{ asset('Multi-level-Vertical-Accordion/src/lazeemenu.css') }}">
@@ -24,6 +25,7 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
     {% endblock %}
 </head>
@@ -333,6 +335,7 @@
     <script src="{{ asset('Datatable/buttons.html5.min.js') }}"></script>
     {#<script src="{{ asset('js/chart.js') }}"></script>#}
     {#<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>#}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     {% block javascriptsPlus %}
     {% endblock %}
@@ -348,6 +351,113 @@
 
         });
 
+    </script>
+    <script>
+        $(function() {
+            $('div.icon-tab').click(function() {
+                $(this).addClass('active').siblings().removeClass('active');
+                setDisplay(450);
+            });
+
+            function setDisplay(time) {
+                $('div.icon-tab').each(function(rang) {
+                    $('.item').eq(rang).css('display', 'none');
+
+                    if($(this).hasClass('active')){
+                        $('.item').eq(rang).fadeIn(time);
+                    }
+                });
+            }
+
+            //Disable the animation on page load
+            setDisplay(0);
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('D/MM/YYYY') + ' - ' + end.format('D/MM/YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                "autoUpdateInput": false,
+                "showDropdowns": true,
+                "minYear": 2015,
+                "maxYear": 2030,
+                "locale": {
+                    "format": "DD/MM/YYYY",
+                    "separator": " - ",
+                    "applyLabel": "Ok",
+                    "cancelLabel": "Annuler",
+                    "fromLabel": "du",
+                    "toLabel": "au",
+                    "customRangeLabel": "Personnalisé",
+                    "weekLabel": "W",
+                    "daysOfWeek": [
+                        "dim.",
+                        "Lun.",
+                        "mar.",
+                        "mer.",
+                        "jeu.",
+                        "ven.",
+                        "sam."
+                    ],
+                    "monthNames": [
+                        "janvier",
+                        "février",
+                        "mars",
+                        "avril",
+                        "mai",
+                        "juin",
+                        "juillet",
+                        "août",
+                        "septembre",
+                        "octobre",
+                        "novembre",
+                        "décembre"
+                    ],
+                    "firstDay": 2
+                },
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    "Aujourd'hui": [moment(), moment()],
+                    'hier': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '7 derniers jours': [moment().subtract(6, 'days'), moment()],
+                    '30 derniers jours': [moment().subtract(29, 'days'), moment()],
+                    'Mois en cours': [moment().startOf('month'), moment().endOf('month')],
+                    'mois précédent': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+
+                }
+            }, cb);
+            cb(start, end);
+            $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+                console.log('date de début: ',picker.startDate.format('YYYY-MM-DD'));
+                console.log('date de fin: ',picker.endDate.format('YYYY-MM-DD'));
+                var startDate = picker.startDate.format("YYYY-MM-DD")
+                var endDate = picker.endDate.format("YYYY-MM-DD")
+                console.log()
+                var url = "{{ path('tmd_prod_transports', {"traite": 1, "date1": "startDate", "date2": "endDate"}) }}"
+                $('#loaderTrackings').css("display","block")
+                url = url.replace("endDate", endDate)
+                url = url.replace("startDate", startDate)
+                window.location.href =  url
+
+            });
+        });
+
+        function afficheFacturation(id) {
+            var url = "{{ path('tmd_prod_transports', {"traite": 1, "type": "id"}) }}"
+            $('#loaderTrackings').css("display","block")
+            url = url.replace("id", parseInt(id))
+            console.log('type= ',id)
+            window.location.href =  url
+        }
     </script>
 <script>
     $(document).ready(function () {
@@ -774,6 +884,7 @@
         $('#table2').DataTable(parameters);
         $('#table3').DataTable(parameters);
         $('.tableTransport').DataTable(parameters3);
+        $('.facturationTable').DataTable(parameters2);
 
     })
 </script>

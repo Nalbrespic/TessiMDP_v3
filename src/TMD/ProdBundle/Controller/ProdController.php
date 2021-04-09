@@ -3322,7 +3322,6 @@ dump($date);
 
     public function PrefacturationAction($idClient, $idOpe, $choix){
 
-
         $em = $this->getDoctrine()->getManager();
         $client = $em->getRepository('TMDProdBundle:Client')->find($idClient);
         $ope = $em->getRepository('TMDProdBundle:EcommAppli')->find($idOpe);
