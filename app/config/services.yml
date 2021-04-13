@@ -16,8 +16,8 @@ services:
         # but if a service is unused, it's removed anyway
         exclude: '../../src/AppBundle/{Entity,Repository}'
 
+
     twig.extension.intl:
         class: Twig_Extensions_Extension_Intl
-        public: false
         tags:
             - { name: twig.extension }

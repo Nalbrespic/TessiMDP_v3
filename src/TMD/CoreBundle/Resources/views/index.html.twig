@@ -26,6 +26,9 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/searchpanes/1.2.1/css/searchPanes.dataTables.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css" />
+
 
     {% endblock %}
 </head>
@@ -328,14 +331,13 @@
     <script src="{{ asset('js/timeline.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('newstyle.css') }}">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
-{#    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>#}
     <script src="{{ asset('Datatable/dataTables.buttons.min.js') }}"></script>
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-{#    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>#}
     <script src="{{ asset('Datatable/buttons.html5.min.js') }}"></script>
-    {#<script src="{{ asset('js/chart.js') }}"></script>#}
-    {#<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>#}
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/1.2.1/js/dataTables.searchPanes.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+
 
     {% block javascriptsPlus %}
     {% endblock %}
@@ -878,13 +880,42 @@
                 },
             ],
         }
+        var parameters4 = {
+            language: language,
+            searchPanes: {
+                cascadePanes: true,
+                layout: 'columns-3'
 
+            },
+            columnDefs: [
+                {
+                    searchPanes: {
+                        show: true
+                    },
+                    targets: [0, 1, 2]
+                },
+                {
+                    searchPanes: {
+                        show: false
+                    },
+                    targets: [3,4,5]
+                }
+            ],
+            dom: '<PBf<t>ip>',
+            buttons: [
+                {
+                    extend:'excel',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                },
+            ],
+        }
         $('#articleCommande').DataTable(parameters2);
         $('#table1').DataTable(parameters);
         $('#table2').DataTable(parameters);
         $('#table3').DataTable(parameters);
         $('.tableTransport').DataTable(parameters3);
         $('.facturationTable').DataTable(parameters2);
+        $('#tableTransporteursTarif').DataTable(parameters4);
 
     })
 </script>

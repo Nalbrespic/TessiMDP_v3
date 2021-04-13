@@ -292,15 +292,30 @@ if ($traite==0){
             'traite'=> $traite,
         ));
 } else {
-    return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
-        'listTarif' => $listTarifValide,
-        'listTransporteurs' => $transporteurs,
-        'clients'=>$clients,
-        'traite'=> $traite,
-        'listeColissimo' => $listTrackingColissimo,
-        'listeColiprive'=> $listTrackingColisPrive,
-        'listeDpd' => $listTrackingDpd
-    ));
+    if (isset($thisDate)) {
+        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+            'listTarif' => $listTarifValide,
+            'listTransporteurs' => $transporteurs,
+            'clients' => $clients,
+            'traite' => $traite,
+            'listeColissimo' => $listTrackingColissimo,
+            'listeColiprive' => $listTrackingColisPrive,
+            'listeDpd' => $listTrackingDpd,
+            'thisDate'=> $thisDate,
+        ));
+    } else {
+        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+            'listTarif' => $listTarifValide,
+            'listTransporteurs' => $transporteurs,
+            'clients' => $clients,
+            'traite' => $traite,
+            'listeColissimo' => $listTrackingColissimo,
+            'listeColiprive' => $listTrackingColisPrive,
+            'listeDpd' => $listTrackingDpd,
+            'date1'=> $date1,
+            'date2' => $date2,
+        ));
+    }
 }
 
     }

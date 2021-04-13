@@ -578,6 +578,17 @@ button.dt-button:hover{
         transition-duration: 0.25s;
     }
 }
+.logoTransport{
+    opacity:0.5;
+}
 .logoTransport:hover{
-    box-shadow: grey 3px 3px 3px 3px;
+    opacity: 1;
+}
+.icon-tab.active span img{
+    opacity:1;
+}
+
+.nav-tabs li.active a {
+    background-color: #f4f0f0;
+
 }
