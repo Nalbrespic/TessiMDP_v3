@@ -147,7 +147,7 @@
         {% if blCmd is defined and blCmd != null %}
             <span  style="display: none;" id ="recupEtat" >{{etat }}</span>
             <div class="col-md-5">
-                <div class="row">
+                <div class="row" style="margin-bottom: 50px">
                     <div class="col-md-3 img-responsive" style="text-align: -moz-center;">
                         <div style="max-width: 130px;">
                             {% if logoAppli is defined and logoAppli != null %}
@@ -242,6 +242,18 @@
                             </table>
                         </div>
                     </div>
+                    {% if idclient == 175 %}
+                    {% if ouvrirCarton != false %}
+                        <div  class="col-md-12"  style="margin-top: -15px;">
+                            <div><i class="fas fa-exclamation-triangle" style="color: #D34026;margin-left: -100px;font-size: 40px;display: flex;justify-content: center"></i></div>
+                             <h2 style="color : #D34026;font-size: 40px;margin-left: -100px;text-align: center" >COLIS A OUVRIR</h2>
+                        </div>
+                        {% else %}
+                            <div  class="col-md-12"  style="margin-top: -13px;">
+                                <h2 style="color : darkgreen;font-size: 40px;margin-left: -100px;text-align: center"  >COLIS OK</h2>
+                            </div>
+                    {% endif %}
+                    {% endif %}
                     {% if appAverif != 'false' %}
                         <div id="saisicoderappro" class="col-md-12"  style="margin-top: -13px;">
 
