@@ -436,7 +436,7 @@ class AppliController extends Controller
 
                 $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl));
 
-
+                $idClient = $articles[0]->getIdclient();
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
                 $env = $this->container->get('kernel')->getEnvironment();
                 if ($env != 'dev'){
@@ -460,6 +460,7 @@ class AppliController extends Controller
                         $articleArray['art'][$k]['perso1'] = $v->getPerso1();
                         $articleArray['art'][$k]['quantite'] = $v->getQuantite();
                         $articleArray['art'][$k]['perso2'] = $v->getPerso2();
+                        $articleArray['art'][$k]['codeArticle']=$v->getCodearticle();
                         $articleArray['art'][$k]['libelle'] = $v->getLibelle();
                         if ($v->getQuantite() > 1){
                             for ($u = 1 ; $u <= $v->getQuantite() ; $u++){
@@ -498,6 +499,12 @@ class AppliController extends Controller
                 }
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
+                $ouvrirCarton = false;
+                foreach ($articleArray['art'] as $art){
+                    if ( $art['codeArticle'] == "21LP08" or $art['codeArticle'] == "21LP09") {
+                        $ouvrirCarton = true;
+                    }
+                }
                 $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
 
                 if ($etat === '1') {
@@ -546,7 +553,9 @@ class AppliController extends Controller
                     'verif'         =>$verif,
                     'vue'           =>$vue,
                     'error'         =>$error,
-                    'appAverif'     =>$appAverif
+                    'appAverif'     =>$appAverif,
+                    'ouvrirCarton'  =>$ouvrirCarton,
+                    'idclient'      =>$idClient,
     //                'numHeineken'   => $NumHeineken
                 ));
             }
