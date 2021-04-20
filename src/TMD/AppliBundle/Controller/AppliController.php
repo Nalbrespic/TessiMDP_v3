@@ -669,9 +669,7 @@ class AppliController extends Controller
                 }
             }
         }
-        dump($articleArray);
-        dump($ouvrirCarton);
-        dump($CmdAppliImage);
+
         if ($bl != "") {
             return $this->render('TMDAppliBundle:Appli:pluginSejer.html.twig', array(
                 'bl' => $bl,
