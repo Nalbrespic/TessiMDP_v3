@@ -34,6 +34,10 @@
                 <div class="modal-body">
                     <p id="error_message"></p> L'imprimante n'est pas connectée !
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
             </div>
         </div>
     </div>
@@ -1108,7 +1112,7 @@
     </script>
 
     <script>
-        if ($('#verifVue').text() !== '1') {
+        if ($('#verifVue').text() !== '1' ) {
             var available_printers = sessionStorage.getItem("available_printers");
             var selected_category = null;
             var default_printer = sessionStorage.getItem("selected_printer");
@@ -1193,7 +1197,7 @@
 
                 var dateString = $('#dateDepotProdInAdd').text();
                 checkPrinterStatus(function (text) {
-                    if (text === "Ready to Print") {
+                    if (text === "Ready to Print" || $('#checkVerifBL').prop('checked')) {
                         if ($('#veriOrNot').text() === "verif" && message === "first") {
                             var cmd = $('#entered_name').val();
                             console.log('valeur cmd: ', cmd);
