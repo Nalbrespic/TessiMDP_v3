@@ -23,6 +23,7 @@
        <input  id="inputBl" class="form-control" onchange="searchBl()" type="text" placeholder="n° bl">
         </label>
     </div>
+    {% if bl !="" %}
     <div class="row>" style="margin-top: 100px">
         <div class="col-md-4">
             {% if ouvrirCarton != false %}
@@ -57,6 +58,7 @@
             </table>
         </div>
     </div>
+    {% endif %}
 {% endblock %}
 {% block javascriptsPlus %}
 <script>
