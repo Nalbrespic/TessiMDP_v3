@@ -24,7 +24,7 @@
         </label>
     </div>
     {% if bl !="" %}
-    <div class="row>" style="margin-top: 100px">
+    <div class="row>" style="margin-top: 50px">
         <div class="col-md-4">
             {% if ouvrirCarton != false %}
                 <div  class="col-md-12" >
@@ -47,9 +47,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for art in listArticle %}
+                {% for art in countArticle %}
                 <tr>
-                    <td>{{ art['codeArticle'] }}</td>
+                    <td>{{ art['codearticle'] }}</td>
                     <td>{{ art['libelle'] }}</td>
                     <td>{{ art['quantite'] }}</td>
                 </tr>
