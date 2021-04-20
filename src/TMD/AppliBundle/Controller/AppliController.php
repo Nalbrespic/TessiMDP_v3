@@ -585,6 +585,7 @@ class AppliController extends Controller
 
     public function consultSejerAction(Request $request){
         $bl = $request->get('bl');
+        $ouvrirCarton = false;
         if ($bl !="") {
             $Cmd = $this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
             if ($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage() != null) {
@@ -662,7 +663,7 @@ class AppliController extends Controller
             }
             $countArticle = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
             $articleArray['countArticle'] = $countArticle;
-            $ouvrirCarton = false;
+
             foreach ($articleArray['art'] as $art){
                 if ( $art['codeArticle'] == "21LP08" or $art['codeArticle'] == "21LP09") {
                     $ouvrirCarton = true;
@@ -681,6 +682,7 @@ class AppliController extends Controller
         }else{
             return $this->render('TMDAppliBundle:Appli:pluginSejer.html.twig', array(
                 'bl' => $bl,
+                'ouvrirCarton'=>$ouvrirCarton,
             ));
         }
     }
