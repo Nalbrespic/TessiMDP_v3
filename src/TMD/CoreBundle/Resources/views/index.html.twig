@@ -139,6 +139,7 @@
                 <nav>
                     <ul class="nav menu shadow" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 4px;margin-right: 27px;">
                         <li ><a onclick="hideMenu()" onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_production') }}">Etiquettes ZPL</a></li>
+                        <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_sejer') }}">Vérif Sejer</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_cartepage') }}">Saisi cartes</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_editStatut') }}">Statut Election</a></li>
 
@@ -766,8 +767,15 @@
                 },
             ],
         }
+        var parameters4 = {
+            language: language,
+            dom: '<t>',
+
+
+        }
 
         $('#articleCommande').DataTable(parameters2);
+        $('#tableArticle').DataTable(parameters4);
         $('#table1').DataTable(parameters);
         $('#table2').DataTable(parameters);
         $('#table3').DataTable(parameters);
