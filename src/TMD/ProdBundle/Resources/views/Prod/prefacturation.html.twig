@@ -239,7 +239,7 @@
                                 <tbody>
 
                                 <tr>
-                                    <td>Nombre d'articles</td>{% for type in typeCommande %}<td>{{ totalArticles['VPC'] }}</td>{% endfor %}<td>{{ totalArticles['VPC'] + totalArticles['PRIME'] }}</td>
+                                    <td>Nombre d'articles</td>{% for type in typeCommande %}<td>{{ totalArticles[type] }}</td>{% endfor %}<td></td>
                                 </tr>
 
                                 <tr>

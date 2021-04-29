@@ -26,10 +26,8 @@ class DefaultController extends Controller
     public function imprimEtiqAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-            dump($request);
         if ($request->isXmlHttpRequest()) {
             $numCmd = $request->get('numCmd');
-            dump($numCmd);
             $date = $request->request->get('date');
             $verif = $request->request->get('verif');
             $okverif = $request->request->get('okverif');
@@ -44,7 +42,6 @@ class DefaultController extends Controller
 
             try {
                 $bl = $em->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $numCmd));
-                dump($bl);
                 $numLigne = $bl->getBl()->getNumLigne();
             }
             catch (Exception $e) {
@@ -153,7 +150,6 @@ class DefaultController extends Controller
                 $trackBL = $bl->getBl()->getNumligne();
 
                 $em->flush();
-                dump($histo);
                 $updateHistoOK = false;
                 $updateProdOK = false;
                 $updateDateDepotOK = false;
@@ -164,7 +160,6 @@ class DefaultController extends Controller
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
                     $histoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl->getBl()->getNumbl(), 'idstatut' => '2'));
-                    dump($histoVerif);
                     if ($histoVerif == null) {
                         $break++;
                         $em->persist($histo);
@@ -207,20 +202,24 @@ class DefaultController extends Controller
                 }
                 else {
                     $serializer = $this->get('jms_serializer');
+                    dump($blBefore);
                     $blArray = $serializer->serialize($blBefore, 'json');
+                    dump($blArray);
                     $donneArray = $serializer->serialize($donne, 'json');
                     //lié au WS colissimo
                     $cn23 = null;
-                    $tot = array('bl' =>  $blArray, 'zpl' => $zplMod, 'donne' => $donneArray, 'CN23' => $cn23, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif, 'annule' => $annule);
+                    $tot = array('bl' =>  $blArray, 'zpl' => utf8_encode($zplMod), 'donne' => $donneArray, 'CN23' => $cn23, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif, 'annule' => $annule);
                     return new JsonResponse($tot);
                 }
             }
             $serializer = $this->get('jms_serializer');
+            dump($blBefore);
             $blArray = $serializer->serialize($blBefore, 'json');
+            dump($blArray);
+            dump($zplMod);
             $donneArray = $serializer->serialize($donne, 'json');
 //            'zpl' =>utf8_encode(utf8_decode($zplMod))
-            $tot = array('bl' => $blArray, 'zpl' =>$zplMod, 'donne' => $donneArray, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif , 'annule' => $annule);
-            dump($tot);
+            $tot = array('bl' => $blArray, 'zpl' => utf8_encode($zplMod), 'donne' => $donneArray, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif , 'annule' => $annule);
             return new JsonResponse($tot);
         }
         return new Response("erreur: ce n'est pas du Json", 400);

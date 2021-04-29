@@ -140,11 +140,8 @@ Gestion transports
             complete: function (data) {
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('objet reçu: ', obj);
                 var transporteurs = obj[0];
                 var clients = obj[2];
-                console.log('les transporteurs: ', transporteurs)
-                console.log(transporteurs.length);
 
 
                 let html = '<form>' +
@@ -209,7 +206,6 @@ Gestion transports
             var idTransporteur = inputTransporteur.value;
             var selectZone = document.getElementById('zoneDest');
             var selectTranche = document.getElementById('tranche');
-            console.log('valeur de idTransport: ', idTransporteur)
 
             $.ajax({
                 url: "{{ path('tmd_core_transportFormSuite') }}",
@@ -221,15 +217,12 @@ Gestion transports
 
                     var json = data.responseText;
                     var obj = JSON.parse(json);
-                    console.log('object reçu: ', obj)
                    var typeTransportByTransporteur = obj[0];
                     var zones = obj[1];
                     var tranches = obj[2];
                     var html ="";
                     var html2 ="";
                     var html3 ="";
-                    console.log('type filtré: ', typeTransportByTransporteur);
-                    console.log('zones: ', zones);
                     typeTransportByTransporteur.forEach(function (type) {
                        html += '<option value="'+type.idtransport+'">'+ type.codetransport +'</option>';
                     })
@@ -263,12 +256,6 @@ Gestion transports
             var tarif = document.getElementById('tarif').value;
             var tranche = document.getElementById('tranche').value;
             var date = document.getElementById('tarifValidity').value;
-            console.log('client: ', client);
-            console.log('transporteur: ', transporteur);
-            console.log('type de transport: ', typeTransport);
-            console.log('zone: ', zone);
-            console.log('tranche: ', tranche);
-            console.log('tarif: ', tarif);
 
 
 
@@ -281,7 +268,6 @@ Gestion transports
                 complete: function (data) {
                     var json = data.responseText;
                     var obj = JSON.parse(json);
-                    console.log('object reçu: ', obj)
                     document.location.href="{{ path('tmd_prod_transports') }}"
                 }
             })
@@ -300,10 +286,8 @@ function ajoutMasse() {
             complete: function (data) {
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('objet reçu: ', obj);
                 var transporteurs = obj[0];
                 var clients = obj[2];
-                console.log('les transporteurs: ', transporteurs)
 
 
                let html = '<div class="alert alert-success" role="alert" id="divMessage" style="display: none;"><input id="inputGost" style="display: none"></div><form>'+
@@ -351,7 +335,6 @@ function ajoutMasse() {
     function ajoutNameTransporteurMasse() {
 
         var idTransporteur = document.getElementById('idTransporteurMasses').value
-        console.log(idTransporteur)
         let selectType = document.getElementById('inputTypeTransportMasse')
 
         let tableau = document.getElementById('tableauTranches')
@@ -365,7 +348,6 @@ function ajoutMasse() {
 
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('object reçu: ', obj)
                 var typeTransportByTransporteur = obj[0];
                 let html = "";
                 html += '<option>Selectionner le type de transport</option>'
@@ -392,7 +374,6 @@ function ajoutMasse() {
 
                         var json = data.responseText;
                         var obj = JSON.parse(json);
-                        console.log('object reçu: ', obj)
                         var zones = obj[0];
                         var tranches = obj[1];
                         let html3 = "";
@@ -443,7 +424,6 @@ function saveTarifsMasse() {
     var client = document.getElementById('idClientMasses').value
 
 
-    console.log("dates saisies: ",date)
     let divmessage = document.getElementById('divMessage')
 
         $.ajax({
@@ -456,7 +436,6 @@ function saveTarifsMasse() {
 
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('object reçu: ', obj)
                 var zones = obj[0];
                 var tranches = obj[1];
                 var tarifs = [];
@@ -486,7 +465,6 @@ function saveTarifsMasse() {
                     complete(data) {
                         var json = data.responseText;
                         var obj = JSON.parse(json);
-                        console.log('objet reçu :', obj)
                         let message = "Ajout de la grille tarifaire effectué avec succès !"
                         divmessage.innerText = message;
                         attribuerFocus()
@@ -495,7 +473,6 @@ function saveTarifsMasse() {
                     }
                 })
 
-                console.log('mes tarifs enregistrés: ', tarifs);
             }
     })
 }
@@ -512,10 +489,7 @@ function AjoutTarifClient(){
             complete: function (data) {
                 var json = data.responseText;
                 var obj = JSON.parse(json);
-                console.log('objet reçu: ', obj);
                 var transporteurs = obj[0];
-                console.log('les transporteurs: ', transporteurs)
-                console.log(transporteurs.length);
                 let html = ""
                 html += '<form style="margin-top: 15px;border: none"><div class="form-row">'+
                         '<div class="form-group col-md-6"><label for="nameTranspo">Transporteur</label><select id="idtransporteurClient" class="form-control custom-select" onchange="ajoutNameTransporteurClient()">'
@@ -545,7 +519,6 @@ function AjoutTarifClient(){
                 complete: function (data) {
                     let json = data.responseText
                     let obj = JSON.parse(json)
-                    console.log('objet reçu: ',obj)
                     let typeTransports = obj[0]
                     let html = ""
                     html += '<option>Sélectionner le type de transport</option>'
@@ -573,7 +546,6 @@ function AjoutTarifClient(){
 
                 let obj = JSON.parse(json)
                 let clients = obj[0]
-                console.log('objet reçu: ', clients)
                 let html = '<div class="form-group col-md-4"><label for="client">Client</label><select class="form-control custom-select" id="selectClient"><option>Selectionner le client</option>'
                 clients.forEach(function (client) {
                     html += '<option value="'+client.idclient+'">'+client.nomclient+'</option>'
@@ -617,7 +589,6 @@ function AjoutTarifClient(){
                     let json = data.responseText
                     let obj = JSON.parse(json)
                     let message = obj
-                    console.log(message)
                 }
             })
         }
@@ -628,7 +599,6 @@ function AjoutTarifClient(){
             filter = input.value.toUpperCase()
             table = document.getElementById('tableTransporteursTarif')
             tr = table.getElementsByTagName('tr')
-            console.log(filter)
             for (i=0; i< tr.length; i++){
                 let td = tr[i].getElementsByTagName('td')[1];
                 if (td){
@@ -652,7 +622,6 @@ function AjoutTarifClient(){
             filter = input.value.toUpperCase()
             table = document.getElementById('tableTransporteursTarif')
             tr = table.getElementsByTagName('tr')
-            console.log(filter)
             for (i=0; i< tr.length; i++){
                 let td = tr[i].getElementsByTagName('td')[0];
                 if (td){

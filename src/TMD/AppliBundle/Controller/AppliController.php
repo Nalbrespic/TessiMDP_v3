@@ -413,7 +413,6 @@ class AppliController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $button = true;
-        dump($etat);
 
         if ($etat != 'nc' and $etat != '3' ) {
             if ($etat != '9'){
@@ -437,15 +436,12 @@ class AppliController extends Controller
 
                 $articles = $em->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl));
 
-
+                $idClient = $articles[0]->getIdclient();
                 $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
-                dump($cheminImage);
                 $env = $this->container->get('kernel')->getEnvironment();
-                dump($env);
                 if ($env != 'dev'){
                     $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
                     $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
-                    dump($chemeinImageMod1);
                 }else{
                     $chemeinImageMod1 = $cheminImage;
                 }
@@ -464,6 +460,7 @@ class AppliController extends Controller
                         $articleArray['art'][$k]['perso1'] = $v->getPerso1();
                         $articleArray['art'][$k]['quantite'] = $v->getQuantite();
                         $articleArray['art'][$k]['perso2'] = $v->getPerso2();
+                        $articleArray['art'][$k]['codeArticle']=$v->getCodearticle();
                         $articleArray['art'][$k]['libelle'] = $v->getLibelle();
                         if ($v->getQuantite() > 1){
                             for ($u = 1 ; $u <= $v->getQuantite() ; $u++){
@@ -500,11 +497,15 @@ class AppliController extends Controller
                         $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
                     }
                 }
-                dump($articleArray);
                 $countArticle = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
                 $articleArray['countArticle'] = $countArticle;
+                $ouvrirCarton = false;
+                foreach ($articleArray['art'] as $art){
+                    if ( $art['codeArticle'] == "21LP08" or $art['codeArticle'] == "21LP09") {
+                        $ouvrirCarton = true;
+                    }
+                }
                 $jouristo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl);
-                dump($jouristo);
 
                 if ($etat === '1') {
                     $messageApresScan = "Commande N° " . $bl . " déjà produite !";
@@ -552,7 +553,9 @@ class AppliController extends Controller
                     'verif'         =>$verif,
                     'vue'           =>$vue,
                     'error'         =>$error,
-                    'appAverif'     =>$appAverif
+                    'appAverif'     =>$appAverif,
+                    'ouvrirCarton'  =>$ouvrirCarton,
+                    'idclient'      =>$idClient,
     //                'numHeineken'   => $NumHeineken
                 ));
             }
@@ -580,6 +583,110 @@ class AppliController extends Controller
         ));
     }
 
+    public function consultSejerAction(Request $request){
+        $bl = $request->get('bl');
+
+        if ($bl !="") {
+            $Cmd = $this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findOneBy(array('bl' => $bl));
+            if ($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage() != null) {
+                $CmdAppliImage['appliImage'] = (base64_encode(stream_get_contents($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage())));
+            } else {
+                $CmdAppliImage['appliImage'] = '';
+            }
+
+            $articles = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findBy(array('numbl' => $bl));
+
+            $idClient = $articles[0]->getIdclient();
+            $cheminImage = $Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getDossierimg();
+            $env = $this->container->get('kernel')->getEnvironment();
+            if ($env != 'dev'){
+                $chemeinImageMod = str_replace('\\standard$\\','/standard/',$cheminImage);
+                $chemeinImageMod1 = str_replace('\\','/',$chemeinImageMod);
+            }else{
+                $chemeinImageMod1 = $cheminImage;
+            }
+            if ($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage() != null) {
+                $CmdAppliImage['appliImage'] = (base64_encode(stream_get_contents($Cmd->getBl()->getNumligne()->getIdfile()->getIdappli()->getAppliImage())));
+            } else {
+                $CmdAppliImage['appliImage'] = '';
+            }
+            $articleArray = array();
+            $articlesAverif = array();
+            $indexeArtVerif = 0;
+            foreach ($articles as $k=>$v)
+            {
+                if (!$v->isFlagart()) {
+                    $articleArray['art'][$k]['Image'] = null;
+                    if (substr($v->getCodearticle(),0,6) == '370072'){
+                        $articleArray['art'][$k]['artAverif']['codeArticle'] = $v->getCodearticle();
+                    }
+                    $articleArray['art'][$k]['id'] = $v->getNumero();
+                    $articleArray['art'][$k]['perso1'] = $v->getPerso1();
+                    $articleArray['art'][$k]['quantite'] = $v->getQuantite();
+                    $articleArray['art'][$k]['perso2'] = $v->getPerso2();
+                    $articleArray['art'][$k]['codeArticle']=$v->getCodearticle();
+                    $articleArray['art'][$k]['libelle'] = $v->getLibelle();
+                    if ($v->getQuantite() > 1){
+                        for ($u = 1 ; $u <= $v->getQuantite() ; $u++){
+                            $articlesAverif[$indexeArtVerif]['codeAverif'] = $v->getNumTrack();
+                            $articlesAverif[$indexeArtVerif]['id'] = $v->getNumero()."-".$u;
+                            $articlesAverif[$indexeArtVerif]['indexVerif'] = 0;
+                            $indexeArtVerif++;
+                        }
+
+                    }else{
+                        $articlesAverif[$indexeArtVerif]['codeAverif'] = $v->getNumTrack();
+                        $articlesAverif[$indexeArtVerif]['id'] = $v->getNumero()."-1";
+                        $articlesAverif[$indexeArtVerif]['indexVerif'] = 0;
+                        $indexeArtVerif++;
+                    }
+
+                    if (strlen($cheminImage . $v->getNomimg()) > 0  and $cheminImage . $v->getNomimg() != "") {
+                        if ( file_exists($chemeinImageMod1 . $v->getNomimg())) {
+                            $articleArray['art'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
+                            $dimensions = getimagesizefromstring(file_get_contents($chemeinImageMod1.$v->getNomimg()));
+                            $articleArray['art'][$k]['dimensionL'] = $dimensions[0];
+                            $articleArray['art'][$k]['dimensionH'] = $dimensions[1];
+                        }
+                    }
+
+                    $articleArray['art'][$k]['nameImage'] = $v->getNomimg();
+                }
+                else{
+                    if (strlen($cheminImage . $v->getNomimg()) > 0 and $cheminImage . $v->getNomimg() != ""  ) {
+                        if ( file_exists($chemeinImageMod1 . $v->getNomimg())){
+                            $articleArray['emb'][$k]['Image'] = (base64_encode(file_get_contents($chemeinImageMod1 . $v->getNomimg())));
+                        }
+                    }
+                    $articleArray['emb'][$k]['libelle'] = $v->getLibelle();
+                }
+            }
+            $countArticle = $this->getDoctrine()->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByBlforSynthese($bl);
+            $articleArray['countArticle'] = $countArticle;
+            dump($articleArray);
+            $ouvrirCarton = false;
+            foreach ($articleArray['art'] as $art){
+                if ( $art['codeArticle'] == "21LP08" or $art['codeArticle'] == "21LP09") {
+                    $ouvrirCarton = true;
+                }
+            }
+        }
+
+        if ($bl != "") {
+            return $this->render('TMDAppliBundle:Appli:pluginSejer.html.twig', array(
+                'bl' => $bl,
+                'listArticle' => $articleArray['art'],
+                'countArticle'=> $articleArray['countArticle'],
+                'ouvrirCarton' => $ouvrirCarton,
+                'logoAppli'=>$CmdAppliImage,
+            ));
+        }else{
+            return $this->render('TMDAppliBundle:Appli:pluginSejer.html.twig', array(
+                'bl' => $bl,
+
+            ));
+        }
+    }
     public function verifArticleAction(Request $request)
     {
         if ($request->isXmlHttpRequest()) {

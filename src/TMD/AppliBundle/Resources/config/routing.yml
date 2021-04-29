@@ -66,3 +66,8 @@ tmd_appli_editCodeHeineken:
     path: /editCodeHeineken
     defaults:
         _controller: TMDAppliBundle:Appli:editCodeHeineken
+
+tmd_appli_sejer:
+    path: /consultSejer
+    defaults:
+        _controller: TMDAppliBundle:Appli:consultSejer

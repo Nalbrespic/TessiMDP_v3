@@ -34,6 +34,10 @@
                 <div class="modal-body">
                     <p id="error_message"></p> L'imprimante n'est pas connectée !
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
             </div>
         </div>
     </div>
@@ -147,7 +151,7 @@
         {% if blCmd is defined and blCmd != null %}
             <span  style="display: none;" id ="recupEtat" >{{etat }}</span>
             <div class="col-md-5">
-                <div class="row">
+                <div class="row" style="margin-bottom: 50px">
                     <div class="col-md-3 img-responsive" style="text-align: -moz-center;">
                         <div style="max-width: 130px;">
                             {% if logoAppli is defined and logoAppli != null %}
@@ -242,6 +246,18 @@
                             </table>
                         </div>
                     </div>
+                    {% if idclient == 175 %}
+                    {% if ouvrirCarton != false %}
+                        <div  class="col-md-12"  style="margin-top: -15px;">
+                            <div><i class="fas fa-exclamation-triangle" style="color: #D34026;margin-left: -100px;font-size: 40px;display: flex;justify-content: center"></i></div>
+                             <h2 style="color : #D34026;font-size: 40px;margin-left: -100px;text-align: center" >COLIS A OUVRIR</h2>
+                        </div>
+                        {% else %}
+                            <div  class="col-md-12"  style="margin-top: -13px;">
+                                <h2 style="color : darkgreen;font-size: 40px;margin-left: -100px;text-align: center"  >COLIS OK</h2>
+                            </div>
+                    {% endif %}
+                    {% endif %}
                     {% if appAverif != 'false' %}
                         <div id="saisicoderappro" class="col-md-12"  style="margin-top: -13px;">
 
@@ -1037,7 +1053,6 @@
                 complete: function (data) {
                     var json = data.responseText;
                     var obj = JSON.parse(json);
-                    console.log('objet reçu: ', obj)
                     var Bl = obj[0];
                     console.log('mon Bl: ', Bl);
 
@@ -1096,7 +1111,7 @@
     </script>
 
     <script>
-        if ($('#verifVue').text() !== '1') {
+        if ($('#verifVue').text() !== '1' ) {
             var available_printers = sessionStorage.getItem("available_printers");
             var selected_category = null;
             var default_printer = sessionStorage.getItem("selected_printer");
@@ -1181,7 +1196,7 @@
 
                 var dateString = $('#dateDepotProdInAdd').text();
                 checkPrinterStatus(function (text) {
-                    if (text === "Ready to Print") {
+                    if (text === "Ready to Print" || $('#checkVerifBL').prop('checked')) {
                         if ($('#veriOrNot').text() === "verif" && message === "first") {
                             var cmd = $('#entered_name').val();
                             console.log('valeur cmd: ', cmd);
@@ -1192,6 +1207,7 @@
                                 dataType: "json",
                                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
+
                                     if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 402 ) {
                                         var bl = html.responseText;
                                         var obj = JSON.parse(bl);
@@ -1297,9 +1313,9 @@
                                 dataType: "json",
                                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
+
                                     if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 407 && html.status !== 402 ) {
                                         var bl = html.responseText;
-                                        console.log('objet reçu:', bl);
                                         var obj = JSON.parse(bl);
                                         var blT = JSON.parse(obj['bl']);
 
@@ -1433,9 +1449,10 @@
                                 type: "POST",
                                 data: {numCmd: message, verif: 1, okverif : okverif},
                                 dataType: "json",
-                                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
                                     hideLoading();
+                                    console.log('test: ', html)
                                     if (html.responseJSON['zpl'] !== 'colissimo'){
                                         selected_printer.send(html.responseJSON['zpl'], printComplete, printerError);
                                     }

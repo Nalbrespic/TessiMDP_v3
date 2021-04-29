@@ -24,6 +24,7 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
         <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.7/css/rowReorder.dataTables.min.css">
@@ -143,6 +144,7 @@
                 <nav>
                     <ul class="nav menu shadow" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 4px;margin-right: 27px;">
                         <li ><a onclick="hideMenu()" onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_production') }}">Etiquettes ZPL</a></li>
+                        <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_sejer') }}">Vérif Sejer</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_cartepage') }}">Saisi cartes</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_editStatut') }}">Statut Election</a></li>
 
@@ -497,7 +499,6 @@
         }
         var lengthTabTransport = $('.tableTransport').length
         var titleTable1 = $('#titleTable1').text()
-        console.log('mon titre 1: ', titleTable1)
         var titleTable2 = $('#titleTable2').text()
         var titleTable3 = $('#titleTable3').text()
         var titleArticleCommande = $('#titleArticleCommande').text()
@@ -505,7 +506,6 @@
         for (let i=1; i <= lengthTabTransport; i++){
             titleTransport[i] = $('#titleTableTransport'+i).text()
         }
-        console.log(titleTransport)
         function addSheet(xlsx, table, title, name, sheetId) {
             //Clones sheet from Sheet1 to build new sheet.
             //Params:
@@ -569,7 +569,7 @@
                             addSheet(xlsx, '#tableTransport'+i, titleTransport[i], titleTransport[i], '4'+i);
                         }
                         addSheet(xlsx,'#table3', titleTable3,titleTable3,'5');
-                        addSheet(xlsx, '#articleCommande', titleArticleCommande, titleArticleCommande, '6');
+                        // addSheet(xlsx, '#articleCommande', titleArticleCommande, titleArticleCommande, '6');
 
                         var sheet = xlsx.xl.worksheets['sheet1.xml'];
                         $('row c[r*="2"]', sheet).attr( 's', '42' );
@@ -800,6 +800,7 @@
                 },
             ],
         }
+
         var emmeteurOptions = {"1": "none", '39':'Tessi TMS'}
         var columnDefs =[
             {
@@ -890,9 +891,18 @@
         {#    }#}
         {#    });#}
         {#}#}
+
+        var parameters4 = {
+            language: language,
+            dom: '<t>ip',
+
+
+
+
         }
 
         $('#articleCommande').DataTable(parameters2);
+        $('#tableArticle').DataTable(parameters4);
         $('#table1').DataTable(parameters);
         $('#table2').DataTable(parameters);
         $('#table3').DataTable(parameters);
@@ -1639,11 +1649,6 @@
                         var statutLivr = obj[4];
                         var nbstatut = histoStatut.length
                         var len = obj.length;
-                        console.log("les articles: ",articles);
-                        console.log("le tracking: ", tracking);
-                        console.log("le statut: ", statut);
-                        console.log('historique: ', histoStatut);
-                        console.log('statut de livraison', statutLivr);
 
                         if ( len != 0) {
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
@@ -1657,7 +1662,6 @@
                             html += '<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;"><tr><td>Code article</td><td>Libellé article</td><td>Quantité</td></tr>';
 
                             articles.forEach(function(article) {
-                                console.log('un de mes articles: ', article)
                                 html += '<tr><td>' + article.codearticle + '</td><td>' + article.libelle + '</td><td>' + article.quantite + '</td></tr>'
                             })
 
@@ -1691,7 +1695,6 @@
                                 '            <div class="swiper-container text-center">' +
                                 '<div class="swiper-wrapper"><div class="swiper-slide"> '
                             histoStatut.forEach(function(item) {
-                                console.log ('un statut: ',item)
                             html += '<div class="swiper-wrapper"><div class="swiper-slide">' +
                                 '                      <div class="timestamp"><span class="date">'+ moment(item.datestatut.date).format('LLL') +'</span></div>'
 
@@ -1776,7 +1779,7 @@
             var listFileTracking = [];
             var prod = 0;
             eraseAllSelect();
-            document.getElementById("inlineRadio4").checked = true;
+            // document.getElementById("inlineRadio4").checked = true;
             document.getElementById("inlineRadio9").checked = true;
             document.getElementById("date-range0").value = "";
 
@@ -1803,7 +1806,6 @@
                         }
 
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
 
                 }
@@ -1821,7 +1823,6 @@
                         }
 
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
                 }
                 if (this.value === '3')
@@ -1832,7 +1833,6 @@
                         $('#trackSelect'.concat(i)).prop('checked', true);
                         listFileTracking.push($('#idFileTracking'.concat(i)).html())
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                    exporter(listFileTracking);
                 }
 
@@ -1862,7 +1862,7 @@
                 {}).on('datepicker-first-date-selected', function (event, obj) {
                 /* This event will be triggered when first date is selected */
                 eraseAllSelect();
-                document.getElementById("inlineRadio4").checked = true;
+                // document.getElementById("inlineRadio4").checked = true;
                 // obj will be something like this:
                 // {
                 // 		date1: (Date object of the earlier date)
@@ -1947,7 +1947,6 @@
                 if ($(this).is(':checked')) {
                     listFileTracking.push($(this).val());
                     exporter(listFileTracking);
-                    console.log(listFileTracking.length)
                 } else {
 
                         for (var k =0 ; k < listFileTracking.length ; k++)
@@ -1975,17 +1974,17 @@
     </script>
 
 
-    <script>
-        $(document).ready(function() {
-            if ($('#entered_name').val() != 0)
-            {
-                sendData();
-            }
+{#    <script>#}
+{#        $(document).ready(function() {#}
+{#            if ($('#entered_name').val() != 0)#}
+{#            {#}
+{#                sendData();#}
+{#            }#}
 
-        })
+{#        })#}
 
 
-    </script>
+{#    </script>#}
 
 
 
@@ -2092,7 +2091,6 @@
     <script>
         function tabTrackings(obj, len, titre, afficheTout, html)
         {
-            console.log('object reçu: ',obj);
 
 
             html += '<div class="fondBlanc " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
@@ -2105,7 +2103,6 @@
                 if (obj[i]['histoStatut'] != undefined) {
                     var histoStatut = obj[i]['histoStatut'];
                     var lastStatut = histoStatut[histoStatut.length - 1];
-                    console.log('dernier idstatut: ', lastStatut['idstatut']);
                 }
 
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
@@ -2248,8 +2245,6 @@
 
                     html += '{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td><button onclick="AnnulTracking('+obj[i]['numbl']+')" style="background: none; border:none" type="button"><span class="glyphicon glyphicon-remove" style="color: #D34026"></span></button></td>{% endif %}';
 
-                console.log('objet en cours: ', obj[i]);
-                console.log('statut objet: ',obj[i]['trStatut'])
             }
 
             html += '</tr></table></div>';
@@ -2291,7 +2286,6 @@
                     contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                     complete: function (data) {
                         modal.style.display = "none";
-                        console.log('controller ok')
 
                         var modal2 = document.getElementById('modalDelete2');
                         var modalConfirme2 = document.getElementById('modalDeleteConfirme2');

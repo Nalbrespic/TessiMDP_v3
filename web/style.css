@@ -152,7 +152,7 @@ table.table-bordered.table-striped.tableSynthese tbody tr th
 
 table.table-bordered.table-striped.tableSynthese tbody tr td
 {
-    padding: 0 5px 0 5px;
+    padding: 0px;
     vertical-align: inherit;
 }
 
@@ -481,6 +481,7 @@ button.dt-button:hover{
     color: #28274d !important;
     font-weight: bolder !important;
 }
+
 #alteditor-row-4{
     display: none !important;
 }
@@ -501,3 +502,8 @@ button.dt-button:hover{
 #maillingInput{
     padding-left: 15px;
 }
+
+.tableSynthese > tbody > tr > th {
+    padding:0;
+}
+
