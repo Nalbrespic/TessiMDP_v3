@@ -55,7 +55,7 @@ class ProdController extends Controller
             return $this->redirectToRoute('tmd_core_homepage', array());
         }
 
-        return $this->render('TMDProdBundle:Prod:addApplication.html.twig', array(
+        return $this->render('TMDCoreBundle:Core:gestionAppli.html.twig', array(
             'form' => $form->createView(),
         ));
     }

@@ -763,8 +763,8 @@ class AppliController extends Controller
 
 //        dump($dateJour[$jour]);
 
-            $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(0);
-            $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(0);
+            $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1);
+            $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(1);
 
             $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour]);
             $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour]);
@@ -823,8 +823,8 @@ class AppliController extends Controller
                     }
                 }
         $tabChart=[];
-        $nbKubByStatut[-1]=null;
-        $nbElecteurByStatut[-1]=null;
+        $nbKubByStatut[-1][0][1]=null;
+        $nbElecteurByStatut[-1][0][1]=null;
         for ($j = 0; $j < count($joureureInterro); $j++) {
             if ($j == 0) {
                 array_push($tabChart, ['', 'Nombre de plis', 'Nombre de KUB']);

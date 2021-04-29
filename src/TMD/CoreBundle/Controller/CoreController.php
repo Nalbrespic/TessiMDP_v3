@@ -3,6 +3,7 @@
 namespace TMD\CoreBundle\Controller;
 
 use DateTime;
+use PhpParser\Node\Expr\Cast\Object_;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,10 +12,12 @@ use TMD\AppliBundle\TMDAppliBundle;
 use TMD\CoreBundle\Entity\TransporteursTarif;
 use TMD\CoreBundle\Entity\TransporteursTarifClient;
 use TMD\CoreBundle\TMDCoreBundle;
+use TMD\ProdBundle\Entity\EcommAppli;
 use TMD\ProdBundle\Entity\EcommArticles;
 use TMD\ProdBundle\Entity\EcommCmdep;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
 use TMD\ProdBundle\Entity\EcommLignes;
+use TMD\ProdBundle\Form\EcommAppliType;
 use TMD\ProdBundle\Form\EcommLignesType;
 use TMD\ProdBundle\Form\EcommTrackingType;
 use TMD\ProdBundle\TMDProdBundle;
@@ -347,11 +350,13 @@ class CoreController extends Controller
         $date = $request->get('date');
         $dateFormat = DateTime::createFromFormat('d/m/Y',$date);
 
+
         for ($i = 0; $i < count($tranches); $i++){
             for ($t =0; $t<count($zones);$t++){
                 $tranche= $em->getRepository('TMDCoreBundle:TransporteursTranche')->find($tranches[$i]['idTransportTranches']);
                 $zone = $em->getRepository('TMDCoreBundle:TransporteursZones')->find($zones[$t]['idTransporteursZones']);
                 $ancienTarif = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findSame($idClient, $idTransporteur, $tranches[$i]['idTransportTranches'],$zones[$t]['idTransporteursZones'], $idTransport);
+
                 if ($ancienTarif != [])
                 {
                     foreach ($ancienTarif as $onetarif){
@@ -391,6 +396,59 @@ class CoreController extends Controller
         $listClients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
         return new JsonResponse(array($listClients));
+    }
+
+    public function gestionAppliAction(Request $request){
+
+        $applis = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->findAllOpe();
+        dump($applis);
+        $appli = new EcommAppli();
+        $form = $this->get('form.factory')->create(EcommAppliType::class, $appli);
+
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+
+            if( $form->getData()->getappliImage()) {
+                $blob = $form->getData()->getappliImage()->getpathname();
+                $appli->setappliImage(file_get_contents($blob));
+            }
+
+            $em->persist($appli);
+            $em->flush();
+
+            $request->getSession()->getFlashBag()->add('addApp', 'Opération bien enregistrée.');
+
+            return $this->redirectToRoute('tmd_core_applis', array());
+        }
+
+        return $this->render('TMDCoreBundle:Core:gestionAppli.html.twig', array(
+            'form' => $form->createView(),
+            'applis'=>$applis,
+        ));
+
+    }
+    public function EditeFormAction(Request $request){
+        $em = $this->getDoctrine()->getManager();
+        $idAppli= $request->get('idappli');
+        $appli = $em->getRepository('TMDProdBundle:EcommAppli')->findbyId($idAppli);
+        dump($appli);
+        $request->getSession()->getFlashBag()->add('editApp', 'l\'opération a bien été modifiée');
+        return new JsonResponse(array($appli));
+    }
+    public function gestionAppliEditeAction( Request $request){
+        $em = $this->getDoctrine()->getManager();
+       $idappli = $request->get('idappli');
+        $idemetteur = $request->get('idemetteur');
+
+        $appli = $this->getDoctrine()->getRepository('TMDProdBundle:EcommAppli')->find($idappli);
+        $clientEmetteur = $this->getDoctrine()->getRepository('TMDProdBundle:Client')->find($idemetteur);
+        if ($clientEmetteur != null) {
+            $appli->setIdclientEmmetteur($clientEmetteur);
+            $em->persist($appli);
+            $em->flush();
+        }
+$message = "ok";
+        return new JsonResponse(array($clientEmetteur));
     }
 
 

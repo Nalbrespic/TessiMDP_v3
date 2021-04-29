@@ -79,11 +79,14 @@ class EcommAppli
     private $codeappli;
 
     /**
-     * @var boolean
+     * @var \TMD\ProdBundle\Entity\EcommTrtAppli
      *
-     * @ORM\Column(name="trtAppli", type="boolean", nullable=true)
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\EcommTrtAppli")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="trtAppli", referencedColumnName="idtrtAppli", nullable=true)
+     * })
      */
-    private $trtappli;
+    private $idtrtappli;
 
     /**
      * @var integer
@@ -124,6 +127,29 @@ class EcommAppli
      */
     private $idtypeprod = 1 ;
 
+
+    public function getIdclientEmmetteur()
+    {
+        return $this->idclientEmmetteur;
+    }
+
+    /**
+     * @param Client $idclientEmmetteur
+     */
+    public function setIdclientEmmetteur(Client $idclientEmmetteur)
+    {
+        $this->idclientEmmetteur = $idclientEmmetteur;
+    }
+
+    /**
+     * @var \TMD\ProdBundle\Entity\Client
+     *
+     * @ORM\ManyToOne(targetEntity="TMD\ProdBundle\Entity\Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idClientEmetteur", referencedColumnName="idClient", nullable=true)
+     * })
+     */
+    private $idclientEmmetteur;
 //    /**
 //     * @ORM\ManyToMany(targetEntity="TMD\AppliBundle\Entity\EcommCompteTransport", cascade={"persist"})
 //     *  @ORM\JoinTable(name="ecomm_Appli_Transport",
@@ -304,18 +330,7 @@ class EcommAppli
     /**
      * @return bool
      */
-    public function isTrtappli()
-    {
-        return $this->trtappli;
-    }
 
-    /**
-     * @param bool $trtappli
-     */
-    public function setTrtappli($trtappli)
-    {
-        $this->trtappli = $trtappli;
-    }
 
     /**
      * @return int
@@ -379,6 +394,18 @@ class EcommAppli
     public function setMailing($mailing)
     {
         $this->mailing = $mailing;
+    }
+
+
+    public function getIdtrtappli()
+    {
+        return $this->idtrtappli;
+    }
+
+
+    public function setIdtrtappli(EcommTrtAppli $idtrtappli)
+    {
+        $this->idtrtappli = $idtrtappli;
     }
 
 
