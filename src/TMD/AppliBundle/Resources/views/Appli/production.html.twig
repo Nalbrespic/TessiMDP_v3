@@ -1053,7 +1053,6 @@
                 complete: function (data) {
                     var json = data.responseText;
                     var obj = JSON.parse(json);
-                    console.log('objet reçu: ', obj)
                     var Bl = obj[0];
                     console.log('mon Bl: ', Bl);
 
@@ -1208,6 +1207,7 @@
                                 dataType: "json",
                                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
+
                                     if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 402 ) {
                                         var bl = html.responseText;
                                         var obj = JSON.parse(bl);
@@ -1313,9 +1313,9 @@
                                 dataType: "json",
                                 contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
+
                                     if (html.status !== 400 && html.status !== 401 && html.status !== 405 && html.status !== 408 && html.status !== 407 && html.status !== 402 ) {
                                         var bl = html.responseText;
-                                        console.log('objet reçu:', bl);
                                         var obj = JSON.parse(bl);
                                         var blT = JSON.parse(obj['bl']);
 
@@ -1449,9 +1449,10 @@
                                 type: "POST",
                                 data: {numCmd: message, verif: 1, okverif : okverif},
                                 dataType: "json",
-                                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                                 complete: function (html) {
                                     hideLoading();
+                                    console.log('test: ', html)
                                     if (html.responseJSON['zpl'] !== 'colissimo'){
                                         selected_printer.send(html.responseJSON['zpl'], printComplete, printerError);
                                     }
