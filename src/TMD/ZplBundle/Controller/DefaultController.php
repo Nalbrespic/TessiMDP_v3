@@ -203,18 +203,21 @@ class DefaultController extends Controller
                 else {
                     $serializer = $this->get('jms_serializer');
                     $blArray = $serializer->serialize($blBefore, 'json');
+                    dump($blArray);
                     $donneArray = $serializer->serialize($donne, 'json');
                     //lié au WS colissimo
                     $cn23 = null;
-                    $tot = array('bl' =>  $blArray, 'zpl' => $zplMod, 'donne' => $donneArray, 'CN23' => $cn23, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif, 'annule' => $annule);
+                    $tot = array('bl' =>  $blArray, 'zpl' => utf8_encode(utf8_decode($zplMod)), 'donne' => $donneArray, 'CN23' => $cn23, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif, 'annule' => $annule);
                     return new JsonResponse($tot);
                 }
             }
             $serializer = $this->get('jms_serializer');
             $blArray = $serializer->serialize($blBefore, 'json');
+            dump($blArray);
+            dump(utf8_encode(utf8_decode($zplMod)));
             $donneArray = $serializer->serialize($donne, 'json');
 //            'zpl' =>utf8_encode(utf8_decode($zplMod))
-            $tot = array('bl' => $blArray, 'zpl' =>$zplMod, 'donne' => $donneArray, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif , 'annule' => $annule);
+            $tot = array('bl' => $blArray, 'zpl' => utf8_encode(utf8_decode($zplMod)), 'donne' => $donneArray, 'verifAppli' => $VerifAppli, 'verifAppliOK' => $okverif , 'annule' => $annule);
             return new JsonResponse($tot);
         }
         return new Response("erreur: ce n'est pas du Json", 400);
