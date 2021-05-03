@@ -302,7 +302,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('bl.dateProduction')
             ->addSelect('bl.nColis')
             ->orderBy('tr.dateInsert', 'DESC')
-            ->groupBy('tr.expRef')
+            ->groupBy('ligne.numbl')
             ->getQuery()
             ->getArrayResult()
             ;
@@ -358,7 +358,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('cmd.libelle')
             ->addSelect('cmd.quantite')
             ->addSelect('IDENTITY(cmd.idStatut) as cmdStatut')
-            ->orderBy('tr.expRef', 'DESC')
+            ->orderBy('ligne.numbl', 'DESC')
             ->getQuery()
             ->getArrayResult()
             ;
@@ -539,7 +539,7 @@ class EcommLigneRepository extends EntityRepository
             ->addSelect('cmd.libelle')
             ->addSelect('cmd.quantite')
             ->addSelect('IDENTITY(cmd.idStatut) as cmdStatut')
-            ->orderBy('tr.expRef', 'DESC')
+            ->orderBy('ligne.numbl', 'DESC')
             ->getQuery()
             ->getArrayResult()
             ;

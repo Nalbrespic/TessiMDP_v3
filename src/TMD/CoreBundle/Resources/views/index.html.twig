@@ -30,6 +30,11 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css" />
 
 
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.7/css/rowReorder.dataTables.min.css">
+        <link rel="stylesheet" href="{{ asset('fontawesome/css/all.css')}}">
+
     {% endblock %}
 </head>
 
@@ -144,6 +149,7 @@
                 <nav>
                     <ul class="nav menu shadow" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 4px;margin-right: 27px;">
                         <li ><a onclick="hideMenu()" onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_production') }}">Etiquettes ZPL</a></li>
+                        <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_sejer') }}">Vérif Sejer</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_cartepage') }}">Saisi cartes</a></li>
                         <li ><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_appli_editStatut') }}">Statut Election</a></li>
 
@@ -180,9 +186,9 @@
                                     <h3 class="ongletMenu " style="margin-bottom: 20px;"><a class="arrow-btn" href="#" style="float: none;margin-left: -5px;color: white;font-family: ColaborateReg;font-size: 1.1em;width: 166px;outline-style: none;">Gestions</a></h3>
                                     <ul class="lz-menu nav menu " id="zindexmenu-1" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 12px;margin-left: 4px;box-shadow: 4px 2px 7px #504A62;margin-bottom: 7px;z-index: -10;">
                                         <li ><a style="padding-top: 13px;" href="http://tmdsws801/portail/interface_enregistrement/index.php" target="_blank">Suivi de production</a></li>
-                                        {% if is_granted('ROLE_ADMIN') %}<li ><a href="{{ path('tmd_prod_addApplication') }}">Opération</a></li>{% endif %}
                                         <li><a href="http://tmdsws801/portail/fiche_de_suivi/modif.php" target="_blank" >Gérer ATC/fichiers</a></li>
                                         {% if is_granted('ROLE_ATC') %} <li><a href="{{ path('tmd_prod_transports') }}">Gestion Transports</a></li>{% endif %}
+                                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %} <li><a href="{{ path('tmd_core_applis') }}">Gestion des Opérations</a></li>{% endif %}
                                         <li ><a href="http://tmdsws801/portail/completer_enregistrement/index.php" target="_blank">Saisie production</a></li>
                                         <li ><a href="http://tmdsws801/portail/contenants/contenants_index.php" target="_blank">Cartons</a></li>
                                         <li ><a href="http://tmdsws801/portail/doublons/doublons_index.php" target="_blank">Doublons</a></li>
@@ -333,10 +339,23 @@
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
     <script src="{{ asset('Datatable/dataTables.buttons.min.js') }}"></script>
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
     <script src="{{ asset('Datatable/buttons.html5.min.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/1.2.1/js/dataTables.searchPanes.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+{#    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>#}
+    <script src="{{ asset('Datatable/buttons.html5.min.js') }}"></script>
+    {#<script src="{{ asset('js/chart.js') }}"></script>#}
+    {#<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>#}
+  
+    <script type="text/javascript" charset="utf8" src="https://luca-vercelli.github.io/DataTable-AltEditor/src/dataTables.altEditor.free.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowreorder/1.2.7/js/dataTables.rowReorder.min.js"></script>
+    <script src="{{ asset('fontawesome/js/all.js') }}"></script>
+
 
 
     {% block javascriptsPlus %}
@@ -350,10 +369,15 @@
             $('#menu-2').lazeemenu('menu-1');
             $('#menu-3').lazeemenu('menu-1');
             $('#menu-4').lazeemenu('menu-1');
-
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip({
+                    placement : 'top'
+                })
+            })
         });
 
     </script>
+
     <script>
         $(function() {
             $('div.icon-tab').click(function() {
@@ -461,6 +485,7 @@
             window.location.href =  url
         }
     </script>
+
 <script>
     $(document).ready(function () {
         // Based on example from:
@@ -593,7 +618,6 @@
         }
         var lengthTabTransport = $('.tableTransport').length
         var titleTable1 = $('#titleTable1').text()
-        console.log('mon titre 1: ', titleTable1)
         var titleTable2 = $('#titleTable2').text()
         var titleTable3 = $('#titleTable3').text()
         var titleArticleCommande = $('#titleArticleCommande').text()
@@ -601,7 +625,6 @@
         for (let i=1; i <= lengthTabTransport; i++){
             titleTransport[i] = $('#titleTableTransport'+i).text()
         }
-        console.log(titleTransport)
         function addSheet(xlsx, table, title, name, sheetId) {
             //Clones sheet from Sheet1 to build new sheet.
             //Params:
@@ -665,7 +688,7 @@
                             addSheet(xlsx, '#tableTransport'+i, titleTransport[i], titleTransport[i], '4'+i);
                         }
                         addSheet(xlsx,'#table3', titleTable3,titleTable3,'5');
-                        addSheet(xlsx, '#articleCommande', titleArticleCommande, titleArticleCommande, '6');
+                        // addSheet(xlsx, '#articleCommande', titleArticleCommande, titleArticleCommande, '6');
 
                         var sheet = xlsx.xl.worksheets['sheet1.xml'];
                         $('row c[r*="2"]', sheet).attr( 's', '42' );
@@ -695,7 +718,23 @@
         aria: {
             sortAscending:  ": activer pour trier la colonne par ordre croissant",
             sortDescending: ": activer pour trier la colonne par ordre décroissant"
-        }
+        },
+            altEditor : {
+                "modalClose" : "Annuler",
+                "edit" : {
+                    "title" : "Modifier l'Opération",
+                    "button" : "Valider"
+                },
+
+                "success" : "Modification effectuée",
+                "error" : {
+                    "message" : "une erreur s'est produite",
+                    "label" : "Erreur",
+                    "responseCode" : "Response code:",
+                    "required" : "Champs recquis",
+                    "unique" : "cette valeur doit être unique"
+                }
+            }
     }
         var parameters = {
             language: language,
@@ -886,6 +925,7 @@
                 cascadePanes: true,
                 layout: 'columns-3'
 
+
             },
             columnDefs: [
                 {
@@ -909,21 +949,215 @@
                 },
             ],
         }
+
+        var emmeteurOptions = {"1": "none", '39':'Tessi TMS'}
+        var columnDefs =[
+            {
+                title: "Date de création",
+                // readonly: true,
+            },
+            {
+                title: "nom de l'opération",
+                // type: 'text',
+            },
+            {
+                title:"client",
+                // type: 'text',
+            },
+            {
+                title: "client Emmeteur",
+                // type: 'select',
+                // options: emmeteurOptions,
+                // select2: {width: '100%'},
+                // render: function (data,type,row,meta) {
+                //     if (data == null || (data in emmeteurOptions)) return null;
+                //     return emmeteurOptions[data];
+                // },
+
+            },
+            // {
+            //     data: null,
+            //     title: "Actions",
+            //     name: "Actions",
+            //     render: function (data, type, row, meta) {
+            //         return '<i class="editbutton fa fa-pen-square" href="#" style="color: orange;background-color: white;font-size: 22px"></i>';
+            //     },
+            //     disabled: true
+            // }
+        ]
+        var parametersAppli ={
+            destroy: true,
+            rowReorder: true,
+            language: language,
+            ordering: false,
+            columnDefs: columnDefs,
+            dom: 'Bfrtip',        // Needs button container
+            select: 'single',
+            responsive: true,
+            altEditor: true,     // Enable altEditor
+            buttons: [
+                {
+                    text: "<i class='fa fa-plus' data-toggle='tooltip' data-placement='top' title='créer une nouvelle opération'></i>",
+                    action: function (e, dt, node, config) {
+                        var url = "{{ path("tmd_prod_addApplication") }}"
+                        $('#appliModal').modal('show')
+
+                    }
+                },
+                {
+                    extend:'excel',
+                    text: 'Exporter vers Excel',
+                    exportOptions: {columns: [0,1,2,3]}
+                },
+                {
+                    extend: 'pdf',
+                    text: 'Exporter vers Pdf',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
+                    exportOptions: {columns: [0,1,2,3]}
+                }
+              ],
+
+
+        {#onEditRow: function(datatable, rowdata, success, error) {#}
+        {#        console.log(error)#}
+        {#    $.ajax({#}
+        {#        // a tipycal url would be /{id} with type='POST'#}
+        {#        url: "{{path('tmd_core_editAppli')}}",#}
+        {#        type: 'GET',#}
+        {#        data: rowdata,#}
+        {#        success: success,#}
+        {#        error: error,#}
+        {#        complete: function () {#}
+        {#            var divMessage = document.getElementById('messageAppli')#}
+
+        {#            divMessage.style.visibility = "visible"#}
+
+        {#            setTimeout( function(){#}
+        {#                divMessage.style.visibility = 'hidden';#}
+        {#            }, 5000);#}
+
+        {#    }#}
+        {#    });#}
+        {#}#}
+
+        var parameters4 = {
+            language: language,
+            dom: '<t>ip',
+
+
+
+
+        }
+
+
         $('#articleCommande').DataTable(parameters2);
+        $('#tableArticle').DataTable(parameters4);
         $('#table1').DataTable(parameters);
         $('#table2').DataTable(parameters);
         $('#table3').DataTable(parameters);
         $('.tableTransport').DataTable(parameters3);
+
         $('.facturationTable').DataTable(parameters2);
         $('#tableTransporteursTarif').DataTable(parameters4);
 
+        $('#appliTable').DataTable(parametersAppli);
+
     })
 </script>
+    <script>
+        function editFormAppli(idappli) {
+            $.ajax({
+                url: "{{ path('tmd_core_editFormAppli') }}",
+                type: "POST",
+                data: {idappli: idappli},
+                dataType: "html",
+                contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
+                complete: function (data) {
+                    var json = data.responseText;
+                    var obj = JSON.parse(json);
+                    var app = obj[0][0]
+
+                    console.log('mon appli: ', app)
+                    var html = '<p id="idappliNum" style="display: none">'+idappli+'</p>'
+                    html += '<form>' +
+                        '  <div class="form-group">' +
+                        '    <label for="datecreateInput">Date de création</label>' +
+                        '    <input type="text" class="form-control" id="datecreateInput" value="'+moment(app.dateappli.date).format("DD/MM/YYYY")+'" disabled>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label for="nomOpeInput">Nom de l\'opération</label>' +
+                        '    <input type="text" class="form-control" id="nomOpeInput" value="'+app.appliname+'" disabled>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label for="clientInput">Client</label>' +
+                        '    <input type="email" class="form-control" id="clientInput" value="'+app.client+'" disabled>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label for="emetteurInput">Client emetteur</label>' +
+                        '    <select  class="form-control" id="emetteurInput"  >'
+                    if (app.idEmetteur == 39) {
+                        html +='<option value="39" selected="selected">Tessi TMS</option>' +
+                        '       <option value="598">Tessi MD</option>'
+                    } else{
+                        html +='<option value="39" >Tessi TMS</option>' +
+                            '       <option value="598" selected="selected">Tessi MD</option>'
+                    }
+                        '  </div>' +
+                        '</form>'
+
+                    $("#editFormModalBody").html(html)
+                    $('#editFormModal').modal('show')
+
+                }
+            })
+        }
+    </script>
+    <script>
+        function editAppli() {
+            var idappli = document.getElementById('idappliNum').textContent
+            var idemetteur = document.getElementById('emetteurInput').value
+            console.log('idappli: ', idappli)
+            console.log('idemetteur', idemetteur)
+            $.ajax({
+                // a tipycal url would be /{id} with type='POST'
+                url: "{{path('tmd_core_editAppli')}}",
+                type: 'GET',
+                data: {idemetteur: idemetteur, idappli: idappli},
+
+                complete: function () {
+                    document.location.reload();
+                }
+            });
+        }
+    </script>
+    <script>
+        // $(document).on('click', "[id^='appliTable'] .editbutton", 'tr', function (x) {
+        //     var tableID = $(this).closest('table').attr('id');    // id of the table
+        //     var that = $( '#'+tableID )[0].altEditor;
+        //     that._openEditModal();
+        //     $('#altEditor-edit-form-' + that.random_id)
+        //         .off('submit')
+        //         .on('submit', function (e) {
+        //             e.preventDefault();
+        //             e.stopPropagation();
+        //             that._editRowData();
+        //         });
+        // });
+        // $(document).on("alteditor:edit_dialog_opened", function(evt){
+        //     var modal_selector = $('#appliTable')[0].altEditor.modal_selector;
+        //     $(modal_selector).find("#0").attr('readonly', true)
+        //     $(modal_selector).find("#1").attr('readonly', true)
+        //     $(modal_selector).find("#2").attr('readonly', true)
+        //     $(modal_selector).find("#4").hide()
+        // });
+    </script>
     <script>
         $(document).ready(function(){
             $('#tableExtract').css('display','none');
         })
     </script>
+
     {# ###   lien  BL Attente PROD  ### #}
     <script type="text/javascript">
 
@@ -1568,11 +1802,6 @@
                         var statutLivr = obj[4];
                         var nbstatut = histoStatut.length
                         var len = obj.length;
-                        console.log("les articles: ",articles);
-                        console.log("le tracking: ", tracking);
-                        console.log("le statut: ", statut);
-                        console.log('historique: ', histoStatut);
-                        console.log('statut de livraison', statutLivr);
 
                         if ( len != 0) {
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
@@ -1586,7 +1815,6 @@
                             html += '<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;"><tr><td>Code article</td><td>Libellé article</td><td>Quantité</td></tr>';
 
                             articles.forEach(function(article) {
-                                console.log('un de mes articles: ', article)
                                 html += '<tr><td>' + article.codearticle + '</td><td>' + article.libelle + '</td><td>' + article.quantite + '</td></tr>'
                             })
 
@@ -1620,7 +1848,6 @@
                                 '            <div class="swiper-container text-center">' +
                                 '<div class="swiper-wrapper"><div class="swiper-slide"> '
                             histoStatut.forEach(function(item) {
-                                console.log ('un statut: ',item)
                             html += '<div class="swiper-wrapper"><div class="swiper-slide">' +
                                 '                      <div class="timestamp"><span class="date">'+ moment(item.datestatut.date).format('LLL') +'</span></div>'
 
@@ -1705,7 +1932,7 @@
             var listFileTracking = [];
             var prod = 0;
             eraseAllSelect();
-            document.getElementById("inlineRadio4").checked = true;
+            // document.getElementById("inlineRadio4").checked = true;
             document.getElementById("inlineRadio9").checked = true;
             document.getElementById("date-range0").value = "";
 
@@ -1732,7 +1959,6 @@
                         }
 
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
 
                 }
@@ -1750,7 +1976,6 @@
                         }
 
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                     exporter(listFileTracking);
                 }
                 if (this.value === '3')
@@ -1761,7 +1986,6 @@
                         $('#trackSelect'.concat(i)).prop('checked', true);
                         listFileTracking.push($('#idFileTracking'.concat(i)).html())
                     }
-                    console.log('nombre de fichiers séléctionnés', listFileTracking.length)
                    exporter(listFileTracking);
                 }
 
@@ -1791,7 +2015,7 @@
                 {}).on('datepicker-first-date-selected', function (event, obj) {
                 /* This event will be triggered when first date is selected */
                 eraseAllSelect();
-                document.getElementById("inlineRadio4").checked = true;
+                // document.getElementById("inlineRadio4").checked = true;
                 // obj will be something like this:
                 // {
                 // 		date1: (Date object of the earlier date)
@@ -1876,7 +2100,6 @@
                 if ($(this).is(':checked')) {
                     listFileTracking.push($(this).val());
                     exporter(listFileTracking);
-                    console.log(listFileTracking.length)
                 } else {
 
                         for (var k =0 ; k < listFileTracking.length ; k++)
@@ -1904,17 +2127,17 @@
     </script>
 
 
-    <script>
-        $(document).ready(function() {
-            if ($('#entered_name').val() != 0)
-            {
-                sendData();
-            }
+{#    <script>#}
+{#        $(document).ready(function() {#}
+{#            if ($('#entered_name').val() != 0)#}
+{#            {#}
+{#                sendData();#}
+{#            }#}
 
-        })
+{#        })#}
 
 
-    </script>
+{#    </script>#}
 
 
 
@@ -2017,410 +2240,10 @@
     </script>
 
 
-     {# ###   FULLCALENDAR   ### #}
-    {#<script>#}
-
-
-
-        {#$(document).ready(function () {#}
-
-
-            {#var max = $('#dateMaxProd').text();#}
-            {#if ( max !== '1980-01-01'){#}
-
-
-
-                    {#var caseBefore;#}
-                    {#var recase = false;#}
-                    {#if (max == 0)#}
-                    {#{#}
-                        {#max =Date.now();#}
-                    {#}#}
-                    {#tabSynthese(moment(max).format('YYYY-MM'), $('#recupIdAppli').text(),0);#}
-                    {#$('#calendar').fullCalendar({#}
-
-                        {#header: {#}
-                            {#left: 'prev,next ',#}
-                            {#center: 'title',#}
-                            {#right: ''#}
-                        {#},#}
-
-                        {#defaultDate: max,#}
-                        {#lang: 'fr',#}
-
-
-                        {#buttonIcons: false, // show the prev/next text#}
-                        {#editable: true,#}
-                        {#eventLimit: true,#}
-
-
-                        {#// allow "more" link when too many events#}
-                        {#dayClick: function () {#}
-                        {#},#}
-                        {#events:#}
-                            {#{#}
-                                {#url: '{{ path('tmd_prod_calendar') }}',#}
-                                {#data: { idappli: ($('#recupIdAppli').text())},#}
-
-
-
-                            {#},#}
-                        {#eventRender: function(event, eventElement) {#}
-                                {#eventElement.find("div.fc-content").css('text-align', 'center');#}
-                                {#eventElement.find("div.fc-row.fc-week.fc-widget-content.fc-rigid").css('height', 'inherit');#}
-                                {#eventElement.find("tr:first-child td .fc-day-grid-event").css('margin-top','-4px');#}
-                                {#eventElement.find("span.fc-day-number").css('padding', '-4px');#}
-
-                        {#},#}
-
-                        {#eventClick: function(calEvent, jsEvent, view) {#}
-
-                            {#var dateProd = calEvent.infoDate;#}
-                            {#var idAppli = calEvent.infoIdAppli;#}
-        {#//                    document.getElementById("modifClassCalendar").className = "col-md-4";#}
-        {#//                    $('#modifClassCalendar2').css('display', 'inherit');#}
-        {#//                    document.getElementById("modifClassCalendar2").css('display', 'block');#}
-                            {#if (caseBefore !== undefined) {#}
-                                {#caseBefore.css('border-color', '#3A87AD')#}
-                                {#$(this).css('border-color', 'red');#}
-                                {#if (caseBefore[0] === $(this)[0]) {#}
-                                    {#$(this).css('border-color', '#3A87AD');#}
-                                    {#recase = true;#}
-                                {#}#}
-                            {#}#}
-                            {#else {#}
-                                {#$(this).css('border-color', 'red');#}
-                            {#}#}
-
-                            {#if(!recase){#}
-                                {#afficherDateFile();#}
-                            {#}else{#}
-                                {#$("#afficherPardate").html("");#}
-                                {#tabSynthese(moment(view.start).add(1,'week').format('YYYY-MM'), $('#recupIdAppli').text(),0);#}
-                                {#recase = false;#}
-                            {#}#}
-
-
-                            {#caseBefore = $(this);#}
-
-                                {#var init = 0;#}
-
-
-                                {#function afficherDateFile(){#}
-
-                                        {#$.ajax({#}
-                                            {#url: "{{ path('tmd_prod_donneTrackingsByDateProd') }}",#}
-                                            {#type: "POST",#}
-                                            {#data: {infoDate:  dateProd,infoAppli:  idAppli},#}
-
-                                            {#dataType: "html",#}
-                                            {#contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",#}
-                                            {#complete: function (data) {#}
-
-                                                {#var json = data.responseText;#}
-                                                {#var obj = JSON.parse(json);#}
-                                                {#var len = obj.length;#}
-
-                                                {#if ( len != 0) {#}
-
-                                                    {#var afficheTout = false;#}
-                                                    {#var titre = "Trackings:";#}
-                                                    {#var html ="";#}
-
-                                                    {#html+= tabTrackings(obj, len, titre, afficheTout, html);#}
-
-                                                    {#html += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse: </p></div>';#}
-
-                                                    {#tabSynthese(moment(dateProd).format('YYYY-MM-DD'), $('#recupIdAppli').text(),1);#}
-
-                                                    {#$("#afficherPardate").html(html);#}
-                                                {#}#}
-
-                                            {#}#}
-                                        {#});#}
-
-                                {#} ;#}
-
-                        {#},#}
-                        {#viewRender: function(view,element) {#}
-                                   {#var date = moment(view.start).add(1,'M').format('YYYY-MM');#}
-                                   {#tabSynthese(moment(view.start).add(1,'week').format('YYYY-MM'), $('#recupIdAppli').text(),0);#}
-                                   {#$("#afficherPardate").html("");#}
-
-                       {#}#}
-                    {#});#}
-            {#}#}
-            {#else{#}
-                {#$("#rempliCalendar2").html("Pas de production à ce jour !");#}
-            {#}#}
-        {#});#}
-    {#</script>#}
-
-     {#<script>#}
-        {#function tabSynthese(date,app,indice ) {#}
-            {#$.ajax({#}
-                {#url: "{{ path('tmd_prod_donneSyntheseByDateProd') }}",#}
-                {#type: "POST",#}
-                {#data: {infoDate: date, infoAppli: app},#}
-
-                {#dataType: "html",#}
-                {#contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",#}
-                {#complete: function (data) {#}
-
-                    {#var json = data.responseText;#}
-                    {#var obj = JSON.parse(json);#}
-                    {#var obj2 = obj[1];#}
-                    {#var obj3 = obj[2];#}
-                    {#var len = obj2.length;#}
-
-                    {#var html2 = "";#}
-                    {#if ( indice == 0){#}
-                        {#html2 += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse pour le mois de '+moment(date).format('MMMM')+'</p><hr class="menutr">';#}
-{#//                        html2 = '<p>Synthese pour le mois de '+moment(date).format('MMMM')+'</p>';#}
-                    {#}#}
-                    {#else{#}
-                        {#html2 += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse pour la date: '+moment(date).format('DD-MM-YYYY')+'</p><hr class="menutr">';#}
-                    {#}#}
-
-                    {#html2 += '<div class="row">'#}
-                                         {#+'<div class="col-md-8" >'#}
-                                                        {#+'<ul class="nav nav-tabs" role="tablist">'#}
-                                                            {#+'<li role="presentation" class="active"><a href="#detailsS" aria-controls="home" role="tab" data-toggle="tab">Synthese</a></li>'#}
-                                                            {#+'<li role="presentation"><a href="#transportS" aria-controls="profile" role="tab" data-toggle="tab">Transport</a></li>'#}
-                                                            {#+'<li role="presentation"><a href="#testS" aria-controls="home" role="tab" data-toggle="tab">SiteProd</a></li>'#}
-                                                            {#+'<li role="presentation"><a href="#articleS" aria-controls="home" role="tab" data-toggle="tab">Articles</a></li>'#}
-                                                        {#+'</ul>'#}
-                                                        {#+'<div class="tab-content">'#}
-                                                            {#+'<div role="tabpanel" class="tab-pane active" id="detailsS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'#}
-                                                                {#+'<div class="row">'#}
-                                                                    {#+'<div class="col-md-12">'#}
-{#//                                                                        +'<div class="row">'#}
-{#//                                                                            +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de fichiers:    </p></div>'#}
-{#//                                                                            +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">    </p></div>'#}
-{#//                                                                        +'</div>'#}
-{#//                                                                        +'<div class="row">'#}
-{#//                                                                            +'<div class="col-md-9" style="margin-bottom: -8px;"><p >Total des commandes:     </p></div>'#}
-{#//                                                                            +'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'#}
-{#//                                                                        +'</div>'#}
-                                                                        {#+'<div class="row">'#}
-                                                                            {#+'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL produits:     </p></div>'#}
-                                                                            {#+'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;">'+obj[0]+'</p></div>'#}
-                                                                        {#+'</div>'#}
-                                                                        {#+'<div class="row">'#}
-                                                                            {#+'<div class="col-md-9" style="margin-bottom: -8px;"><p >Nombre de BL en réclamation:     </p></div>'#}
-                                                                            {#+'<div class="col-md-3"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'#}
-                                                                        {#+'</div>'#}
-{#//                                                                    +'</div>'#}
-{#//                                                                    +'<div class="col-md-7">'#}
-{#//                                                                        +'<div class="row">'#}
-{#//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Attente PROD:    </p></div>'#}
-{#//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;width: 40px;></p></div>'#}
-{#//                                                                        +'</div>'#}
-{#//                                                                        +'<div class="row">'#}
-{#//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Date premiere production:    </p></div>'#}
-{#//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'#}
-{#//                                                                        +'</div>'#}
-{#//                                                                        +'<span id="dateMaxProd" style="display: none;"></span>'#}
-{#//                                                                        +'<div class="row">'#}
-{#//                                                                            +'<div class="col-md-7" style="margin-bottom: -8px;"><p >Date dernière production:</p></div>'#}
-{#//                                                                            +'<div class="col-md-5"><p style="font-size: 1.2em;margin-bottom: -8px;"></p></div>'#}
-{#//                                                                        +'</div>'#}
-{#//                                                                    +'</div>'#}
-                                                                {#+'</div>'#}
-                                                            {#+'</div>'#}
-                                                            {#+'</div>'#}
-                                                            {#+'<div role="tabpanel" class="tab-pane" id="transportS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'#}
-                                                                {#+'<div class="row" >'#}
-                                                                    {#+'<div class="col-md-12" style="padding-right: 27px;">'#}
-                                                                        {#+'<div class="row" style="overflow-y: auto;max-height: 98px;overflow-x: hidden;">'#}
-                                                                            {#+'<div class="col-md-11">'#}
-                                                                                {#+'<div class="row">'#}
-                                                                                {#for (var key in obj3) {#}
-                                                                                    {#html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p>'+key+'</p>'#}
-                                                                                        {#+'</div>'#}
-                                                                                        {#+'<div class="col-md-4" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p style="font-size: 1.2em;">'+obj3[key]+'</p>'#}
-                                                                                        {#+'</div>';#}
-                                                                                {#}#}
-                                                                                {#html2 +='</div>'#}
-                                                                            {#+'</div>'#}
-                                                                        {#+'</div>'#}
-                                                                    {#+'</div>'#}
-                                                                {#+'</div>'#}
-                                                            {#+'</div>'#}
-                                                            {#+'<div role="tabpanel" class="tab-pane" id="testS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'#}
-                                                                {#+'<div class="row">'#}
-                                                                {#+'</div>'#}
-                                                            {#+'</div>'#}
-                                                            {#+'<div role="tabpanel" class="tab-pane" id="articleS" style="background-color: white;border: 1px solid #504a62;border-radius: 3px;padding: 5px;">'#}
-                                                                {#+'<div class="row" >'#}
-                                                                    {#+'<div class="col-md-12" style="padding-right: 27px;">'#}
-{#//                                                                        +'<div class="row" >'#}
-{#//                                                                            +'<div class="col-md-12">'#}
-{#//                                                                                +'<div class="row">'#}
-{#//                                                                                    +'<div class="col-md-5">'#}
-{#//                                                                                        +'<p></p>'#}
-{#//                                                                                    +'</div>'#}
-{#//                                                                                    +'<div class="col-md-3">'#}
-{#//                                                                                        +'<p>Quantité totale</p>'#}
-{#//                                                                                    +'</div>'#}
-{#//                                                                                    +'<div class="col-md-3">'#}
-{#//                                                                                        +'<p>Reste à produire</p>'#}
-{#//                                                                                    +'</div>'#}
-{#//                                                                                +'</div>'#}
-{#//                                                                                +'<div class="row" >'#}
-{#//                                                                                    +'<div class="col-md-offset-5 col-md-7" >'#}
-{#//                                                                                        +'<hr style="margin: -5px -20px;border: 0.2px #504A62 solid;" >'#}
-{#//                                                                                    +'</div>'#}
-{#//                                                                                +'</div>'#}
-{#//                                                                            +'</div>'#}
-{#//                                                                        +'</div>'#}
-                                                                        {#+'<div class="row" style="overflow-y: auto;max-height: 98px;overflow-x: hidden;">'#}
-                                                                            {#+'<div class="col-md-12">'#}
-                                                                                {#+'<div class="row">';#}
-                                                                                {#var compt = null ;#}
-                                                                                {#for (var key in obj2[0]) {#}
-                                                                                    {#html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p>'+key+'</p>'#}
-                                                                                    {#+'</div>'#}
-                                                                                    {#+'<div class="col-md-4" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p style="font-size: 1.2em;">'+obj2[0][key]+'</p>'#}
-                                                                                    {#+'</div>';#}
-                                                                                    {#compt = compt + parseInt(obj2[0][key]);#}
-                                                                                {#}#}
-
-                                                                                {#if (compt !== null) {#}
-                                                                                    {#html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'#}
-                                                                                        {#+ '<p style="font-size: 1.2em;">Total : ' + compt + ' articles</p>';#}
-                                                                                        {#if (obj2[1] != null && obj2[1].length !== 0) {#}
-                                                                                            {#html2 += '<hr style="border: 1px #504A62 solid;">';#}
-                                                                                        {#}#}
-                                                                                        {#html2 += '</div>'#}
-                                                                                        {#+ '</div>';#}
-                                                                                {#}else{#}
-                                                                                    {#html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'#}
-                                                                                        {#+ '<p style="font-size: 1.2em;">Pas d\'articles enregistrés</p>'#}
-                                                                                        {#+ '</div>'#}
-                                                                                        {#+ '</div>';#}
-                                                                                {#}#}
-
-                                                                                {#for (var key in obj2[1]) {#}
-                                                                                    {#html2 += '<div class="col-md-8" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p>'+key+'</p>'#}
-                                                                                        {#+'</div>'#}
-                                                                                        {#+'<div class="col-md-4" style="margin-bottom: -8px;">'#}
-                                                                                        {#+'<p style="font-size: 1.2em;">'+obj2[1][key]+'</p>'#}
-                                                                                        {#+'</div>';#}
-
-                                                                                {#}#}
-
-                                                                                {#if (app === '416') {#}
-                                                                                    {#var url = '{{ path('tmd_prod_syntheseArtCoke', {'date': 'data' }) }}';#}
-                                                                                    {#url = url.replace("data", date);#}
-                                                                                    {#html2 += '<a href=' + url + ' style="margin-bottom: 9px;" type="button" class="btn btn-default btn-xs"   >Synthese Nb bouteilles</a>';#}
-                                                                                {#}#}
-                                                                                {#if (app === '554') {#}
-                                                                                    {#var url = '{{ path('tmd_prod_syntheseCoriolis', {'date': 'data' }) }}';#}
-                                                                                    {#url = url.replace("data", date);#}
-                                                                                    {#html2 += '<a href=' + url + ' style="margin-bottom: 9px;margin-top: 9px;" type="button" class="btn btn-default btn-xs"   >Synthese Multi</a>';#}
-                                                                                {#}#}
-
-
-
-                                                                        {#html2 +='</div>'#}
-                                                                    {#+'</div>'#}
-                                                                {#+'</div>'#}
-                                                            {#+'</div>'#}
-                                                        {#+'</div>'#}
-                                                    {#+'</div>'#}
-                                                {#+'</div>';#}
-
-                    {#$("#rempliCalendar2").html(html2);#}
-
-                {#}#}
-            {#})#}
-        {#}#}
-
-    {#</script>#}
-    {#<script>#}
-    {#function sendDataBL(cmd)#}
-        {#{#}
-            {#if (cmd !== undefined){#}
-                        {#$.ajax({#}
-                            {#url: "{{ path('tmd_zpl_imprimEtiq') }}",#}
-                            {#type: "POST",#}
-                            {#data: {numCmd: cmd, verif: 1},#}
-                            {#dataType: "json",#}
-                            {#contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",#}
-                            {#complete: function (html) {#}
-                        {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true, 'vue' : 1,'appAverif': 'false'})|escape('js') }}';#}
-                        {#temp = temp.replace('varBl', cmd);#}
-
-                        {#if (html.status !== 400 && html.status !== 401 && html.status !== 405) {#}
-                            {#var bl = html.responseText;#}
-                            {#var obj = JSON.parse(bl);#}
-                            {#var blT = JSON.parse(obj['bl']);#}
-                            {#var objb = JSON.parse(bl);#}
-                            {#var dateT = JSON.parse(objb['donne']);#}
-
-
-                            {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true, 'vue' : 1,'appAverif': 'false'})|escape('js') }}';#}
-{#//                            temp = temp.replace('varBl', cmd);#}
-                            {#if ((blT.date_production).substr(0, 11) === '-0001-11-30') {#}
-
-                                {#if (html.responseJSON['zpl'] !== 'inconnu') {#}
-                                    {#temp = temp.replace('varEtat', '0v');#}
-                                    {#window.location.href = temp;#}
-
-                                {#}#}
-                                {#else {#}
-                                    {#temp = temp.replace('varEtat', '2.0');#}
-                                    {#window.location.href = temp#}
-                                {#}#}
-                            {#}#}
-                            {#else {#}
-                                {#temp = temp.replace('varEtat', '1');#}
-                                {#window.location.href = temp#}
-                            {#}#}
-
-                        {#}#}
-                        {#else if (html.status === 400) {#}
-                            {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true})|escape('js') }}';#}
-{#//                            temp = temp.replace('varBl', cmd);#}
-                            {#temp = temp.replace('varEtat', '4');#}
-                            {#window.location.href = temp;#}
-                        {#}#}
-                        {#else if (html.status === 401) {#}
-                            {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true})|escape('js') }}';#}
-{#//                            temp = temp.replace('varBl', cmd);#}
-                            {#temp = temp.replace('varEtat', '3');#}
-                            {#window.location.href = temp;#}
-                        {#}#}
-                        {#else if (html.status === 405) {#}
-                            {#var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true})|escape('js') }}';#}
-{#//                            temp = temp.replace('varBl', cmd);#}
-                            {#temp = temp.replace('varEtat', '5');#}
-                            {#window.location.href = temp;#}
-                        {#}#}
-
-                    {#},#}
-                            {#error: function (request, status, error) {#}
-
-
-                            {#}#}
-                        {#})#}
-
-            {#}#}
-        {#}#}
-
-        {#</script>#}
-
     {#tableau affiche trackings#}
     <script>
         function tabTrackings(obj, len, titre, afficheTout, html)
         {
-            console.log('object reçu: ',obj);
 
 
             html += '<div class="fondBlanc " style="margin-bottom: 100px;"><p style="text-align: left;font-size: 1.6em;margin: 10px;">'+titre+' </p><hr class="menutr">';
@@ -2433,7 +2256,6 @@
                 if (obj[i]['histoStatut'] != undefined) {
                     var histoStatut = obj[i]['histoStatut'];
                     var lastStatut = histoStatut[histoStatut.length - 1];
-                    console.log('dernier idstatut: ', lastStatut['idstatut']);
                 }
 
                 html += '<tr id="'+ obj[i]['numbl'] +'" class="tabSyntheseBlanc toutAffiche"';
@@ -2576,8 +2398,6 @@
 
                     html += '{% if (is_granted("ROLE_ATC")) or (is_granted("ROLE_SUPER_PROD")) %}<td><button onclick="AnnulTracking('+obj[i]['numbl']+')" style="background: none; border:none" type="button"><span class="glyphicon glyphicon-remove" style="color: #D34026"></span></button></td>{% endif %}';
 
-                console.log('objet en cours: ', obj[i]);
-                console.log('statut objet: ',obj[i]['trStatut'])
             }
 
             html += '</tr></table></div>';
@@ -2619,7 +2439,6 @@
                     contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                     complete: function (data) {
                         modal.style.display = "none";
-                        console.log('controller ok')
 
                         var modal2 = document.getElementById('modalDelete2');
                         var modalConfirme2 = document.getElementById('modalDeleteConfirme2');

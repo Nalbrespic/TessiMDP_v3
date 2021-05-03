@@ -152,7 +152,7 @@ table.table-bordered.table-striped.tableSynthese tbody tr th
 
 table.table-bordered.table-striped.tableSynthese tbody tr td
 {
-    padding: 0 5px 0 5px;
+    padding: 0px;
     vertical-align: inherit;
 }
 
@@ -281,7 +281,7 @@ tr.tabSyntheseBlanc
     margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 2px solid #504A62;
-    width: 50%; /* Could be more or less, depending on screen size */
+    width: 80%; /* Could be more or less, depending on screen size */
 }
 
 /* The Close Button */
@@ -481,6 +481,7 @@ button.dt-button:hover{
     color: #28274d !important;
     font-weight: bolder !important;
 }
+
 #tableProdFichier thead tr td{
     padding: 0px !important;
 }
@@ -592,3 +593,31 @@ button.dt-button:hover{
     background-color: #f4f0f0;
 
 }
+
+
+#alteditor-row-4{
+    display: none !important;
+}
+
+#appliModalContent{
+    width: 80%;
+    /*margin-top: -200px;*/
+}
+
+.formClass{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#trtInput{
+    padding-right: 15px;
+}
+#maillingInput{
+    padding-left: 15px;
+}
+
+.tableSynthese > tbody > tr > th {
+    padding:0;
+}
+
+

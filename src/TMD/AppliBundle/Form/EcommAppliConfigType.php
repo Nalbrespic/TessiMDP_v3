@@ -37,12 +37,12 @@ class EcommAppliConfigType extends AbstractType
 //                    return $category->getIdtransport()->getLibelletransport();
 //                }
 //            ));
-            ->add('idCompteTransport', EntityType::class, array(
-                'class' => EcommCompteTransport::class,
-                'choice_label' => function ($category) {
-                    return $category->getIdcomptetransport();
-                },
-            ))
+//            ->add('idCompteTransport', EntityType::class, array(
+//                'class' => EcommCompteTransport::class,
+//                'choice_label' => function ($category) {
+//                    return $category->getIdcomptetransport();
+//                },
+//            ))
             ->add('commentaire' , TextType::class)
 //            ->add('idTransport', EntityType::class, array(
 //            'class' => EcommTransport::class,

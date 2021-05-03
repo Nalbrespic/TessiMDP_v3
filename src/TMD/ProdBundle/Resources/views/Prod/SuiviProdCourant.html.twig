@@ -719,7 +719,6 @@
                                     var json = data.responseText;
                                     var obj = JSON.parse(json);
                                     var len = obj['add'].length;
-                                    console.log('object reçu date de dépot: ',obj);
                                     if ( len != 0) {
 
                                         var afficheTout = false;
@@ -992,7 +991,6 @@
                     var obj2 = obj[1];
                     var obj3 = obj[2];
                     var len = obj2.length;
-                    console.log('objet reçu', obj);
                     var html2 = "";
                     if ( indice == 0){
                         html2 += '<p style="text-align: left;font-size: 1.6em;margin: 10px;">Synthèse pour le mois de '+moment(date).format('MMMM')+'</p><hr class="menutr">';
@@ -1129,7 +1127,6 @@
                     dataType: "json",
                     contentType: "application/x-www-form-urlencoded; charset=ISO-8859-1",
                     complete: function (html) {
-                        console.log('html: ',html)
                         var temp = '{{ path('tmd_appli_production' ,{ 'bl': 'varBl', 'etat': 'varEtat', 'verif': true, 'vue' : 1,'appAverif': 'false'})|escape('js') }}';
                         temp = temp.replace('varBl', cmd);
 
