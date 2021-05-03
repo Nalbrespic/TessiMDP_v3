@@ -677,7 +677,7 @@
             buttons: [
                 {
                     extend: 'excel',
-                    text: '<i class="fa fa-file-excel-o"></i> Exporter tout vers excel',
+                    text: '<i class="fas fa-file-excel"></i> Exporter tout vers excel',
                     messageTop: ''+nomClient+'',
                     header:false,
                     customize: function( xlsx ) {
@@ -744,7 +744,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                     customize: function (xlsx) {
                         var sSh = xlsx.xl['styles.xml'];
                         var lastXfIndex = $('cellXfs xf', sSh).length - 1;
@@ -828,7 +828,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                 },
             ],
         }
@@ -840,7 +840,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                     title: 'Colis selon le mode de Transport',
                     customize: function (xlsx) {
                         var sSh = xlsx.xl['styles.xml'];
@@ -924,8 +924,6 @@
             searchPanes: {
                 cascadePanes: true,
                 layout: 'columns-3'
-
-
             },
             columnDefs: [
                 {
@@ -945,7 +943,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                 },
             ],
         }
@@ -985,7 +983,7 @@
             //     disabled: true
             // }
         ]
-        var parametersAppli ={
+        var parametersAppli = {
             destroy: true,
             rowReorder: true,
             language: language,
@@ -1005,48 +1003,41 @@
                     }
                 },
                 {
-                    extend:'excel',
+                    extend: 'excel',
                     text: 'Exporter vers Excel',
-                    exportOptions: {columns: [0,1,2,3]}
+                    exportOptions: {columns: [0, 1, 2, 3]}
                 },
                 {
                     extend: 'pdf',
                     text: 'Exporter vers Pdf',
                     orientation: 'landscape',
                     pageSize: 'LEGAL',
-                    exportOptions: {columns: [0,1,2,3]}
+                    exportOptions: {columns: [0, 1, 2, 3]}
                 }
-              ],
+            ],
 
 
-        {#onEditRow: function(datatable, rowdata, success, error) {#}
-        {#        console.log(error)#}
-        {#    $.ajax({#}
-        {#        // a tipycal url would be /{id} with type='POST'#}
-        {#        url: "{{path('tmd_core_editAppli')}}",#}
-        {#        type: 'GET',#}
-        {#        data: rowdata,#}
-        {#        success: success,#}
-        {#        error: error,#}
-        {#        complete: function () {#}
-        {#            var divMessage = document.getElementById('messageAppli')#}
+            {# onEditRow: function(datatable, rowdata, success, error) { #}
+            {# console.log(error) #}
+            {# $.ajax({ #}
+            {# // a tipycal url would be /{id} with type='POST' #}
+            {# url: "{{path('tmd_core_editAppli')}}", #}
+            {# type: 'GET', #}
+            {# data: rowdata, #}
+            {# success: success, #}
+            {# error: error, #}
+            {# complete: function () { #}
+            {# var divMessage = document.getElementById('messageAppli') #}
 
-        {#            divMessage.style.visibility = "visible"#}
+            {# divMessage.style.visibility = "visible" #}
 
-        {#            setTimeout( function(){#}
-        {#                divMessage.style.visibility = 'hidden';#}
-        {#            }, 5000);#}
+            {# setTimeout( function(){ #}
+            {# divMessage.style.visibility = 'hidden'; #}
+            {# }, 5000); #}
 
-        {#    }#}
-        {#    });#}
-        {#}#}
-
-        var parameters4 = {
-            language: language,
-            dom: '<t>ip',
-
-
-
+            {# } #}
+            {# }); #}
+            {# } #}
 
         }
 
