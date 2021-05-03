@@ -677,7 +677,7 @@
             buttons: [
                 {
                     extend: 'excel',
-                    text: '<i class="fa fa-file-excel-o"></i> Exporter tout vers excel',
+                    text: '<i class="fas fa-file-excel"></i> Exporter tout vers excel',
                     messageTop: ''+nomClient+'',
                     header:false,
                     customize: function( xlsx ) {
@@ -744,7 +744,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                     customize: function (xlsx) {
                         var sSh = xlsx.xl['styles.xml'];
                         var lastXfIndex = $('cellXfs xf', sSh).length - 1;
@@ -828,7 +828,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                 },
             ],
         }
@@ -840,7 +840,7 @@
             buttons: [
                 {
                     extend:'excel',
-                    text: '<i class="fa fa-file-excel-o"></i>',
+                    text: '<i class="fas fa-file-excel"></i>',
                     title: 'Colis selon le mode de Transport',
                     customize: function (xlsx) {
                         var sSh = xlsx.xl['styles.xml'];
