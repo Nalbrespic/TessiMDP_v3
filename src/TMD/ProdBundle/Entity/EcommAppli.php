@@ -127,7 +127,6 @@ class EcommAppli
      */
     private $idtypeprod = 1 ;
 
-
     public function getIdclientEmmetteur()
     {
         return $this->idclientEmmetteur;

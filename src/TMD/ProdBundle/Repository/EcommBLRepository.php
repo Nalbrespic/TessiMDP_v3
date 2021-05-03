@@ -1590,4 +1590,207 @@ class EcommBLRepository extends EntityRepository
 
     }
 
+    public function findbyTransportByMonthColissimo($thisDate){
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $thisDate.'%' )
+            ->andwhere('bl.modexp LIKE :mode')
+            ->setParameter('mode', "CO%")
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+
+    }
+
+    public function findbyTransportByMonthColisPrive($thisDate){
+
+        $prefixe1 ="M2";
+        $prefixe2="M3";
+        $prefixe3="M4";
+        $prefixe4="ZR";
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $thisDate.'%' )
+            ->andwhere('bl.nColis LIKE :prefixe1 or bl.nColis LIKE :prefixe2 or bl.nColis LIKE :prefixe3 or bl.nColis LIKE :prefixe4' )
+            ->setParameter('prefixe1', $prefixe1.'%')
+            ->setParameter('prefixe2', $prefixe2.'%')
+            ->setParameter('prefixe3', $prefixe3.'%')
+            ->setParameter('prefixe4', $prefixe4.'%')
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findbyTransportByMonthDpd($thisDate){
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot LIKE :dat')
+            ->setParameter('dat', $thisDate.'%' )
+            ->andwhere('bl.modexp LIKE :mode')
+            ->setParameter('mode', "DPD%")
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findbyTransportByMonthColissimoDate($date1, $date2){
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot BETWEEN :dat and :dat2')
+            ->setParameter('dat', $date1.'%' )
+            ->setParameter('dat2', $date2.'%' )
+            ->andwhere('bl.modexp LIKE :mode')
+            ->setParameter('mode', "CO%")
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+    public function findbyTransportByMonthColisPriveDate($date1,$date2){
+
+        $prefixe1 ="M2";
+        $prefixe2="M3";
+        $prefixe3="M4";
+        $prefixe4="ZR";
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot BETWEEN :dat AND :dat2')
+            ->setParameter('dat', $date1.'%' )
+            ->setParameter('dat2', $date2.'%' )
+            ->andwhere('bl.nColis LIKE :prefixe1 or bl.nColis LIKE :prefixe2 or bl.nColis LIKE :prefixe3 or bl.nColis LIKE :prefixe4' )
+            ->setParameter('prefixe1', $prefixe1.'%')
+            ->setParameter('prefixe2', $prefixe2.'%')
+            ->setParameter('prefixe3', $prefixe3.'%')
+            ->setParameter('prefixe4', $prefixe4.'%')
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
+
+    public function findbyTransportByMonthDpdDate($date1, $date2){
+
+        return $this
+            ->createQueryBuilder('bl')
+            ->leftJoin('bl.bl', 'ligne')
+            ->leftJoin('ligne.ecommCmdeps', 'cmd')
+            ->innerJoin('ligne.numligne', 'tr')
+            ->innerJoin('tr.idfile', 'file')
+            ->innerJoin('file.idappli', 'appli')
+            ->innerJoin('appli.idclient', 'cl')
+            ->innerJoin('appli.idclientEmmetteur','ecl')
+            ->where('tr.dateDepot BETWEEN :dat AND :dat2')
+            ->setParameter('dat', $date1.'%' )
+            ->setParameter('dat2', $date2.'%' )
+            ->andwhere('bl.modexp LIKE :mode')
+            ->setParameter('mode', "DPD%")
+            ->select('tr.expRef as BL')
+            ->addselect('sum(cmd.poids) as poids')
+            ->addselect('tr.dateDepot')
+            ->addselect('tr.dateCmde')
+            ->addselect('bl.nColis as suivi')
+            ->addselect('bl.modexp as transport')
+            ->addselect('cl.nomclient as Client')
+            ->addselect('appli.appliname as Operation')
+            ->addselect('ecl.nomclient as clientEmetteur')
+            ->groupBy('ligne.numbl')
+            ->orderBy('ligne.numbl', 'ASC')
+            ->getQuery()
+            ->getArrayResult()
+            ;
+    }
 }
