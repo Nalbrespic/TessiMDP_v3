@@ -187,8 +187,8 @@
                                     <ul class="lz-menu nav menu " id="zindexmenu-1" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 12px;margin-left: 4px;box-shadow: 4px 2px 7px #504A62;margin-bottom: 7px;z-index: -10;">
                                         <li ><a style="padding-top: 13px;" href="http://tmdsws801/portail/interface_enregistrement/index.php" target="_blank">Suivi de production</a></li>
                                         <li><a href="http://tmdsws801/portail/fiche_de_suivi/modif.php" target="_blank" >Gérer ATC/fichiers</a></li>
-                                        {% if is_granted('ROLE_ATC') %} <li><a href="{{ path('tmd_prod_transports') }}">Gestion Transports</a></li>{% endif %}
-                                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %} <li><a href="{{ path('tmd_core_applis') }}">Gestion des Opérations</a></li>{% endif %}
+                                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_SUPER_PROD')%} <li><a href="{{ path('tmd_prod_transports') }}">Gestion Transports</a></li>{% endif %}
+                                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_SUPER_PROD') %} <li><a href="{{ path('tmd_core_applis') }}">Gestion des Opérations</a></li>{% endif %}
                                         <li ><a href="http://tmdsws801/portail/completer_enregistrement/index.php" target="_blank">Saisie production</a></li>
                                         <li ><a href="http://tmdsws801/portail/contenants/contenants_index.php" target="_blank">Cartons</a></li>
                                         <li ><a href="http://tmdsws801/portail/doublons/doublons_index.php" target="_blank">Doublons</a></li>
