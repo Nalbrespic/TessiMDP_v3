@@ -731,8 +731,11 @@ class AppliController extends Controller
 
     public function verifElectionAction($statut , $jour)
     {
-//       $jour = 6;
-//
+        if ($jour === 99){
+            $jour = 0;
+        }
+
+
         $dateJour = ['2019-05-13',
             '2019-05-14 ',
             '2019-05-15 ',
