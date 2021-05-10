@@ -1,0 +1,24 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Election - choix Préfecture
+{% endblock %}
+
+
+
+{% block body %}
+    <div id="hideheaderRow" class="row" style="margin-top: -8px;">
+        <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
+            <div class="titreFenetre" >
+                <h3 style="margin-bottom: 1px;">Suivi Election </h3>
+            </div>
+        </div>
+    </div>
+
+        <h4> Choix de la préfécture</h4>
+        <a href="{{ path('tmd_appli_verifEletion',  {'dep': 02}) }}"><button type="button" class="btn btn-default" >Préfecture de l'Aisne</button></a>
+        <a href="{{ path('tmd_appli_verifEletion',  {'dep': 10}) }}"><button type="button" class="btn btn-default">Préfecture de l'Aube</button></a>
+        <a href="{{ path('tmd_appli_verifEletion',  {'dep': 39}) }}"><button type="button" class="btn btn-default" >Préfecture du Jura</button></a>
+    </div>
+
+{% endblock %}
