@@ -1136,45 +1136,45 @@ class EcommBLRepository extends EntityRepository
     }
 
 
-    public function findnbKubTotal($idStatut)
+    public function findnbKubTotal($idStatut,$files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') 
+                                                              WHERE bl.idfile IN ('.$files.') and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') 
                                                               GROUP BY cmd.numbl');
         $results = $query->getArrayResult();
         return $results;
     }
 
 
-    public function findnbKubTotalJ($idStatut, $jour)
+    public function findnbKubTotalJ($idStatut, $jour,$files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') and hs.datestatut <= '."'".$jour." 23:00:00'".'
+                                                              WHERE bl.idfile IN ('.$files.') and hs.id > 1000000 and hs.idstatut = ('.$idStatut.') and hs.datestatut <= '."'".$jour." 23:00:00'".'
                                                               GROUP BY cmd.numbl');
         $results = $query->getArrayResult();
         return $results;
     }
 
 
-    public function findnbKubbyHour($idStatut, $dateJour, $dateInterro)
+    public function findnbKubbyHour($idStatut, $dateJour, $dateInterro,$files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT COUNT(bl.bl) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                              WHERE bl.idfile IN ('.$files.') 
                                                                 and hs.id > 1000000 
                                                                 and hs.idstatut = '.$idStatut.'
                                                                 and hs.datestatut > '."'".$dateJour."'".'
@@ -1185,30 +1185,30 @@ class EcommBLRepository extends EntityRepository
     }
 
 
-    public function findnbElecteurTotal($idStatut)
+    public function findnbElecteurTotal($idStatut, $files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' and hs.id > 1000000 and hs.idstatut = ('.$idStatut.')
+                                                              WHERE bl.idfile IN ('.$files.') and hs.id > 1000000 and hs.idstatut = ('.$idStatut.')
                                                               ');
         $results = $query->getArrayResult();
         return $results;
     }
 
 
-    public function findnbElecteurTotalJ($idStatut, $jour)
+    public function findnbElecteurTotalJ($idStatut, $jour,$files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                              WHERE bl.idfile IN ('.$files.') 
                                                               and hs.id > 1000000 
                                                               and hs.idstatut = ('.$idStatut.')
                                                               and hs.datestatut <= '."'".$jour." 23:00:00'".'
@@ -1218,15 +1218,15 @@ class EcommBLRepository extends EntityRepository
     }
 
 
-    public function findnbElecteurbyHour($idStatut, $dateJour, $dateInterro)
+    public function findnbElecteurbyHour($idStatut, $dateJour, $dateInterro, $files)
     {
-        $idFichier = 5580;
+
         $query = $this->_em->createQuery('SELECT SUM(cmd.quantite) FROM TMDProdBundle:EcommBl bl 
                                                               INNER JOIN TMDProdBundle:EcommCmdep cmd
                                                               WITH bl.bl = cmd.numbl
                                                               INNER JOIN TMDProdBundle:EcommHistoStatut hs
                                                               WITH hs.numbl = bl.bl
-                                                              WHERE bl.idfile = '.$idFichier.' 
+                                                              WHERE bl.idfile IN ('.$files.') 
                                                                 and hs.id > 1000000 
                                                                 and hs.idstatut = '.$idStatut.'
                                                                 and hs.datestatut > '."'".$dateJour."'".'

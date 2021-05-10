@@ -729,19 +729,30 @@ class AppliController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
-    public function verifElectionAction($statut , $jour)
+    public function electionChoixDepAction(){
+
+        return $this->render('TMDAppliBundle:Appli:electionChoixDep.html.twig', array(
+
+        ));
+    }
+
+    public function verifElectionAction($statut , $jour, $dep)
     {
-//       $jour = 6;
-//
-        $dateJour = ['2019-05-13',
-            '2019-05-14 ',
-            '2019-05-15 ',
-            '2019-05-16 ',
-            '2019-05-17 ',
-            '2019-05-18 ',
-            '2019-05-20 ',
-            '2019-05-21 ',
-            '2019-05-22 ',];
+
+        $dateJour = ['2021-05-10',
+            '2021-05-11 ',
+            '2021-05-12 ',
+            '2021-05-14 ',
+            '2021-05-15 ',
+            '2021-05-17 ',
+            '2021-05-18 ',
+            '2021-05-19 ',
+            '2021-05-21 ',
+            '2021-05-25 ',
+            '2021-05-26 ',
+            '2021-05-27 ',
+
+            ];
         $joureureInterro = ['06:00:00',
             '07:00:00',
             '08:00:00',
@@ -761,13 +772,28 @@ class AppliController extends Controller
         
         $em = $this->getDoctrine()->getManager();
 
-//        dump($dateJour[$jour]);
 
-            $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1);
-            $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(1);
+            if ($dep == 2) {
+                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1832);
+            } elseif ($dep == 10){
+                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1833);
+            } else{
+                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1831);
+            }
 
-            $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour]);
-            $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour]);
+            $listFiles ="";
+            foreach ($Files as $file){
+                foreach ($file as $key => $v)
+               $listFiles .= $v.', ';
+            }
+            $listFiles = substr($listFiles,0, -2);
+
+
+            $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1,$listFiles);
+            $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(1,$listFiles);
+
+            $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour],$listFiles);
+            $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour],$listFiles);
 
             $pieChart = new PieChart();
             $pieChart->getData()->setArrayToDataTable(
@@ -803,8 +829,8 @@ class AppliController extends Controller
             $pieChart2->getOptions()->getLegend()->setPosition('none');
 
                 for ($j = 0; $j < count($joureureInterro); $j++) {
-                    $nbKubByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
-                    $nbElecteurByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j]);
+                    $nbKubByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j], $listFiles);
+                    $nbElecteurByStatut[$j] = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurbyHour($statut, $dateJour[$jour] . ' 00:00:00', $dateJour[$jour] . ' ' . $joureureInterro[$j],$listFiles);
                 }
 
 //                dump( date_format(new DateTime(),"d" ));
@@ -871,7 +897,16 @@ class AppliController extends Controller
                 $chart->getOptions()
                     ->getHAxis()->setFormat('H:mm');
 
-        return $this->render('TMDAppliBundle:Appli:election.html.twig', array('statut' => $statut,'jour' => $jour, 'piechart' => $pieChart,'piechart2' => $pieChart2,'line' => $line, 'chart' => $chart));
+        return $this->render('TMDAppliBundle:Appli:election.html.twig', array(
+            'statut' => $statut,
+            'jour' => $jour,
+            'dep'=> $dep,
+            'piechart' => $pieChart,
+            'piechart2' => $pieChart2,
+            'line' => $line,
+            'chart' => $chart,
+            'listJour' => $dateJour,
+            ));
     }
 
     public function colissimoAction()

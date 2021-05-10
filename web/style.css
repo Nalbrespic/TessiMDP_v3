@@ -123,11 +123,15 @@ html {
 div.titreFenetre
 {
     color: #504a62;
+    border-bottom: 2px solid #504a62;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
 }
 
 div.titreFenetre h3
 {
-    border-bottom: 2px solid #504a62;
+
     padding-bottom: 9px;
     margin-bottom: 12px;
 }
@@ -620,4 +624,8 @@ button.dt-button:hover{
     padding:0;
 }
 
+#tableJours{
+    border-radius: 10px !important;
+    border: 2px black solid;
+}
 

@@ -48,12 +48,18 @@ tmd_appli_verifArticle:
     defaults:
         _controller: TMDAppliBundle:Appli:verifArticle
 
+tmd_appli_electionChoix:
+    path: /electionChoix
+    defaults:
+        _controller: TMDAppliBundle:Appli:electionChoixDep
+
 tmd_appli_verifEletion:
-    path: /verifElection/{statut}/{jour}
+    path: /verifElection/{statut}/{jour}/{dep}
     defaults:
         _controller: TMDAppliBundle:Appli:verifElection
         statut: 11
-        jour: 99
+        jour: 0
+        dep: 2
 
 tmd_appli_editStatut:
     path: /editStatut/{bl}/{statut}

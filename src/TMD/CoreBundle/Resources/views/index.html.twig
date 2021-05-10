@@ -139,7 +139,7 @@
                     <ul class="nav menu shadow" style="background-color: #28274D;border-radius: 5px;margin-top: -26px;padding-top: 4px;padding-bottom: 4px;margin-right: 27px;">
                         <li><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{ path('tmd_prod_client') }}">Suivi opération</a></li>
                         <li><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{  path('tmd_prod_suiviCourant') }}">Opérations en cours</a></li>
-                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}<li><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{  path('tmd_appli_verifEletion') }}">Suivi Election</a></li>{% endif %}
+                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_PROD') %}<li><a onmouseover="this.style.color = 'palevioletred'" onmouseout="this.style.color = 'white'" href="{{  path('tmd_appli_electionChoix') }}">Suivi Election</a></li>{% endif %}
                     </ul>
                 </nav>
             {% endif %}

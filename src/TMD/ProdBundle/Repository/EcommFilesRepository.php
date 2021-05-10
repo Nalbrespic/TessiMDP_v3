@@ -20,7 +20,18 @@ class EcommFilesRepository extends EntityRepository
             ->setParameter('id', $idOpe)
             ->getQuery()
             ->getResult()
+            ;
+    }
 
+    public function idfileByOperation($idOpe)
+    {
+        return $this
+            ->createQueryBuilder('f')
+            ->where('f.idappli = :id')
+            ->setParameter('id', $idOpe)
+            ->select('f.idfile')
+            ->getQuery()
+            ->getResult()
             ;
     }
 
