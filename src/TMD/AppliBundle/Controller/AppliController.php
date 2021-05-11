@@ -179,8 +179,8 @@ class AppliController extends Controller
 
                 ));
             }
-            if ( $statut === '12'){
-                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '11'));
+            if ( $statut === '19'){
+                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '18'));
                 if (count($histo) == 0 ){
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
@@ -190,7 +190,7 @@ class AppliController extends Controller
             }
 
             if ( $statut === '2'){
-                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '12'));
+                $histo = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $bl, 'idstatut' => '19'));
                 if (count($histo) == 0 ){
                     $request->getSession()->getFlashBag()->add('PbStatutsupp', $Cmd->getBl()->getNumbl());
                     return $this->render('TMDAppliBundle:Appli:editStatut.html.twig', array(
@@ -201,7 +201,7 @@ class AppliController extends Controller
 
 
 ////////////////Mis sous pli
-            if ($statut == 11) {
+            if ($statut == 18) {
                 $user = $this->getUser();
 
                 $jouristo = new EcommHistoStatut();
@@ -240,7 +240,7 @@ class AppliController extends Controller
                 $request->getSession()->getFlashBag()->add('ConfirmMissouspli', $Cmd->getBl()->getNumbl());
             }
 ////////////////Assemblage
-            if ($statut == 12) {
+            if ($statut == 19) {
                 $user = $this->getUser();
 
                 $jouristo = new EcommHistoStatut();
@@ -302,7 +302,7 @@ class AppliController extends Controller
                 $jouristo = new EcommHistoStatut();
                 $jouristo->setDatestatut(new \DateTime());
                 $jouristo->setIdstatut(2);
-                $jouristo->setObservation("Validation commande");
+                $jouristo->setObservation("Expédié");
                 $jouristo->setNumbl($Cmd->getBl()->getNumbl());
                 $jouristo->setIduser($user->getId());
 
@@ -787,6 +787,7 @@ class AppliController extends Controller
                $listFiles .= $v.', ';
             }
             $listFiles = substr($listFiles,0, -2);
+            dump($listFiles);
 
 
             $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1,$listFiles);

@@ -31,8 +31,8 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
-        <li  {% if statut == 11 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 11 , 'jour': jour,'dep': dep}) }}" aria-controls="home" role="tab" >Mise sous pli</a></li>
-        <li {% if statut == 12 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 12, 'jour': jour,'dep': dep}) }}" aria-controls="profile" role="tab" >Collage</a></li>
+        <li  {% if statut == 18 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 18 , 'jour': jour,'dep': dep}) }}" aria-controls="home" role="tab" >Mise sous pli</a></li>
+        <li {% if statut == 19 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 19, 'jour': jour,'dep': dep}) }}" aria-controls="profile" role="tab" >Collage</a></li>
         <li {% if statut == 2 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 2, 'jour': jour,'dep': dep}) }}" aria-controls="recherche" role="tab" >Expédition</a></li>
     </ul>
 
@@ -110,7 +110,7 @@
 
         var statut = $('#theStatut').val();
         if (statut == 0){
-            statut = 11
+            statut = 18
         }
 
         {{ gc_draw([piechart,piechart2, line , chart],['div_piechart','div_piechart2', 'div_line', 'div_chart']) }}

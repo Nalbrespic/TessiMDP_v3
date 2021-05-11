@@ -57,7 +57,7 @@ tmd_appli_verifEletion:
     path: /verifElection/{statut}/{jour}/{dep}
     defaults:
         _controller: TMDAppliBundle:Appli:verifElection
-        statut: 11
+        statut: 18
         jour: 0
         dep: 2
 
