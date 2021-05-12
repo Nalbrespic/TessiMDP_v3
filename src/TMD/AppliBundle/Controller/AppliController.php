@@ -219,7 +219,7 @@ class AppliController extends Controller
 
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
-                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '11'));
+                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '18'));
                     if (count($jouristoVerif) == 0) {
                         $break++;
                         $em->persist($jouristo);
@@ -262,7 +262,7 @@ class AppliController extends Controller
 
                 $break = 0;
                 while (!$updateHistoOK and $break < 3) {
-                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '12'));
+                    $jouristoVerif = $em->getRepository('TMDProdBundle:EcommHistoStatut')->findOneBy(array('numbl' => $Cmd->getBl()->getNumbl(), 'idstatut' => '19'));
                     if (count($jouristoVerif) == 0) {
                         $break++;
                         $em->persist($jouristo);
