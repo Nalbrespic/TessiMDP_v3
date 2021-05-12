@@ -738,19 +738,22 @@ class AppliController extends Controller
 
     public function verifElectionAction($statut , $jour, $dep)
     {
+$currentDate = new DateTime();
+$currentDate = $currentDate->format('Y-m-d');
+
 
         $dateJour = ['2021-05-10',
-            '2021-05-11 ',
-            '2021-05-12 ',
-            '2021-05-14 ',
-            '2021-05-15 ',
-            '2021-05-17 ',
-            '2021-05-18 ',
-            '2021-05-19 ',
-            '2021-05-21 ',
-            '2021-05-25 ',
-            '2021-05-26 ',
-            '2021-05-27 ',
+            '2021-05-11',
+            '2021-05-12',
+            '2021-05-14',
+            '2021-05-15',
+            '2021-05-17',
+            '2021-05-18',
+            '2021-05-19',
+            '2021-05-21',
+            '2021-05-25',
+            '2021-05-26',
+            '2021-05-27',
 
             ];
         $joureureInterro = ['06:00:00',
@@ -769,7 +772,11 @@ class AppliController extends Controller
             '19:00:00',
             '20:00:00',
             '21:00:00'];
-        
+        $key = array_search($currentDate,$dateJour);
+
+        if ($key != null){
+            $jour = $key;
+        }
         $em = $this->getDoctrine()->getManager();
 
 
