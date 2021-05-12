@@ -206,7 +206,7 @@ class AppliController extends Controller
 
                 $jouristo = new EcommHistoStatut();
                 $jouristo->setDatestatut(new \DateTime());
-                $jouristo->setIdstatut(11);
+                $jouristo->setIdstatut(18);
                 $jouristo->setObservation("Mis sous pli");
                 $jouristo->setNumbl($Cmd->getBl()->getNumbl());
                 $jouristo->setIduser($user->getId());
@@ -245,7 +245,7 @@ class AppliController extends Controller
 
                 $jouristo = new EcommHistoStatut();
                 $jouristo->setDatestatut(new \DateTime());
-                $jouristo->setIdstatut(12);
+                $jouristo->setIdstatut(19);
                 $jouristo->setObservation("Collage");
                 $jouristo->setNumbl($Cmd->getBl()->getNumbl());
                 $jouristo->setIduser($user->getId());
