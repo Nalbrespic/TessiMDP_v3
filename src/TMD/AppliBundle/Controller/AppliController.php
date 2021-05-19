@@ -772,10 +772,13 @@ $currentDate = $currentDate->format('Y-m-d');
             '19:00:00',
             '20:00:00',
             '21:00:00'];
-        $key = array_search($currentDate,$dateJour);
 
-        if ($key != null){
-            $jour = $key;
+        if ($jour == 99) {
+            $key = array_search($currentDate, $dateJour);
+
+            if ($key != null) {
+                $jour = $key;
+            }
         }
         $em = $this->getDoctrine()->getManager();
 
@@ -789,16 +792,23 @@ $currentDate = $currentDate->format('Y-m-d');
             }
 
             $listFiles ="";
+        $blList =[];
             foreach ($Files as $file){
-                foreach ($file as $key => $v)
-               $listFiles .= $v.', ';
+                foreach ($file as $key => $v) {
+                    $listFiles .= $v . ', ';
+                $blByStatutByFile = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalNoDate($statut,$v);
+                $blList += $blByStatutByFile;
+                }
             }
             $listFiles = substr($listFiles,0, -2);
-            dump($listFiles);
+
 
 
             $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1,$listFiles);
             $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(1,$listFiles);
+            dump($nbElecteurTotal);
+
+//            $nbElecteurByStatutNoDate = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalNoDate($statut,$listFiles);
 
             $nbKubByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotalJ($statut, $dateJour[$jour],$listFiles);
             $nbElecteurByStatut = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalJ($statut, $dateJour[$jour],$listFiles);
@@ -859,6 +869,9 @@ $currentDate = $currentDate->format('Y-m-d');
         $tabChart=[];
         $nbKubByStatut[-1][0][1]=null;
         $nbElecteurByStatut[-1][0][1]=null;
+        $theStatut = $this->getDoctrine()->getRepository("TMDProdBundle:EcommStatut")->find($statut);
+        dump($theStatut);
+
         for ($j = 0; $j < count($joureureInterro); $j++) {
             if ($j == 0) {
                 array_push($tabChart, ['', 'Nombre de plis', 'Nombre de KUB']);
@@ -906,7 +919,9 @@ $currentDate = $currentDate->format('Y-m-d');
                     ->getHAxis()->setFormat('H:mm');
 
         return $this->render('TMDAppliBundle:Appli:election.html.twig', array(
+            'listProduit' =>$blList,
             'statut' => $statut,
+            'libelleStatut' => $theStatut->getStatut(),
             'jour' => $jour,
             'dep'=> $dep,
             'piechart' => $pieChart,

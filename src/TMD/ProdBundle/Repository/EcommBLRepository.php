@@ -1198,6 +1198,26 @@ class EcommBLRepository extends EntityRepository
         $results = $query->getArrayResult();
         return $results;
     }
+    public function findnbElecteurTotalNoDate($idStatut, $files)
+    {
+
+        $query = $this->_em->createQuery('SELECT bl, file.dateFile, hs.idstatut, hs.observation, file.filename, tr.destinataire, tr.destRue, tr.destAd2 FROM TMDProdBundle:EcommBl bl 
+                                                              INNER JOIN TMDProdBundle:EcommCmdep cmd
+                                                              WITH bl.bl = cmd.numbl
+                                                              INNER JOIN TMDProdBundle:EcommLignes l
+                                                              WITH l.numbl = bl.bl
+                                                              INNER JOIN TMDProdBundle:EcommTracking tr
+                                                              WITH tr.numligne = l.numligne
+                                                              INNER JOIN TMDProdBundle:EcommFiles file
+                                                              WITH file.idfile = bl.idfile
+                                                              INNER JOIN TMDProdBundle:EcommHistoStatut hs
+                                                              WITH hs.numbl = bl.bl
+                                                              WHERE file.idfile IN ('.$files.') and hs.id > 1000000 and hs.idstatut = ('.$idStatut.')
+                                                         
+                                                              ');
+        $results = $query->getArrayResult();
+        return $results;
+    }
 
 
     public function findnbElecteurTotalJ($idStatut, $jour,$files)

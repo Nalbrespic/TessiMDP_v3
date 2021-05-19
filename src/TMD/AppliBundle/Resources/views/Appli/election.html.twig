@@ -79,6 +79,41 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="margin-top: 10px">
+                                                   Liste des plis au statut {{ libelleStatut }}
+                                                </button>
+                                                <div class="collapse" id="collapseExample" style="margin-top: 15px">
+                                                    <div class="well" style="border: 2px solid #504A62;border-radius: 15px;padding: 10px;width: 833px;position: relative;">
+                                                        <table class="table" id="tableElection">
+                                                            <thead>
+                                                            <th>Date Fichier</th>
+                                                            <th>Fichier</th>
+                                                            <th>numBl</th>
+                                                            <th>Destinataire</th>
+                                                            <th>Rue</th>
+                                                            <th>ad2</th>
+                                                            <th>Statut</th>
+                                                            <th>date de Prod</th>
+                                                            <th>ModExp</th>
+                                                            </thead>
+                                                            <tbody>
+                                                            {%  for tr in listProduit %}
+                                                                <tr>
+                                                                    <td>{{ tr.dateFile | date('d-m-Y') }}</td>
+                                                                    <td>{{ tr.filename }}</td>
+                                                                    <td>{{ tr[0].numCmdeClient }}</td>
+                                                                    <td>{{ tr.destinataire }}</td>
+                                                                    <td>{{ tr.destRue }}</td>
+                                                                    <td>{{ tr.destAd2 }}</td>
+                                                                    <td>{{ tr.observation }}</td>
+                                                                    <td>{{ tr[0].dateProduction |date('d-m-Y')  }}</td>
+                                                                    <td>{{ tr[0].modexp }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                                 <div class="row" style="margin-left: 0px;margin-top: 30px;">
                                                     <div class="col-md-7" style="border: 2px solid #504A62;border-radius: 15px;padding: 17px;width: 833px;position: relative;">
                                                         <div style="position: absolute; top:-9px;left: 11px;background-color: white;padding: 0 4px 0 4px;">
