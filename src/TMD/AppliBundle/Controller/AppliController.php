@@ -750,6 +750,7 @@ $currentDate = $currentDate->format('Y-m-d');
             '2021-05-17',
             '2021-05-18',
             '2021-05-19',
+            '2021-05-20',
             '2021-05-21',
             '2021-05-25',
             '2021-05-26',
@@ -773,9 +774,10 @@ $currentDate = $currentDate->format('Y-m-d');
             '20:00:00',
             '21:00:00'];
         $key = array_search($currentDate,$dateJour);
-
-        if ($key != null){
-            $jour = $key;
+        if ($jour == 99) {
+            if ($key != null) {
+                $jour = $key;
+            }
         }
         $em = $this->getDoctrine()->getManager();
 
