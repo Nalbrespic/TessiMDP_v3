@@ -58,7 +58,7 @@ tmd_appli_verifEletion:
     defaults:
         _controller: TMDAppliBundle:Appli:verifElection
         statut: 18
-        jour: 0
+        jour: 99
         dep: 2
 
 tmd_appli_editStatut:
