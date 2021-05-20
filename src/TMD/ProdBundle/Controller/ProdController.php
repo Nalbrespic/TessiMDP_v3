@@ -386,6 +386,7 @@ class ProdController extends Controller
             $allBLs = $em->getRepository('TMDProdBundle:EcommBl')->findAllBlsByFile($idClient,$ipOpe);
 
             foreach ($allBLs as $v){
+
                 if ($v->getBl()->getNumligne()->getDestCiv() != ""){
                     $v->getBl()->getNumligne()->setDestCiv("*******");
                 }

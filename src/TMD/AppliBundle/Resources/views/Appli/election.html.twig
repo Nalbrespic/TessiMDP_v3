@@ -84,7 +84,7 @@
                                                 </button>
                                                 <div class="collapse" id="collapseExample" style="margin-top: 15px">
                                                     <div class="well" style="border: 2px solid #504A62;border-radius: 15px;padding: 10px;width: 833px;position: relative;">
-                                                        <table class="table" id="tableElection">
+                                                        <table class="table compact" id="tableElection">
                                                             <thead>
                                                             <th>Date Fichier</th>
                                                             <th>Fichier</th>
@@ -98,6 +98,7 @@
                                                             </thead>
                                                             <tbody>
                                                             {%  for tr in listProduit %}
+                                                                {% if (tr.idStatut == statut) %}
                                                                 <tr>
                                                                     <td>{{ tr.dateFile | date('d-m-Y') }}</td>
                                                                     <td>{{ tr.filename }}</td>
@@ -105,10 +106,11 @@
                                                                     <td>{{ tr.destinataire }}</td>
                                                                     <td>{{ tr.destRue }}</td>
                                                                     <td>{{ tr.destAd2 }}</td>
-                                                                    <td>{{ tr.observation }}</td>
+                                                                    <td>{{ tr.statut }}</td>
                                                                     <td>{{ tr[0].dateProduction |date('d-m-Y')  }}</td>
                                                                     <td>{{ tr[0].modexp }}</td>
                                                                 </tr>
+                                                                {% endif %}
                                                             {% endfor %}
                                                             </tbody>
                                                         </table>

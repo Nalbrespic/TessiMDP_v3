@@ -796,17 +796,25 @@ $currentDate = $currentDate->format('Y-m-d');
             foreach ($Files as $file){
                 foreach ($file as $key => $v) {
                     $listFiles .= $v . ', ';
-                $blByStatutByFile = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalNoDate($statut,$v);
-                $blList += $blByStatutByFile;
-                }
+                $blByStatutByFile = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalNoDate($v);
+                for ($i=0; $i < count($blByStatutByFile);$i++){
+                array_push($blList,$blByStatutByFile[$i]);
+                }}
             }
             $listFiles = substr($listFiles,0, -2);
 
+            $listTotalBl =[];
+            foreach ($blList as $bl){
+                  $listTotalBl[$bl[0]['numCmdeClient']]  = $bl;
+                  $histoStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBl($bl[0]['numCmdeClient']);
+                $listTotalBl[$bl[0]['numCmdeClient']]['idStatut']  = $histoStatut[0]['idstatut'];
+                $listTotalBl[$bl[0]['numCmdeClient']]['statut']  = $histoStatut[0]['observation'];
+            }
 
 
             $nbKubTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbKubTotal(1,$listFiles);
             $nbElecteurTotal = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotal(1,$listFiles);
-            dump($nbElecteurTotal);
+
 
 //            $nbElecteurByStatutNoDate = $em->getRepository('TMDProdBundle:EcommBl')->findnbElecteurTotalNoDate($statut,$listFiles);
 
@@ -917,9 +925,9 @@ $currentDate = $currentDate->format('Y-m-d');
 
                 $chart->getOptions()
                     ->getHAxis()->setFormat('H:mm');
-
+        dump($listTotalBl);
         return $this->render('TMDAppliBundle:Appli:election.html.twig', array(
-            'listProduit' =>$blList,
+            'listProduit' =>$listTotalBl,
             'statut' => $statut,
             'libelleStatut' => $theStatut->getStatut(),
             'jour' => $jour,
