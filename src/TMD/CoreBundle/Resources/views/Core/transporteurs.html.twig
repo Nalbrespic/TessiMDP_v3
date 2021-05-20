@@ -78,7 +78,11 @@ Gestion transports
                                             <td>{{ bl['transport'] }}</td>
                                             <td>{{ bl['Client'] }}</td>
                                             <td>{{ bl['Operation'] }}</td>
-                                            <td>{{ bl['clientEmetteur'] }}</td>
+                                            {% if bl['clientEmetteur'] is null %}
+                                                <td>Tessi MD</td>
+                                            {% else %}
+                                                <td>{{ bl['clientEmetteur'] }}</td>
+                                            {% endif%}
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -113,7 +117,11 @@ Gestion transports
                                         <td>{{ bl['transport'] }}</td>
                                         <td>{{ bl['Client'] }}</td>
                                         <td>{{ bl['Operation'] }}</td>
-                                        <td>{{ bl['clientEmetteur'] }}</td>
+                                        {% if bl['clientEmetteur'] is null %}
+                                            <td>Tessi MD</td>
+                                        {% else %}
+                                            <td>{{ bl['clientEmetteur'] }}</td>
+                                        {% endif%}
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -147,7 +155,11 @@ Gestion transports
                                         <td>{{ bl['transport'] }}</td>
                                         <td>{{ bl['Client'] }}</td>
                                         <td>{{ bl['Operation'] }}</td>
+                                        {% if bl['clientEmetteur'] is null %}
+                                        <td>Tessi MD</td>
+                                        {% else %}
                                         <td>{{ bl['clientEmetteur'] }}</td>
+                                        {% endif%}
                                     </tr>
                                 {% endfor %}
                                 </tbody>
