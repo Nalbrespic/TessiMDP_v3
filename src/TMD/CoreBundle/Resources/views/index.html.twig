@@ -2530,7 +2530,56 @@
         }
     </script>
 
+    <script>
+        function choixPrefecture(dep){
+            buttonAube = document.getElementById('pref10')
+            buttonAisne = document.getElementById('pref2')
+            buttonJura = document.getElementById('pref39')
+            divType = document.getElementById('choixType')
+            divTour = document.getElementById('choixTour')
+            var html = ""
+            console.log('departement : ',dep)
+            if (dep == 10){
+                buttonAisne.setAttribute('disabled', 'disabled')
+                buttonJura.setAttribute('disabled', 'disabled')
+                html += '<button type="button" class="btn btn-default" id="typeDep" onclick="choixTour(\'dep\',10)" style="margin-right:10px">Elections Départementales</button>'+
+                '<button type="button" class="btn btn-default" id="typeReg" onclick="choixTour(\'reg\',10)">Elections Régionales</button>'
+            }
+            divType.innerHTML = html
 
+        }
+    </script>
+    <script>
+        function choixTour(type,dep) {
+            buttonAube = document.getElementById('pref10')
+            buttonAisne = document.getElementById('pref2')
+            buttonJura = document.getElementById('pref39')
+            divType = document.getElementById('choixType')
+            divTour = document.getElementById('choixTour')
+            var html = ''
+            if (dep != 10) {
+                buttonAube.setAttribute('disabled', 'disabled')
+                if (dep == 2) {
+                    buttonJura.setAttribute('disabled', 'disabled')
+                } else {
+                    buttonAisne.setAttribute('disabled', 'disabled')
+                }
+            }
+            var url1 = '{{ path('tmd_appli_verifEletion',{"dep":'thisdep',"type":'thistype',"tour":'thistour'}) }}'
+            var url2 = '{{ path('tmd_appli_verifEletion',{"dep":'thisdep',"type":'thistype',"tour":'thistour'}) }}'
+            url1 = url1.replace('thisdep', dep)
+            url1 = url1.replace('thistype', type)
+            url1 = url1.replace('thistour',1)
+            url2 = url2.replace('thisdep', dep)
+            url2 = url2.replace('thistype',type)
+            url2 = url2.replace('thistour',2)
+            html += '<a href=' + url1 + '><button class="btn btn-default" type="button" style="margin-right:10px">Premier Tour</button></a>'
+            html += '<a href=' + url2 + '><button class="btn btn-default" type="button">Second Tour</button></a>'
+
+            divTour.innerHTML = html
+        }
+
+    </script>
 
 
 
