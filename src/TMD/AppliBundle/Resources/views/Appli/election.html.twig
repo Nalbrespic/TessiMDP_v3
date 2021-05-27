@@ -14,16 +14,19 @@
         <div class="col-md-11" style="background-color: white;position: relative;z-index: 8;margin-bottom: 10px;padding-right: 0px;">
             <div class="titreFenetre" >
                 <h3 style="margin-bottom: 1px;">Suivi Election - {% if (dep == 2) %} Préfécture de l'Aisne {% endif %}{% if (dep == 10) %} Préfécture de l'Aube {% endif %}{% if (dep == 39) %} Préfécture du Jura {% endif %}</h3>
+                <h5 style="margin-right: 10px">{% if (type == 'dep') %} Elections Départementales{% else %} Elections Régionales{% endif %}</h5>
+                <h5>{% if (tour == 1) %} 1<sup>er</sup> tour{% else %}Second tour{% endif %}</h5>
                 <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_electionChoix') }}" >Retour au menu</a></button>
                     {% if (dep == 2) %}
-                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':10}) }}" >Aube</a></button>
-                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':39}) }}" >Jura</a></button>
+                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':10, 'type':type, 'tour':tour}) }}" >Aube</a></button>
+                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':39, 'type':type, 'tour':tour}) }}" >Jura</a></button>
                     {% elseif (dep == 10) %}
-                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':2}) }}" >Aisne</a></button>
-                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':39}) }}" >Jura</a></button>
+                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':2, 'type':type, 'tour':tour}) }}" >Aisne</a></button>
+                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':39, 'type':type, 'tour':tour}) }}" >Jura</a></button>
                     {% else %}
-                    <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':2}) }}" >Aisne</a></button>
-                    <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':10}) }}" >Aube</a></button>
+                    <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':2, 'type':type, 'tour':tour}) }}" >Aisne</a></button>
+                    <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut,  'dep':10, 'type':type, 'tour':tour}) }}" >Aube</a></button>
                     {% endif %}
                 </div>
             </div>
@@ -37,27 +40,6 @@
     </ul>
 
     <span id="theStatut" style="display: none;">{{ statut }}</span>
-
-
-{#                <div class="row" style="position: relative;">#}
-{#                   <div class="col-md-12" style="position: absolute;text-align: end;margin-top: -3px;z-index: 2;">#}
-{#                       <table>#}
-{#                           <tr>#}
-{#                           {% for key, value in listJour %}#}
-{#                            <td><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': key}) }}" {% if jour == key %}style="color: #DC3912;"{% endif %}>{{ value |localizeddate('none', 'none', null, null, 'EEE dd') }} </a></td>#}
-{#                           {% endfor %}#}
-{#                           </tr>#}
-{#                       </table>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 1}) }}" style="margin-left: 20px;{% if jour == 1 %}color: #DC3912;{% endif %}">Mardi 14</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 2}) }}" style="margin-left: 20px;{% if jour == 2 %}color: #DC3912;{% endif %}">Mercredi 15</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 3}) }}" style="margin-left: 20px;{% if jour == 3 %}color: #DC3912;{% endif %}">Jeudi 16</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 4}) }}" style="margin-left: 20px;{% if jour == 4 %}color: #DC3912;{% endif %}">Vendredi 17</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 5}) }}" style="margin-left: 20px;{% if jour == 5 %}color: #DC3912;{% endif %}">Samedi 18</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 6}) }}" style="margin-left: 20px;{% if jour == 6 %}color: #DC3912;{% endif %}">Lundi 20</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 7}) }}" style="margin-left: 20px;{% if jour == 7 %}color: #DC3912;{% endif %}">Mardi 21</a>#}
-{#                        <a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': 8}) }}" style="margin-left: 20px;{% if jour == 8 %}color: #DC3912;{% endif %}">Mercredi 22</a>#}
-{#                    </div>#}
-{#                </div>#}
 
                                     <div role="tabpanel" class="tab-pane active" id="home">
                                         <div class="row">

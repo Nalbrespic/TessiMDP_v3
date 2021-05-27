@@ -54,12 +54,14 @@ tmd_appli_electionChoix:
         _controller: TMDAppliBundle:Appli:electionChoixDep
 
 tmd_appli_verifEletion:
-    path: /verifElection/{statut}/{jour}/{dep}
+    path: /verifElection/{statut}/{jour}/{dep}/{type}/{tour}
     defaults:
         _controller: TMDAppliBundle:Appli:verifElection
         statut: 18
         jour: 99
         dep: 2
+        type: 'dep'
+        tour: 1
 
 tmd_appli_editStatut:
     path: /editStatut/{bl}/{statut}

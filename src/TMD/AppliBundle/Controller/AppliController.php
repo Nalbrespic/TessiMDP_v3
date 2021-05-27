@@ -729,19 +729,23 @@ class AppliController extends Controller
         return new Response("erreur: ce n'est pas du Json", 400);
     }
 
-    public function electionChoixDepAction(){
+    public function electionChoixDepAction(Request $request){
+
+            $aube = $request->get('ok');
+
 
         return $this->render('TMDAppliBundle:Appli:electionChoixDep.html.twig', array(
-
+            'aube' => $aube,
         ));
     }
 
-    public function verifElectionAction($statut , $jour, $dep)
+    public function verifElectionAction($statut , $jour, $dep,$type, $tour)
     {
 $currentDate = new DateTime();
 $currentDate = $currentDate->format('Y-m-d');
 
-
+if ($type == 'dep') {
+    if ($tour == 1) {
         $dateJour = ['2021-05-10',
             '2021-05-11',
             '2021-05-12',
@@ -755,8 +759,34 @@ $currentDate = $currentDate->format('Y-m-d');
             '2021-05-25',
             '2021-05-26',
             '2021-05-27',
-
+        ];
+    } else {
+        $dateJour = [
+            '2021-06-23',
+            '2021-06-24',
             ];
+    }
+} else {
+    if ($tour == 1) {
+        $dateJour = [
+            '2021-05-25',
+            '2021-05-26',
+            '2021-05-27',
+            '2021-05-28',
+            '2021-05-31',
+            '2021-06-01',
+            '2021-06-02',
+            '2021-06-03',
+            '2021-06-04',
+            '2021-06-07',
+        ];
+    } else {
+        $dateJour = [
+            '2021-06-23',
+            '2021-06-24',
+        ];
+    }
+}
         $joureureInterro = ['06:00:00',
             '07:00:00',
             '08:00:00',
@@ -776,23 +806,49 @@ $currentDate = $currentDate->format('Y-m-d');
 
         $key = array_search($currentDate,$dateJour);
         if ($jour == 99) {
-
-            if ($key != null) {
+            if ($key != false) {
                 $jour = $key;
+            } else {
+                $jour = 0;
             }
         }
         $em = $this->getDoctrine()->getManager();
 
-
-            if ($dep == 2) {
-                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1832);
-            } elseif ($dep == 10){
-                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1833);
-            } else{
-                $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation(1831);
+        if ( $type == 'dep') {
+            if ($tour == 1) {
+                if ($dep == 2) {
+                   $idOpe = 1832;
+                } elseif ($dep == 10) {
+                    $idOpe = 1833;
+                } else {
+                    $idOpe = 1831;
+                }
+            } elseif ($tour == 2){
+                if ($dep == 2) {
+                    $idOpe = 1865;
+                } elseif ($dep == 10) {
+                    $idOpe = 1864;
+                } else {
+                    $idOpe = 1866;
+                }
             }
-
-            $listFiles ="";
+        } elseif ($type == 'reg'){
+            if ($tour == 1) {
+                if ($dep == 2) {
+                    $idOpe = 1845;
+                } elseif ($dep == 10) {
+                    $idOpe = 1843;
+                }
+            } elseif ($tour == 2) {
+                if ($dep == 2) {
+                    $idOpe = 1862;
+                } elseif ($dep == 10) {
+                    $idOpe = 1863;
+                }
+            }
+        }
+        $Files = $em->getRepository('TMDProdBundle:EcommFiles')->idfileByOperation($idOpe);
+        $listFiles ="";
         $blList =[];
             foreach ($Files as $file){
                 foreach ($file as $key => $v) {
@@ -802,8 +858,9 @@ $currentDate = $currentDate->format('Y-m-d');
                 array_push($blList,$blByStatutByFile[$i]);
                 }}
             }
-            $listFiles = substr($listFiles,0, -2);
-
+            if ($listFiles != "") {
+                $listFiles = substr($listFiles, 0, -2);
+            }
             $listTotalBl =[];
             foreach ($blList as $bl){
                   $listTotalBl[$bl[0]['numCmdeClient']]  = $bl;
@@ -887,7 +944,11 @@ $currentDate = $currentDate->format('Y-m-d');
             }
             if (intval(substr($joureureInterro[$j],0,2)) <= intval(date_format(new DateTime(),"H")) or
                 intval(substr($dateJour[$jour],8,2)) < intval(date_format(new DateTime(),"d" ))){
-                array_push($tabChart, [new DateTime($joureureInterro[$j]),intval($nbElecteurByStatut[$j][0][1])-intval($nbElecteurByStatut[$j-1][0][1]), count($nbKubByStatut[$j])-count($nbKubByStatut[$j-1])]);
+                if ($nbKubByStatut[$j] != []) {
+                    array_push($tabChart, [new DateTime($joureureInterro[$j]), intval($nbElecteurByStatut[$j][0][1]) - intval($nbElecteurByStatut[$j - 1][0][1]), count($nbKubByStatut[$j]) - count($nbKubByStatut[$j - 1])]);
+                } else {
+                    array_push($tabChart, [new DateTime($joureureInterro[$j]), intval($nbElecteurByStatut[$j][0][1]) - intval($nbElecteurByStatut[$j - 1][0][1]), 0]);
+                }
             }else{
                 array_push($tabChart, [new DateTime($joureureInterro[$j]), 'none', 'none']);
             }
@@ -926,7 +987,7 @@ $currentDate = $currentDate->format('Y-m-d');
 
                 $chart->getOptions()
                     ->getHAxis()->setFormat('H:mm');
-        dump($listTotalBl);
+        dump($dateJour);
         return $this->render('TMDAppliBundle:Appli:election.html.twig', array(
             'listProduit' =>$listTotalBl,
             'statut' => $statut,
@@ -938,6 +999,8 @@ $currentDate = $currentDate->format('Y-m-d');
             'line' => $line,
             'chart' => $chart,
             'listJour' => $dateJour,
+            'type' => $type,
+            'tour' => $tour,
             ));
     }
 
