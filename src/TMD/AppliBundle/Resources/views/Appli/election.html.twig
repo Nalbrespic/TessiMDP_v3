@@ -34,9 +34,9 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
-        <li  {% if statut == 18 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 18 , 'jour': jour,'dep': dep}) }}" aria-controls="home" role="tab" >Mise sous pli</a></li>
-        <li {% if statut == 19 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 19, 'jour': jour,'dep': dep}) }}" aria-controls="profile" role="tab" >Collage</a></li>
-        <li {% if statut == 2 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 2, 'jour': jour,'dep': dep}) }}" aria-controls="recherche" role="tab" >Expédition</a></li>
+        <li  {% if statut == 18 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 18 , 'jour': jour,'dep': dep,'type':type, 'tour':tour}) }}" aria-controls="home" role="tab" >Mise sous pli</a></li>
+        <li {% if statut == 19 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 19, 'jour': jour,'dep': dep,'type':type, 'tour':tour}) }}" aria-controls="profile" role="tab" >Collage</a></li>
+        <li {% if statut == 2 %}class="active"{% endif %}><a href="{{ path('tmd_appli_verifEletion',  {'statut': 2, 'jour': jour,'dep': dep,'type':type, 'tour':tour}) }}" aria-controls="recherche" role="tab" >Expédition</a></li>
     </ul>
 
     <span id="theStatut" style="display: none;">{{ statut }}</span>

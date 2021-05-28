@@ -53,7 +53,7 @@
                             {% endif %}
                         {% endif %}
                     <label>{% if clients is defined %} {% if idClient != 0 %}Clients:{% endif %}{% endif %}</label>
-                    <select class="form-control" onchange="location = this.options[this.selectedIndex].value;" style="width: 210px;>
+                    <select class="form-control" onchange="location = this.options[this.selectedIndex].value;" style="width: 210px;">
                         {% if clients is defined %}
                             {% if idClient == 0 %}
                                 <option>Choisir un client</option>
