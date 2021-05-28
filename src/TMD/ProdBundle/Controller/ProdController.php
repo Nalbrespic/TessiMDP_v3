@@ -1922,8 +1922,7 @@ class ProdController extends Controller
 
             $trackings = array();
             $files= array();
-            foreach ($nbTrackingByFile as $key=>$file)
-            {
+            foreach ($nbTrackingByFile as $key=>$file){
                 $trackings[$file['idfile']] = intval($file[1]);
                 $files[$key] = $file ;
             }
