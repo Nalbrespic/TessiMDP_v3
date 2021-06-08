@@ -1804,10 +1804,10 @@
 
                             html += '<div class="listArticles"><p style="font-size: 1.2em; font-weight: bold">Articles de la commande: </p>';
 
-                            html += '<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;"><tr><td>Code article</td><td>Libellé article</td><td>Quantité</td></tr>';
+                            html += '<div><table class="table table-hover table-bordered table-responsive" style="z-index: 1;"><tr><td>Code article</td><td>Libellé article</td><td>Perso1</td><td>Quantité</td></tr>';
 
                             articles.forEach(function(article) {
-                                html += '<tr><td>' + article.codearticle + '</td><td>' + article.libelle + '</td><td>' + article.quantite + '</td></tr>'
+                                html += '<tr><td>' + article.codearticle + '</td><td>' + article.libelle + '</td><td>' + article.perso1 + '</td><td>' + article.quantite + '</td></tr>'
                             })
 
                             html += '<tr style="border-top: grey 2px solid"><td style="border-left-color:white;border-bottom-color: white"></td><td>Poids de la commande</td><td>'+tracking[0].poids+' g</td></tr>';
@@ -1817,10 +1817,10 @@
                                 '<div class="col-md-4"><h5>Date de dépôt</h5><p>'+ moment(tracking[0]["date"]).format('LL') +'</p></div>'
 
                             html += '<div class="col-md-4"><h5>Statut de la commande</h5>';
-                            if (histoStatut[nbstatut-1].idstatut == 1 ){
-                                html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div>';
-                            } else if (histoStatut[nbstatut-1].idstatut == 0){
+                            if (histoStatut[nbstatut-1] == undefined || histoStatut[nbstatut-1].idstatut == 0 ){
                                 html += '<p>'+ statut.statut +'</p></div>';
+                            } else if (histoStatut[nbstatut-1].idstatut == 1 ){
+                                html += '<p>'+ histoStatut[nbstatut-1].observation +'</p></div>';
                             } else {
                                 html += '<p>'+ histoStatut[nbstatut-1].statut +'</p></div>';
                             }
