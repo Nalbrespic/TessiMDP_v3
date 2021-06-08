@@ -282,6 +282,7 @@ class EcommCmdepRepository extends EntityRepository
             ->select('sum(cmd.quantite) as quantite')
             ->addSelect('cmd.libelle')
             ->addSelect('cmd.codearticle')
+            ->addSelect('cmd.perso1')
             ->addSelect('cmd.flagart')
             ->addSelect('ligne.numbl')
             ->groupBy('cmd.codearticle, ligne.numbl')
