@@ -21,7 +21,10 @@
 
     "require": {
         "php": "7.0.*",
+        "ext-ftp": "*",
+        "ext-ssh2": "*",
         "cmen/google-charts-bundle": "3.*",
+        "degagne/libssh2": "^1.2",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/orm": "^2.5",
         "dompdf/dompdf": "^0.8.3",

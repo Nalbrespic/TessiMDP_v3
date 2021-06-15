@@ -1,0 +1,37 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Commandes Exceptionnelles et réexpéditions
+{% endblock %}
+{% block body %}
+    <div>
+        <h2>Commandes Exceptionnelles et réexpéditions</h2>
+    </div>
+
+    <div class="row" style="display: flex;align-items: baseline;margin-top: 50px">
+        <div class="col-md-3">
+            <select class="form-control" id="selectClient" style="width: 250px">
+                <option value="">Selectionner le client</option>
+                <option value="698" {% if idClient =="698" %}selected="selected"{% endif %}>Marie Claire</option>
+                <option value="709" {% if idClient =="709" %}selected="selected"{% endif %}>Le Monde</option>
+            </select>
+        </div>
+        {% if idClient != 0 %}
+        <DIV class="col-md-9" id="dropzone" style="margin-top: 50px">
+
+            <FORM class="dropzone needsclick" id="demo-upload" action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}">
+
+                <DIV class="dz-message needsclick">
+                    Déposez le fichier ici ou cliquez pour le selectionner<BR>
+                </DIV>
+            </FORM>
+        </DIV>
+        {% endif %}
+    </div>
+
+
+
+{% endblock %}
+{% block javascriptplus %}
+
+{% endblock %}

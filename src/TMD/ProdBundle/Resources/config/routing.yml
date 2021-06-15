@@ -245,3 +245,14 @@ tmd_prod_annuleArticle:
     defaults:
         _controller: TMDProdBundle:Prod:AnnulArticle
 
+tmd_prod_reexpedition:
+    path: /Reexpedition/{idClient}
+    defaults:
+        _controller: TMDProdBundle:Prod:Reexpedition
+        idClient: 0
+
+tmd_prod_upload:
+    path: /upload/{idClient}
+    methods: [POST]
+    defaults:
+        _controller: TMDProdBundle:Prod:Upload

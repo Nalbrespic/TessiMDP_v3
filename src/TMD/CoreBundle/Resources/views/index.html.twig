@@ -17,7 +17,7 @@
         <link rel="stylesheet" href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('css/fullcalendar.css') }}">
         <link rel="stylesheet" href="{{ asset('Multi-level-Vertical-Accordion/src/lazeemenu.css') }}">
-        <link rel="stylesheet" href="{{ asset('style.css') }}">
+
         <link rel="stylesheet" href="{{ asset('rangeDatePicker/jquery-date-range-picker-master/dist/daterangepicker.css') }}">
         <link rel="stylesheet" href="{{ asset('datepicker.css') }}">
         <link rel="stylesheet" href="https://printjs-4de6.kxcdn.com/print.min.css">
@@ -34,6 +34,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.7/css/rowReorder.dataTables.min.css">
         <link rel="stylesheet" href="{{ asset('fontawesome/css/all.css')}}">
+        <link rel="stylesheet" href="{{ asset('dropzone-5.7.0/dist/dropzone.css')}}">
+        <link rel="stylesheet" href="{{ asset('style.css') }}">
 
     {% endblock %}
 </head>
@@ -190,6 +192,7 @@
                                         {% if is_granted('ROLE_ATC') or is_granted('ROLE_SUPER_PROD')%} <li><a href="{{ path('tmd_prod_transports') }}">Gestion Transports</a></li>{% endif %}
                                         {% if is_granted('ROLE_ATC') or is_granted('ROLE_SUPER_PROD') %} <li><a href="{{ path('tmd_core_applis') }}">Gestion des Opérations</a></li>{% endif %}
                                         <li ><a href="http://tmdsws801/portail/completer_enregistrement/index.php" target="_blank">Saisie production</a></li>
+                                        {% if is_granted('ROLE_ATC') or is_granted('ROLE_SUPER_PROD')%}<li ><a href="{{ path('tmd_prod_reexpedition') }}" >Commandes Except et Réexpédition</a></li>{% endif %}
                                         <li ><a href="http://tmdsws801/portail/contenants/contenants_index.php" target="_blank">Cartons</a></li>
                                         <li ><a href="http://tmdsws801/portail/doublons/doublons_index.php" target="_blank">Doublons</a></li>
                                         <li ><a href="http://tmdsws801/portail/clients/index_clients.php" target="_blank">Clients</a></li>
@@ -355,6 +358,7 @@
     <script type="text/javascript" charset="utf8" src="https://luca-vercelli.github.io/DataTable-AltEditor/src/dataTables.altEditor.free.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowreorder/1.2.7/js/dataTables.rowReorder.min.js"></script>
     <script src="{{ asset('fontawesome/js/all.js') }}"></script>
+    <script src="{{ asset('dropzone-5.7.0/dist/dropzone.js') }}"></script>
 
 
 
@@ -2580,7 +2584,15 @@
         }
 
     </script>
+    <script type="text/javascript">
 
+        $('#selectClient').change(function (){
+            let id = document.getElementById('selectClient').value
+            let url = "{{ path('tmd_prod_reexpedition',{"idClient":"id"}) }}"
+            url = url.replace("id", id)
+            window.location.href =  url
+        })
+    </script>
 
 
 
