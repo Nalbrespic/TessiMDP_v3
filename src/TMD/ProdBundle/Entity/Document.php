@@ -122,24 +122,34 @@ class Document
             return;
         }
         $file_name = $this->file->getClientOriginalName();
+        $local_path = $this->path;
+
         if($idClient == 698){
             $ftp_server = "172.17.82.211";
             $ftp_user_name = "tmdportail";
             $ftp_user_pass = "tessiptl%01";
-            $destination_file ="/depotFichier";
+            $pathFile ="/depotFichier/$file_name";
             $conn_id = ssh2_connect($ftp_server, 22) or die("Erreur de connexion avec le serveur FTP");
             $login_result = ssh2_auth_password($conn_id, $ftp_user_name, $ftp_user_pass);
-
+            $remote_path = "ssh2.sftp://$ftp_user_name:$ftp_user_pass@$ftp_server:22/var/www/TessiMDP/depotFichier/$file_name";
             if ((!$conn_id) || (!$login_result)) {  // check connection
                 // wont ever hit this, b/c of the die call on ftp_login
                 $errorMessage= "<span style='color:#FF0000'><h2>FTP connection has failed! <br />";
                 $errorMessage += "Attempted to connect to $ftp_server for user $ftp_user_name</h2></span>";
                 exit;
             } else {
-                $message ="Connected to $ftp_server, for user $ftp_user_name <br />";
+                $message = "Connected to $ftp_server, for user $ftp_user_name <br />";
                 //echo "Connected to $ftp_server, for user $ftp_user_name <br />";
+                $sftp = ssh2_sftp($conn_id);
+                $remoteFile = "$sftp$pathFile";
+                ssh2_scp_send($conn_id,$local_path,$remote_path);
+
+//                $stream = fopen("ssh2.sftp://$ftp_user_name:$ftp_user_pass@$ftp_server:22/var/www/TessiMDP/depotFichier","w");
+//                $file = file_get_contents($file_path);
+//                fwrite($stream, $file);
+//                fclose($stream);
+
             }
-            $upload = ftp_put($conn_id, $destination_file.$file_name, $file_name, FTP_BINARY);
         }
 //        $file_name = $this->file->getClientOriginalName();
 //

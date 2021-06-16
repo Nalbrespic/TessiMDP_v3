@@ -246,6 +246,14 @@ class CoreController extends Controller
             return new JsonResponse(array($Bl));
         }
     }
+
+    /**
+     * desc
+     *
+     * @param Request $request
+     *
+     * @return Response|null
+     */
     public function transportsAction(Request $request){
 
         $em = $this->getDoctrine()->getManager();
@@ -255,8 +263,8 @@ class CoreController extends Controller
         $dateTwo= $request->get('amp;date2');
         $date2 = strtotime($dateTwo.'+ 1 days');
         $date2 =date('Y-m-d',$date2);
-        dump($date1);
-        if ($traite ==1){
+
+        if ($traite == 1){
             if ($type != null){
                 if($type == 1){
                     $thisDate = date('Y-m');
@@ -268,15 +276,14 @@ class CoreController extends Controller
 
                 $listTrackingColissimo = $this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthColissimo($thisDate);
                 $listTrackingColisPrive = $this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthColisPrive($thisDate);
-                $listTrackingDpd = $this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthDpd($thisDate);
+                $listTrackingDpd = $this->getDoctrine()->getRepository( 'TMDProdBundle:EcommBl')->findbyTransportByMonthDpd($thisDate);
 
             } else {
                 $listTrackingColissimo =$this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthColissimoDate($date1,$date2);
                 $listTrackingColisPrive=$this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthColisPriveDate($date1,$date2);
                 $listTrackingDpd=$this->getDoctrine()->getRepository('TMDProdBundle:EcommBl')->findbyTransportByMonthDpdDate($date1,$date2);
             }
-            dump($listTrackingColissimo);
-            dump($traite);
+
         }
         $listTarifValide = $em->getRepository('TMDCoreBundle:TransporteursTarif')->findAllValide();
         $transporteurs = $em->getRepository('TMDAppliBundle:EcommTransporteurs')->findallTransporteur();
@@ -284,39 +291,39 @@ class CoreController extends Controller
         $clients = $em->getRepository('TMDProdBundle:EcommAppli')->findClientWithOperation();
 
 
-if ($traite==0){
-        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
-            'listTarif' => $listTarifValide,
-            'listTransporteurs' => $transporteurs,
-            'clients'=>$clients,
-            'traite'=> $traite,
-        ));
-} else {
-    if (isset($thisDate)) {
+        if ($traite==0){
+                return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+                    'listTarif' => $listTarifValide,
+                    'listTransporteurs' => $transporteurs,
+                    'clients'=>$clients,
+                    'traite'=> $traite,
+                ));
+        } else {
+            if (isset($thisDate)) {
 
-        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
-            'listTarif' => $listTarifValide,
-            'listTransporteurs' => $transporteurs,
-            'clients' => $clients,
-            'traite' => $traite,
-            'listeColissimo' => $listTrackingColissimo,
-            'listeColiprive' => $listTrackingColisPrive,
-            'listeDpd' => $listTrackingDpd,
-            'thisDate'=> $thisDate,
-        ));
-    } else {
-        return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
-            'listTarif' => $listTarifValide,
-            'listTransporteurs' => $transporteurs,
-            'clients' => $clients,
-            'traite' => $traite,
-            'listeColissimo' => $listTrackingColissimo,
-            'listeColiprive' => $listTrackingColisPrive,
-            'listeDpd' => $listTrackingDpd,
-            'date1'=> $date1,
-            'date2' => $date2,
-        ));
-    }
+                return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+                    'listTarif' => $listTarifValide,
+                    'listTransporteurs' => $transporteurs,
+                    'clients' => $clients,
+                    'traite' => $traite,
+                    'listeColissimo' => $listTrackingColissimo,
+                    'listeColiprive' => $listTrackingColisPrive,
+                    'listeDpd' => $listTrackingDpd,
+                    'thisDate'=> $thisDate,
+                ));
+            } else {
+                return $this->render('TMDCoreBundle:Core:transporteurs.html.twig', array(
+                    'listTarif' => $listTarifValide,
+                    'listTransporteurs' => $transporteurs,
+                    'clients' => $clients,
+                    'traite' => $traite,
+                    'listeColissimo' => $listTrackingColissimo,
+                    'listeColiprive' => $listTrackingColisPrive,
+                    'listeDpd' => $listTrackingDpd,
+                    'date1'=> $date1,
+                    'date2' => $date2,
+                ));
+            }
 }
 
     }
