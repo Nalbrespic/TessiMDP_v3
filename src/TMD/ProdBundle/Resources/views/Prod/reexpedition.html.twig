@@ -18,8 +18,8 @@
         </div>
         {% if idClient != 0 %}
         <DIV class="col-md-9" id="dropzone" style="margin-top: 50px">
-
-            <FORM class="dropzone needsclick" id="demo-upload" action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}">
+            <div id="MessageSucces" class="alert alert-success" role="alert" style="display: none"></div>
+            <FORM class="dropzone needsclick" id="MyDropzone" action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}">
 
                 <DIV class="dz-message needsclick">
                     Déposez le fichier ici ou cliquez pour le selectionner<BR>

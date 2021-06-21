@@ -2593,7 +2593,23 @@
             window.location.href =  url
         })
     </script>
+<script>
+    var _actionToDropZone = $("#MyDropzone").attr('action');
 
+    //je définis ma zone de drop grâce à l'ID de ma div citée plus haut.
+    Dropzone.autoDiscover = false;
+    var myDropzone = new Dropzone("#MyDropzone", { url: _actionToDropZone });
+    Dropzone.options.myDropzone = {
+        maxFilesize: 15,
+        timeout: 45000,
+    }
+    myDropzone.on("success", function (file){
+        let divSucces = document.getElementById('MessageSucces')
+        let message = "Le fichier a bien été envoyé pour traitement"
+        divSucces.innerText = message
+        divSucces.style.display =""
+    })
+</script>
 
 
 {% endblock %}
