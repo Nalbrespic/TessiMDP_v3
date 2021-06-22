@@ -6,6 +6,7 @@
 {% block body %}
     <div>
         <h2>Commandes Exceptionnelles et réexpéditions</h2>
+        <p id="idClient" style="display: none">{{ idClient }}</p>
     </div>
 
     <div class="row" style="display: flex;align-items: baseline;margin-top: 50px">
@@ -34,6 +35,7 @@
                    multiple
                    data-allow-reorder="true"
                    data-max-file-size="3MB"
+                   action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}"
             >
         </DIV>
         {% endif %}

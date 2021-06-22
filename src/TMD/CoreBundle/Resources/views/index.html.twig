@@ -2624,15 +2624,16 @@
 
         // Get a file input reference
         const input = document.getElementById('inputUpload');
-
+        var action = document.getElementById('inputUpload').getAttribute('action')
         // Create a FilePond instance and post files to /upload
-
-        FilePond.create(input, {
-            server: "{{ path('tmd_prod_upload',{'idClient': idClient}) }}",
-            labelIdle: 'Déposez votre fichier ici ou <span class="filepond--label-action"> cliquez </span>',
-            labelFileProcessing: 'envoi...',
-            labelFileProcessingComplete: 'fichier envoyé',
-        });
+        if (idClient) {
+            FilePond.create(input, {
+                server: action,
+                labelIdle: 'Déposez votre fichier ici ou <span class="filepond--label-action"> cliquez </span>',
+                labelFileProcessing: 'envoi...',
+                labelFileProcessingComplete: 'fichier envoyé',
+            });
+        }
     </script>
 
 
