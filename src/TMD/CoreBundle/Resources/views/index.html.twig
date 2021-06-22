@@ -2590,8 +2590,13 @@
 
         $('#selectClient').change(function (){
             let id = document.getElementById('selectClient').value
-            let url = "{{ path('tmd_prod_reexpedition',{"idClient":"id"}) }}"
-            url = url.replace("id", id)
+            console.log('idClient : ',id)
+            if (id != null) {
+                var url = "{{ path('tmd_prod_reexpedition',{"idClient":"id"}) }}"
+                url = url.replace("id", id)
+            } else {
+                var url = "{{ path('tmd_prod_reexpedition') }}"
+            }
             window.location.href =  url
         })
     </script>

@@ -641,7 +641,7 @@ button.dt-button:hover{
 .filepond--panel-root {
     border-radius: 2em;
     background-color: #edf0f4;
-    height: 3em;
+    height: 5em;
 }
 .filepond--drop-label {
     color: #4c4e53;

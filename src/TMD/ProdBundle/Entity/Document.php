@@ -124,11 +124,15 @@ class Document
         $file_name = $this->file->getClientOriginalName();
         $local_path = $this->path;
 
-        if($idClient == 698){
+        if($idClient == 698) {
             $ftp_server = "sftp01.tessicustomermarketing.fr";
             $ftp_user_name = "marie-claire";
             $ftp_user_pass = "Pfj9n53lGZ";
-
+        } elseif ($idClient == 709){
+            $ftp_server = "sftp01.tessicustomermarketing.fr";
+            $ftp_user_name = "ediis";
+            $ftp_user_pass = "FV553HcPb1";
+        }
             $conn_id = ssh2_connect($ftp_server, 22) or die("Erreur de connexion avec le serveur FTP");
             $login_result = ssh2_auth_password($conn_id, $ftp_user_name, $ftp_user_pass);
 
@@ -152,7 +156,7 @@ class Document
                 fclose($stream);
 //                dump($stream);
             }
-        }
+
 //        $file_name = $this->file->getClientOriginalName();
 //
 //        // la méthode « move » prend comme arguments le répertoire cible et
