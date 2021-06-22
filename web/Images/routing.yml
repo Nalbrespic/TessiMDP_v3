@@ -1,0 +1,76 @@
+#tmd_minos:
+#    resource: "@TMDMinosBundle/Resources/config/routing.yml"
+#    prefix:   /
+#
+tmd_stat:
+    resource: "@TMDStatBundle/Resources/config/routing.yml"
+    prefix:   /
+
+tmd_root :
+    path: /
+    defaults:
+        _controller: TMDCoreBundle:Core:root
+
+tmd_coriolis:
+    resource: "@TMDCoriolisBundle/Resources/config/routing.yml"
+    prefix:   /coriolis
+
+
+tms_logistic:
+    type: rest
+    resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
+    prefix:   /api
+
+
+tmd_appli:
+    resource: "@TMDAppliBundle/Resources/config/routing.yml"
+    prefix:   /appli
+
+tmd_icomed:
+    resource: "@TMDIcomedBundle/Resources/config/routing.yml"
+    prefix:   /icomed
+
+tmd_colis_prive:
+    resource: "@TMDColisPriveBundle/Resources/config/routing.yml"
+    prefix:   /colisprive
+
+tmd_colissimo:
+    resource: "@TMDColissimoBundle/Resources/config/routing.yml"
+    prefix:   /colissimo
+
+
+tmd_config:
+    resource: "@TMDConfigBundle/Resources/config/routing.yml"
+    prefix:   /config
+
+tmd_prod:
+    resource: "@TMDProdBundle/Resources/config/routing.yml"
+    prefix:   /prod
+
+tmd_zpl:
+    resource: "@TMDZplBundle/Resources/config/routing.yml"
+    prefix:   /zpl
+
+tmd_core:
+    resource: "@TMDCoreBundle/Resources/config/routing.yml"
+    prefix:   /home
+
+login:
+    path: /login
+    defaults:
+        _controller: TMDUserBundle:Security:login
+
+login_check:
+    path: /login_check
+
+logout:
+    path: /logout
+
+
+_wdt:
+    resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"
+    prefix:   /_wdt
+#
+_profiler:
+    resource: "@WebProfilerBundle/Resources/config/routing/profiler.xml"
+    prefix:   /_profiler

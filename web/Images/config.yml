@@ -1,0 +1,182 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: fr
+    container.autowiring.strict_mode: true
+
+framework:
+    #esi: ~
+    #translator: { fallbacks: ['%locale%'] }
+    secret: '%secret%'
+    router:
+        resource: '%kernel.root_dir%/config/routing.yml'
+        strict_requirements: ~
+    form: ~
+    csrf_protection: ~
+    validation: { enable_annotations: true }
+    #serializer: { enable_annotations: true }
+    templating:
+        engines: ['twig']
+    default_locale: '%locale%'
+    trusted_hosts: ~
+    trusted_proxies: ~
+    session:
+        handler_id: session.handler.native_file
+        save_path: "%kernel.root_dir%/sessions"
+        # handler_id set to null will use default session handler from php.ini
+#        handler_id: ~
+#        cookie_lifetime: 28800
+    fragments: ~
+    http_method_override: true
+#    profiler: { only_exceptions: false }
+
+# Twig Configuration
+twig:
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+    form_themes:
+            - 'bootstrap_3_layout.html.twig'
+    date:
+        timezone: Europe/Paris
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                driver: pdo_mysql
+                host: '%database_host%'
+                port: '%database_port%'
+                dbname: '%database_name%'
+                user: '%database_user%'
+                password: '%database_password%'
+                charset: UTF8
+#                schema_filter: /^ecomm_stat/
+                mapping_types:
+                    bit: boolean
+            colisprive:
+                driver: pdo_mysql
+                host: '%database_host2%'
+                port: '%database_port2%'
+                dbname: '%database_name2%'
+                user: '%database_user2%'
+                password: '%database_password2%'
+                charset: UTF8
+            dpd:
+                driver: pdo_mysql
+                host: '%database_host3%'
+                port: '%database_port3%'
+                dbname: '%database_name3%'
+                user: '%database_user3%'
+                password: '%database_password3%'
+                charset: UTF8
+#            minos:
+#                driver: oci8
+#                host: '%database_host4%'
+#                port: '%database_port4%'
+#                dbname: '%database_name4%'
+#                user: '%database_user4%'
+##                url: '%database_url4%'
+##                schema_filter: /^CLIENT/
+#                password: '%database_password4%'
+#                charset: UTF8
+#                mapping_types:
+#                    ty_noeud_contenant: string
+
+    orm:
+
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                mappings:
+                    TMDAppliBundle:  ~
+                    TMDCoreBundle: ~
+                    TMDProdBundle:  ~
+                    TMDUserBundle:  ~
+                    TMDCoriolisBundle: ~
+                    TMDConfigBundle: ~
+                    TMDZplBundle: ~
+                    TmsLogisticBundle: ~
+                    TMDStatBundle: ~
+            colisprive:
+                connection: colisprive
+                mappings:
+                    TMDColisPriveBundle: ~
+            dpd:
+                connection: dpd
+                mappings:
+                    TMDDpdBundle: ~
+#            minos:
+#                connection: minos
+#                mappings:
+#                    TMDMinosBundle: ~
+#
+##Profiler
+#web_profiler:
+ #   toolbar: true
+  #  intercept_redirects: true
+
+## FOSRest Configuration
+fos_rest:
+    routing_loader:
+        default_format: json
+    param_fetcher_listener: force
+    service:
+        serializer: jms_serializer.serializer
+    serializer:
+        version: ~
+        groups: []
+        serialize_null: false
+
+# TmsRest
+tms_rest:
+    default:
+        pagination:
+            limit:
+                default: 50
+                maximum: 500
+# Pagination
+knp_paginator:
+    page_range: 5
+    default_options:
+        page_name: page
+        sort_field_name: sort
+        sort_direction_name: direction
+        distinct: true
+    template:
+        pagination: 'KnpPaginatorBundle:Pagination:sliding.html.twig'
+        sortable: 'KnpPaginatorBundle:Pagination:sortable_link.html.twig'
+
+## FOSRest Configuration
+#fos_rest:
+#    routing_loader:
+#        default_format: json
+#    param_fetcher_listener: force
+#    service:
+#        serializer: jms_serializer.serializer
+#    serializer:
+#        version: ~
+#        groups: []
+#        serialize_null: false
+#
+## TmsRest
+#tms_rest:
+#    default:
+#        pagination:
+#            limit:
+#                default: 50
+#                maximum: 500
+
+# Swiftmailer Configuration
+#swiftmailer:
+#    transport: '%mailer_transport%'
+#    host: '%mailer_host%'
+#    username: '%mailer_user%'
+#    password: '%mailer_password%'
+#    spool: { type: memory }
