@@ -10,10 +10,12 @@ use Dompdf\Options;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
+use TMD\ProdBundle\Entity\Document;
 use TMD\ProdBundle\Entity\EcommAppli;
 use TMD\ProdBundle\Entity\EcommHistoStatut;
 use TMD\ProdBundle\Entity\EcommStatut;
@@ -3477,5 +3479,29 @@ class ProdController extends Controller
     }
 
 
+public function ReexpeditionAction($idClient){
 
+    return $this->render('TMDProdBundle:Prod:reexpedition.html.twig', array(
+        'idClient' => $idClient,
+        )
+    );
+}
+
+public function UploadAction($idClient,Request $request){
+
+
+    $document = new Document();
+//    $media = $request->files->get('file');
+    $filepond = $_FILES['filepond'];
+    $media = new UploadedFile($filepond['tmp_name'],$filepond['name'],$filepond['type'],$filepond['size'],$filepond['error']);
+    $document->setFile($media);
+    $document->setPath($media->getPathName());
+    $document->setName($media->getClientOriginalName());
+    $document->upload($idClient);
+
+
+    //infos sur le document envoyé
+    //var_dump($request->files->get('file'));die;
+    return new JsonResponse(array('success' => true));
+}
 }

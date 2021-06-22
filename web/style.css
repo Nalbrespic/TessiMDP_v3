@@ -629,3 +629,27 @@ button.dt-button:hover{
     border: 2px black solid;
 }
 
+.dropzone {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.filepond--panel-root {
+    border-radius: 2em;
+    background-color: #edf0f4;
+    height: 5em;
+}
+.filepond--drop-label {
+    color: #4c4e53;
+    font-size: 1.5rem ;
+}
+.filepond--root .filepond--credits {
+    display: none !important
+}
+.filepond--root{
+    font-size: 1.5rem;
+}

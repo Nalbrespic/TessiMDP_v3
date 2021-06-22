@@ -1,0 +1,49 @@
+{% extends "TMDCoreBundle::index.html.twig" %}
+
+{% block title %}
+    Commandes Exceptionnelles et réexpéditions
+{% endblock %}
+{% block body %}
+    <div>
+        <h2>Commandes Exceptionnelles et réexpéditions</h2>
+        <p id="idClient" style="display: none">{{ idClient }}</p>
+    </div>
+
+    <div class="row" style="display: flex;align-items: baseline;margin-top: 50px">
+        <div class="col-md-3">
+            <select class="form-control" id="selectClient" style="width: 250px">
+                <option value=0>Selectionner le client</option>
+                <option value=698 {% if idClient =="698" %}selected="selected"{% endif %}>Marie Claire</option>
+{#                <option value=709 {% if idClient =="709" %}selected="selected"{% endif %}>Le Monde</option>#}
+            </select>
+        </div>
+        {% if idClient != 0 %}
+        <DIV class="col-md-5" id="dropzone" style="margin-top: 50px">
+            <div id="MessageSucces" class="alert fade in alert-success"  role="alert" style="display: none"></div>
+{#            <FORM class="dropzone needsclick" id="MyDropzone" action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}" style="border-color: #28274d;color: #28274d">#}
+
+{#                <DIV class="dz-message needsclick">#}
+{#                    <i class="fas fa-file-upload" style="font-size: 60px"></i>#}
+{#                    <h4>Déposez le fichier ici ou cliquez pour le selectionner</h4>#}
+{#                    <p style="font-style: italic">fichiers autororisés: txt, csv,excel..</p><BR>#}
+{#                </DIV>#}
+{#            </FORM>#}
+            <input type="file"
+                   class="filepond"
+                   name="filepond"
+                   id="inputUpload"
+                   multiple
+                   data-allow-reorder="true"
+                   data-max-file-size="3MB"
+                   action="{{ path('tmd_prod_upload',{'idClient': idClient}) }}"
+            >
+        </DIV>
+        {% endif %}
+    </div>
+
+
+
+{% endblock %}
+{% block javascriptplus %}
+
+{% endblock %}
