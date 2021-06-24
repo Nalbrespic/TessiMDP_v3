@@ -843,7 +843,7 @@ if ($type == 'dep') {
                 if ($dep == 2) {
                     $idOpe = 1862;
                 } elseif ($dep == 10) {
-                    $idOpe = 1863;
+                    $idOpe = 1895;
                 }
             }
         }
