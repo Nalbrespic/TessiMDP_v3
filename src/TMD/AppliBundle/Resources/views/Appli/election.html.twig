@@ -112,7 +112,7 @@
                                             <div class="col-md-2" style="margin-top: 30px">
                                                 <div class="btn-group-vertical" role="group">
                                                     {% for key, value in listJour %}
-                                                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': key, 'dep':dep}) }}" {% if jour == key %}style="color: #DC3912;"{% endif %}>{{ value |localizeddate('none', 'none', null, null, 'EEE dd ') }} </a></button>
+                                                        <button type="button" class="btn btn-default" ><a href="{{ path('tmd_appli_verifEletion',  {'statut': statut, 'jour': key, 'dep':dep, 'tour':tour, 'type':type }) }}" {% if jour == key %}style="color: #DC3912;"{% endif %}>{{ value |localizeddate('none', 'none', null, null, 'EEE dd ') }} </a></button>
                                                     {% endfor %}
                                                 </div>
                                             </div>
