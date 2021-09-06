@@ -1805,8 +1805,17 @@
 //                                    $("#afficherProfileFile".concat(annonce)).text(" ");
                             var title = '<h4>Détails de la commande n°' + tracking[0]['expRef'] + '</h4>';
 
-                            var html = '<div class="row"> <div class="col-md-6"><h5>Nom et prénom du destinataire :</h5> <p>'+  tracking[0]['destinataire'] + '</p></div>';
-                            html += '<div class="blockAdress col-md-6"><p style="font-weight: bold;font-size: 1.2em;">Adresse de livraison:</p><p>' + tracking[0]['destRue'] + '<p>' + tracking[0]['destAd2'] + '</p><p>' + tracking[0]['destCp'] + ' ' + tracking[0]['destVille'] + '</p></div></div>';
+                            var html = '<div class="row"> <div class="col-md-4"><h5>Nom et prénom du destinataire :</h5> <p>'+  tracking[0]['destinataire'] + '</p></div>';
+                            html += '<div class="blockAdress col-md-4"><p style="font-weight: bold;font-size: 1.2em;">Adresse de livraison:</p><p>' + tracking[0]['destRue'] + '<p>' + tracking[0]['destAd2'] + '</p><p>' + tracking[0]['destCp'] + ' ' + tracking[0]['destVille'] + '</p></div><div class="col-md-4"><p style="font-weight: bold;font-size: 1.2em;">Numéro de téléphone:</p>';
+
+                            if (tracking[0]['destTel'] != '') {
+                                html += '<p>' + tracking[0]['destTel'] + '</p></div></div>';
+                            }
+                            else
+                                {
+                                    html += '<p>non communiqué</p></div></div>';
+                                }
+
 
                             html += '<div class="listArticles"><p style="font-size: 1.2em; font-weight: bold">Articles de la commande: </p>';
 

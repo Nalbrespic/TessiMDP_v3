@@ -27,7 +27,7 @@ class AppKernel extends Kernel
             new TMD\DpdBundle\TMDDpdBundle(),
             new TMD\AppliBundle\TMDAppliBundle(),
             new TMD\CoriolisBundle\TMDCoriolisBundle(),
-            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
+//            new Tms\Bundle\LogisticBundle\TmsLogisticBundle(),
             new Tms\Bundle\RestBundle\TmsRestBundle(),
             new Tms\Bundle\RestClientBundle\TmsRestClientBundle(),
             new TMD\StatBundle\TMDStatBundle(),
