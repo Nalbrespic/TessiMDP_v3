@@ -2919,6 +2919,7 @@ class ProdController extends Controller
 
             $allBlByOpe = $em->getRepository('TMDProdBundle:EcommCmdep')->findArticlesByFileBl($numBl);
             $tracking = $em->getRepository('TMDProdBundle:EcommTracking')->findTrackingByBl($numBl);
+            dump($tracking);
             $statut = $em->getRepository('TMDProdBundle:EcommTracking')->findStatutByBl($numBl);
             $histStatut = $em->getRepository('TMDProdBundle:EcommHistoStatut')->donneHistoByBlASC($numBl);
             $historiqueStat =[];
