@@ -28,8 +28,8 @@ framework:
         handler_id: session.handler.native_file
         save_path: "%kernel.root_dir%/sessions"
         # handler_id set to null will use default session handler from php.ini
-#        handler_id: ~
-#        cookie_lifetime: 28800
+    #        handler_id: ~
+    #        cookie_lifetime: 28800
     fragments: ~
     http_method_override: true
 #    profiler: { only_exceptions: false }
@@ -39,7 +39,7 @@ twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     form_themes:
-            - 'bootstrap_3_layout.html.twig'
+        - 'bootstrap_3_layout.html.twig'
     date:
         timezone: Europe/Paris
 
@@ -56,7 +56,7 @@ doctrine:
                 user: '%database_user%'
                 password: '%database_password%'
                 charset: UTF8
-#                schema_filter: /^ecomm_stat/
+                #                schema_filter: /^ecomm_stat/
                 mapping_types:
                     bit: boolean
             colisprive:
@@ -75,18 +75,18 @@ doctrine:
                 user: '%database_user3%'
                 password: '%database_password3%'
                 charset: UTF8
-#            minos:
-#                driver: oci8
-#                host: '%database_host4%'
-#                port: '%database_port4%'
-#                dbname: '%database_name4%'
-#                user: '%database_user4%'
-##                url: '%database_url4%'
-##                schema_filter: /^CLIENT/
-#                password: '%database_password4%'
-#                charset: UTF8
-#                mapping_types:
-#                    ty_noeud_contenant: string
+    #            minos:
+    #                driver: oci8
+    #                host: '%database_host4%'
+    #                port: '%database_port4%'
+    #                dbname: '%database_name4%'
+    #                user: '%database_user4%'
+    ##                url: '%database_url4%'
+    ##                schema_filter: /^CLIENT/
+    #                password: '%database_password4%'
+    #                charset: UTF8
+    #                mapping_types:
+    #                    ty_noeud_contenant: string
 
     orm:
 
@@ -102,7 +102,7 @@ doctrine:
                     TMDCoriolisBundle: ~
                     TMDConfigBundle: ~
                     TMDZplBundle: ~
-#                    TmsLogisticBundle: ~
+                    TmsLogisticBundle: ~
                     TMDStatBundle: ~
             colisprive:
                 connection: colisprive
