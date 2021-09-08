@@ -18,8 +18,8 @@ tmd_coriolis:
 
 tms_logistic:
     type: rest
-   resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
-   prefix:   /api
+    resource: "@TmsLogisticBundle/Resources/config/routing_api_private.yml"
+    prefix:   /api
 
 
 tmd_appli:
